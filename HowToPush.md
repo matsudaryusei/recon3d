@@ -10,7 +10,7 @@
 もし自分が編集する場合は、
 ```
 git add .
-git commit -m "更新内容"
+git commit -m "更新内容(変更者の名前)"
 git push origin main
 ```
 

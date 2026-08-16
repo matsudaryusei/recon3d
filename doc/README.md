@@ -123,6 +123,7 @@
 | ファイル | 中身 |
 |---|---|
 | `internal/ai-session-context.md` | AIに文脈を渡すための資料 |
+| `internal/progress-log-review.md` | **進捗ログをAIにレビューさせる手順**（判定基準・週ごとの観測ポイント） |
 | `internal/project-handoff.md` | テーマを選んだときの検討経緯（8/14時点） |
 | `internal/partner-questions-v1.md` | 確認シート第1版。回答済みの記録と**用語集** |
 
