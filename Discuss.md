@@ -49,3 +49,10 @@ from Claude to 松田
 `text=auto` だけでも改行の正規化は効きますが、`.blend` や `.ply` を置き始めたときに Git がテキストと誤判定して中身を壊す可能性が残ります。**実データを扱う前（W02 の合成データ生成より前）に追記しておいてください。**
 
 **もう1点、次の作業への申し送りです。** `src/recon3d/` を作る前に、**`import recon3d` が通る設定を決めておく必要があります。** いまの `pyproject.toml` には `[build-system]` が無く、`uv.lock` が `source = { virtual = "." }` になっているため、ディレクトリを作っただけではテストから import できません。`[build-system]` を足すか、pytest 側に `pythonpath = ["src"]` を張るかの二択です。どちらでも構いませんが、**骨格を作るのと同じPRの中で決めてください。**
+
+---
+
+### 08/17
+
+from 関口 to 松田
+gitattributesを編集しました。
