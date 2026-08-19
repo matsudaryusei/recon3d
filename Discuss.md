@@ -21,23 +21,3 @@ logファイルを清書するときは詰まった点や工夫した点など�
 
 ---
 
-### 08/17
-
-from 関口 to 松田
-gitattributesを編集しました。
-
----
-
-### 08/19
-
-from Claude to 松田
-
-`.gitignore` と pytest の追加（`a10e38b` / `6099101`）を確認しました。3点だけ指摘します。
-
-1. **`.gitignore` の `data/` は `/data/` に直してください。** パス区切りを含まない書き方なので、ルートの `data/` だけでなく**どの階層の `data` フォルダにも効きます**。計画書 §6 では `tests/data/`（CI用の小さな合成データ）は**コミットする**方針なので、このままだと後で `tests/data/` が push できずに詰まります。
-2. **`.python-version`（中身は `3.11.13` の1行）がまだありません。** 計画書 §13 ① のチェック項目です。`pyproject.toml` の `requires-python` は「範囲」の指定なので、`uv` が実際に使う Python の実体バージョンまでは揃いません。
-3. **`uv run pytest` は現状「テスト0件」で終わります**（`tests/` も `src/` もまだ無いため。pytest は収集0のとき exit code 5 を返すので、CI に載せると失敗扱いになります）。「通ることの確認」は、次のディレクトリ骨格（計画書 §6）とセットで見てください。
-
-**次の最優先は骨格です。** `src/recon3d/` を切る前に、**`import recon3d` をどう通すか**（`pyproject.toml` に `[build-system]` を足す／pytest の `pythonpath` を張る）だけ先に決めてください。ここが決まらないと G7（テスト・CI）が動けません。
-
-なお `docs/progress.md` の W01 は表（実働・やったこと・PR）が空のままです。**記入はメンバーの担当なので週末にお願いします。**（8/17〜8/19 で `.gitattributes` / `.gitignore` / `pyproject.toml` / `uv.lock` が入っているので、G6 の行は埋まるはずです）

@@ -3,7 +3,7 @@
 **迷ったらこのファイルに戻ってくれば大丈夫です。**
 他の文書は全部「必要になったときに引くもの」なので、頭から読む必要はありません。
 
-**最終更新**: 2026-08-19（`.gitignore`・pytest の追加を反映／残っている W01 タスクを整理）
+**最終更新**: 2026-08-20（`.python-version` の追加と `.gitignore` の修正を反映）
 
 ---
 
@@ -12,7 +12,7 @@
 ```
 着工  ●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━  完成
        ↑
-   いまここ（2026-08-19・W01 3日目）
+   いまここ（2026-08-20・W01 4日目）
 ```
 
 | | 状態 |
@@ -22,18 +22,20 @@
 | 確認シートの回答 | ✅ **受領済み（8/16）。着工をブロックするものは残っていない** |
 | `.gitattributes` | ✅ **完了（8/17）。計画書 §7-3 の6行すべて入った**（`eol=lf` とバイナリ5行を追記済み） |
 | `pyproject.toml` / `uv.lock` | ✅ **作成・コミット済み（8/17）** |
-| `.gitignore` | ✅ **完了（8/19）**（`.venv/` `__pycache__/` `*.pyc` `data/`）。⚠️ **`data/` の書き方だと `tests/data/` まで無視される** → [Discuss.md](../Discuss.md) |
+| `.gitignore` | ✅ **完了（8/19）＋ `/data/` への修正も完了（8/20）**（`.venv/` `__pycache__/` `*.pyc` `/data/`）。`tests/data/` を巻き込まないことを `git check-ignore` で確認済み |
 | pytest（`uv add --dev pytest`） | ✅ **完了（8/19）。** `uv.lock` に pytest 9.1.1 が入った |
 | remote URL → `4bitcom_HandM` | ✅ 完了（`git remote -v` で確認済み。計画書 §13 ①） |
-| `.python-version`（`3.11.13`） | ⬜ **まだ無い**（計画書 §13 ① の項目。`pyproject.toml` の `requires-python` だけでは uv が使う実体バージョンが固定されない） |
+| `.python-version`（`3.11.13`） | ✅ **完了（8/20）。** `uv sync` で `.venv` を 3.11.13 で作り直し済み（Blender 5.0.1 の内蔵版と patch まで一致） |
 | ディレクトリの骨格・コード | ⬜ まだ ← **いまのボトルネックはここ**（`src/` も `tests/` も無いので、`uv run pytest` は「テスト0件」で終わる） |
 
-### 8/19 までに進んだこと
+### 8/20 までに進んだこと
 
 - `.gitignore` を追加（8/19）。`uv sync` で `.venv/` が生えても混ざらなくなった
 - `uv add --dev pytest` 相当が入り、`uv.lock` が再生成された（pytest 9.1.1）
-- **これで G6 の「器」は残り2つ**：`.python-version` と **ディレクトリ骨格＋`import recon3d` を通す設定**
-- **1点だけ直したほうがいい箇所があります** → [Discuss.md](../Discuss.md) の 8/19 の項
+- `.gitignore` の `data/` を `/data/` に修正（8/20）。`tests/data/` が push できる状態になった
+- **`.python-version`（`3.11.13`）を追加（8/20）。** `uv sync` が 3.11.13 を取得して `.venv` を作り直し、`uv run python -V` が 3.11.13 を返すことを確認済み。`uv.lock` は変化なし
+- **これで G6 の「器」は残り1つ**：**ディレクトリ骨格＋`import recon3d` を通す設定**
+- **Discuss.md 8/19 の指摘は ①②が解消、③（`uv run pytest` が exit code 5）は骨格待ちで未解決です**
 
 ### 8/16 に決まったこと
 
@@ -70,10 +72,10 @@
 
 1. ~~**`.gitattributes` を置いて push**~~ **✅ 完了（8/17）。** [計画書 §7-3](plan.md) の6行（`eol=lf` ＋ バイナリ5種）まで入ったので、**W02 の実データ投入前の宿題も消えた**
 2. ~~`pyproject.toml`（Python 3.11 指定）、`uv sync`、`uv.lock` をコミット~~ **✅ 完了（8/17）**
-3. ~~**`.gitignore` を置く**~~ **✅ 完了（8/19）。** ただし `data/` は `/data/` と書かないと `tests/data/`（CI用にコミットする分。[計画書 §6](plan.md)）まで巻き込みます → [Discuss.md](../Discuss.md)
+3. ~~**`.gitignore` を置く**~~ **✅ 完了（8/19）＋ `/data/` への修正も完了（8/20）。** `tests/data/`（CI用にコミットする分。[計画書 §6](plan.md)）を巻き込まないことを確認済み
 4. ~~**`pyproject.toml` に pytest を足す**~~ **✅ 完了（8/19。pytest 9.1.1）**
 5. 🔴 **ディレクトリの骨格**（[計画書 §6](plan.md)）← **いまはここが最優先。** **`src/recon3d/` を作る前に、`import recon3d` が通る設定を決める**（`[build-system]` を足すか、pytest の `pythonpath` を張るか）
-5-b. **`.python-version` に `3.11.13` を書く**（[計画書 §13](plan.md) ①）。1行のファイルで済みます
+5-b. ~~**`.python-version` に `3.11.13` を書く**~~ **✅ 完了（8/20）。** ⚠️ **他の端末は `git pull` のあと `uv sync` を1回流してください**（`.venv` が 3.11.13 で作り直されます）
 
 ### 次に：G7・G9（CIと運用の器）
 
