@@ -39,13 +39,13 @@
 
 ### W01（2026-08-17 〜 08-23）
 
-*着工週。週の終わりに記入する。*
+*着工週。週の途中（8/20）までの記入。週末に実働時間を埋めて確定させる。*
 
 | ジャンル | 実働 | やったこと | PR |
 |---|---|---|---|
-| G6 基盤・I/O | | | |
-| G7 テスト・CI | | | |
-| G9 ドキュメント・運用 | | | |
+| G6 基盤・I/O | | `.gitattributes`（8/17）・`.gitignore`（8/19、8/20 に `/data/` へ修正）・`pyproject.toml`（Python 3.11 指定）・`.python-version`（`3.11.13`）・`[build-system]`（hatchling で editable install）。**ディレクトリ骨格を作成**（`src/recon3d/{io,geometry,solvers,vision,mesh,fusion,viz}/__init__.py`＋`tests/{fixtures,data}/`＋`tools/`＋`docs/{notes,schema,experiments}/`）。remote URL を `4bitcom_HandM` に更新済みを確認 | — |
+| G7 テスト・CI | | `uv add --dev pytest`（9.1.1）。`[tool.pytest.ini_options] testpaths = ["tests"]`。`tests/test_import.py`（smoke test）を追加し、**mac で `uv run pytest` → `1 passed`（exit 0）**。[計画書 §6-2](plan.md) の完了判定を満たした | — |
+| G9 ドキュメント・運用 | | 計画書に §6-2（骨格の範囲）・§6-3（`import recon3d` の通し方）・§7-8（同期フォルダを避ける）を追記。決定記録に [D-38](decisions.md#d-38)・[D-39](decisions.md#d-39) を追加。README の現在地を更新 | — |
 
 **参加者**:
 
@@ -53,7 +53,13 @@
 gitattributesはOS間における改行の処理を統一させるためのものです。Mac, ubuntu, Windowsが混在しており、Windowsのみが改行の中身が異なるので、自動でubuntuやMacと同じ改行に変換してからgitに投稿される構造となっています。つまり、OSによるgit環境の違いによる齟齬が起きないように規格を統一しています。
 
 **詰まった点・持ち越し**:
-**誰も取らなかったジャンル**:
+
+- **iCloud Drive の同期フォルダ配下でリポジトリが壊れた（8/20・mac）。** iCloud が `.venv` 内の `.pth` を hidden 化し、**何も変えていないのに `import recon3d` が落ち続けた**。同期対象外の場所へ移して解決。→ [計画書 §7-8](plan.md)・[D-39](decisions.md#d-39) として明文化。**Windows のデスクトップ／ドキュメントは既定で OneDrive 配下のことが多いので、松田は clone 先を要確認**
+- **`uv run pytest` の確認は mac のみ。Windows / Ubuntu の2台が未確認**（[計画書 §6-2](plan.md) の完了判定は「3台で通ること」なので、骨格は**まだ確定していない**）
+- **骨格一式がまだ未コミット。** `src/`・`tests/`・`tools/`・`docs/*/.gitkeep` が untracked、`pyproject.toml`・`uv.lock` が modified の状態。**push が次の一手**
+- ⚠️ **他の端末は `git pull` のあと `uv sync` を1回。** `src/recon3d/` が無い状態で先に `uv sync` した端末は `uv sync --reinstall-package 4bitcom-handm` が必要（[計画書 §6-3](plan.md)）
+
+**誰も取らなかったジャンル**: G1〜G5・G8（着工週で基盤待ちのため。計画どおり）
 
 ---
 
@@ -123,6 +129,8 @@ Phase 1 の数値目標をここから決める。
 
 | 日付 | 変えたもの | 変更内容 | きっかけになった実績 |
 |---|---|---|---|
-| | | | |
+| 2026-08-20 | 計画書 §6-2（新設） | 「骨格作り」の範囲を「`__init__.py` と `.gitkeep` だけ置いて `uv run pytest` が `1 passed` になるまで」に限定。個別モジュールの空ファイルは作らないと明記 | `uv run pytest` が **exit code 5（テスト0件）** で終わり、着工がブロックされていた |
+| 2026-08-20 | 計画書 §6-3（新設）・[D-38](decisions.md#d-38) | `pyproject.toml` に `[build-system]`（hatchling）を足して editable install する方式を採用し、`import recon3d` を通す。pytest の `pythonpath` 案は CLI で通らないため不採用 | 骨格を作っても `import recon3d` が通らず、smoke test が書けなかった |
+| 2026-08-20 | 計画書 §7-8（新設）・[D-39](decisions.md#d-39) | リポジトリを iCloud Drive / OneDrive / Dropbox の同期フォルダ配下に置かないことを規約化 | mac で iCloud が `.venv` の `.pth` を hidden 化し、**変更していないのに `import recon3d` が落ち続ける**障害を実際に踏んだ |
 
 *着工前（8/15・8/16）の変更履歴は [決定記録の改訂履歴](decisions.md) に移した。*

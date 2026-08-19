@@ -4,7 +4,7 @@
 > 何をすればいいか迷ったら、まず **[README.md](README.md)** を開いてください。
 > 本書は「決まったこと」だけを書いています。**なぜそう決めたか**は [決定記録](decisions.md) にあります。
 
-**作成日**: 2026-08-14 ／ **最終更新**: 2026-08-16（松田の回答を反映）
+**作成日**: 2026-08-14 ／ **最終更新**: 2026-08-20（§6-2 骨格の範囲・§6-3 `import recon3d` の通し方・§7-8 同期フォルダを避ける を追記）
 **位置づけ**: 全ての設計判断と18週の実行計画。**このプロジェクトの正典。**
 
 ---
@@ -479,7 +479,7 @@ def test_no_stray_coordinate_conversion():
 
 ```
 <repo-name>/
-├── pyproject.toml            # uv 管理・Python 3.11 固定
+├── pyproject.toml            # uv 管理・Python 3.11 固定・[build-system]（§6-3）
 ├── uv.lock                   # コミットする（3台の環境同一性の根拠）
 ├── .gitattributes            # * text=auto eol=lf   ← Windows対策
 ├── .gitignore
@@ -565,6 +565,59 @@ def test_no_stray_coordinate_conversion():
 
 > **→ 境界の引き方の設計意図: 決定記録 [D-13](decisions.md#d-13)・[D-05](decisions.md#d-05)**
 
+### 6-2. 骨格作りの範囲（W01・§13① の「ディレクトリ骨格を作成」）
+
+**上のツリーは完成時の姿であり、W01 で全部作るものではない。** 骨格作りのゴールは**「空の器を置いて `uv run pytest` が通る状態にすること」**の1点とする。いまのボトルネックは `src/` も `tests/` も無いために `uv run pytest` が **exit code 5（テスト0件）**で終わることなので、ここが解消すれば骨格は完了と判定してよい。
+
+**作るもの（これで全部）**
+
+```
+src/recon3d/__init__.py
+src/recon3d/{io,geometry,solvers,vision,mesh,fusion,viz}/__init__.py
+tests/test_import.py          # import recon3d するだけの smoke test
+tests/fixtures/.gitkeep
+tests/data/.gitkeep
+tools/.gitkeep
+docs/{notes,schema,experiments}/.gitkeep
+```
+
+- `__init__.py` は**空でよい**。中身を書くのは各ジャンルの担当週。
+- `.gitkeep` を置くのは、**Git が空ディレクトリを追跡しない**ため。中身が入った時点で消してよい。
+- **完了判定**：`uv sync` のあと `uv run pytest` が **`1 passed`（exit code 0）** で終わること。3台（Windows / Ubuntu / mac）で確認する（§13④）。
+
+**作らないもの**
+
+| 作らない | 理由 |
+|---|---|
+| `io/cameras.py`・`geometry/dlt.py` など**個別モジュールの空ファイル** | 着手時に「空ファイルを消して作り直す」無駄なコンフリクトが出る。ファイルは**担当週に、実装する人が作る**（`io/coords.py`・`io/cameras.py` は W01 ペアプロ#1、以降は §11 の週次計画に従う） |
+| **中身の実装** | 骨格は器だけ。実装は各ジャンルの作業 |
+| `data/` 配下 | `.gitignore` の `/data/` で除外済み。**各自がローカルに作る**（`tests/data/` は除外対象外なのでコミットする） |
+| `.github/workflows/ci.yml` | 骨格ではなく **G7**（§13②）の仕事 |
+
+### 6-3. `import recon3d` の通し方：プロジェクトをパッケージとして扱う
+
+**`pyproject.toml` に `[build-system]` を足す**（2026-08-20 採用）。`uv sync` がプロジェクトを **editable install**（`src/` を編集したら即反映される形でインストール）するため、`import recon3d` がどこからでも通る。
+
+```toml
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/recon3d"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+```
+
+- ⚠️ **`packages = ["src/recon3d"]` の明示は必須。** `[project] name` が `4bitcom-HandM` でパッケージ名 `recon3d` と一致しないため、書かないと hatchling がビルド対象を見つけられず **`uv sync` が失敗する**。
+- **採らなかった案**：pytest の `pythonpath = ["src"]` を張る方式。設定は1行で済むが、**通るのは pytest 実行中だけ**で、`uv run python tools/run_pipeline.py`（§6 の CLI エントリポイント）では `import recon3d` が通らない。**CLI を持つ計画なので採らない。**
+- **`uv.lock` は1行変化する**（`source = { virtual = "." }` → `source = { editable = "." }`）。依存関係は増えないので、**この差分はコミットしてよい**。
+- **他の端末は `git pull` のあと `uv sync` を1回流すこと**（editable install が入る）。
+- ⚠️ **`src/recon3d/` が無い状態で先に `uv sync` してしまった端末は、`uv sync` だけでは直らない。** editable install が「中身なし」で固定され、以降の `uv sync` は `Audited` と言って再ビルドしない。**`uv sync --reinstall-package 4bitcom-handm` を1回流すこと**（`git pull` で `src/` ごと受け取る端末では起きない）。
+
+> **→ この方式を選んだ理由・`pythonpath` 案を却下した理由: 決定記録 [D-38](decisions.md#d-38)**
+
 ---
 
 ## 7. 環境の再現
@@ -588,7 +641,7 @@ Python : 3.11.13 (MSC v.1929 64 bit AMD64)
 出典   : blender_system/system-info.txt（松田提出・2026-08-15）
 ```
 
-**設定**: `pyproject.toml` に `requires-python = ">=3.11,<3.12"`、`.python-version` に `3.11.13`。Mac mini のシステムPythonは 3.13.15 だが、`uv` が 3.11 を別途取得するため問題ない。
+**設定**: `pyproject.toml` に `requires-python = ">=3.11,<3.12"`、`.python-version` に `3.11.13`（`[build-system]` は §6-3）。Mac mini のシステムPythonは 3.13.15 だが、`uv` が 3.11 を別途取得するため問題ない。
 
 **運用上の注意：Blender 5.0.x は LTS ではない。**
 
@@ -721,6 +774,26 @@ Python : 3.11.13 (MSC v.1929 64 bit AMD64)
 
 > **注意：これは「担当を減らす」理由にはしない。** ジャンルはやりたい人が取る（§3-2）。**入口の段差を均すのであって、中身を取り上げるのではない**（→ [D-33](decisions.md#d-33)）。
 
+### 7-8. リポジトリを同期フォルダの下に置かない【2026-08-20 追加】
+
+**iCloud Drive / OneDrive / Dropbox / Google Drive の同期フォルダ配下に clone しないこと。** ローカルの作業ディレクトリに置く（例：`~/Projects/4bitcom`）。**同期は Git がやるので、ファイル同期サービスは不要どころか有害。**
+
+**実際に起きたこと（2026-08-20・mac）**
+
+| 現象 | 中身 |
+|---|---|
+| `uv run pytest` が `ModuleNotFoundError: No module named 'recon3d'` | 直前まで `1 passed` だったのに、数分後に落ちるようになった |
+| 原因 | `uv` は `.venv` に macOS の **`hidden` フラグ**を付ける（正常）。**iCloud Drive がそのフラグを `.venv` 配下の全ファイルに伝播させ**、`site-packages/*.pth` まで hidden になった |
+| なぜ import が壊れるか | CPython の `site.py`（`addpackage`）は **`hidden` が付いた `.pth` を読み飛ばす**。editable install のパスを教えるファイルが無視され、`src/` が `sys.path` に入らなくなる |
+| 手で直せない | `chflags nohidden` で外しても、**1分ほどで iCloud が付け直す**（`.venv` 内 691 ファイルすべて） |
+| 併発 | `.venv/lib 2` という **iCloud の衝突コピー**が生成されていた |
+
+**対処**: リポジトリを `~/Projects/4bitcom` へ移動し、`.venv` を作り直した（`rm -rf .venv && uv sync`）。移動後は `hidden` 0 件、`uv run pytest` は `1 passed`。**`.git/` ごと移動するので remote 設定・追跡ブランチはそのまま生きる**（`git remote -v` と `git ls-remote` で確認済み）。
+
+> ⚠️ **Windows の OneDrive も同じ罠がある**（`デスクトップ`・`ドキュメント` が既定で OneDrive 配下になっていることが多い）。**clone 先が同期フォルダでないかを最初に確かめること。**
+
+> **→ 判断の記録: [D-39](decisions.md#d-39)**
+
 ---
 
 ## 8. ブランチ戦略とIssue運用
@@ -843,7 +916,7 @@ steps:
 
 | 週 | ジャンル | やること |
 |---|---|---|
-| **W01** | **G6・G7** | リポジトリ受け取り・`uv` 環境構築（**Python 3.11.13 固定**）・`pyproject.toml`・**`.gitattributes`**・CI雛形・ディレクトリ骨格をpush。**Windows で `uv sync` と `uv run pytest` が通ることの確認** |
+| **W01** | **G6・G7** | リポジトリ受け取り・`uv` 環境構築（**Python 3.11.13 固定**）・`pyproject.toml`・**`.gitattributes`**・CI雛形・**ディレクトリ骨格（範囲は §6-2）**をpush。**Windows で `uv sync` と `uv run pytest` が通ることの確認** |
 | | **G6（ペアプロ#1・2h）** | `docs/conventions.md`・`docs/schema/cameras.md` を書き、`io/coords.py`・`io/cameras.py` を実装 |
 | | **G9** | **Git 練習（1h）**：branch → PR → レビュー → squash merge を1周する（§7-7・§8-1） |
 | **W02** | **G1・G3（ライブラリ版）** | OpenCV既存関数で一直線パイプラインを通す（SIFT → `solvePnP` → `triangulatePoints` → Open3D表示） |
@@ -974,7 +1047,9 @@ L1 と L2 は独立して成立するため、どちらに倒れても成果物�
 - [ ] **`.gitattributes` を作成してpush**（**最優先。他のメンバーが clone する前に**）
 - [ ] `pyproject.toml` 作成、**Python 3.11 指定**（`requires-python = ">=3.11,<3.12"`）、`.python-version` に `3.11.13`
 - [ ] `uv sync` で環境構築、`uv.lock` をコミット
-- [ ] ディレクトリ骨格を作成（§6）
+- [ ] **`pyproject.toml` に `[build-system]` を足す**（§6-3。`packages = ["src/recon3d"]` の明示を忘れないこと）
+- [ ] **ディレクトリ骨格を作成（範囲は §6-2。`__init__.py` と `.gitkeep` だけ・個別モジュールは作らない）**
+- [ ] **`tests/test_import.py`（smoke test）を置き、`uv run pytest` が `1 passed` になることを確認**（いまは exit code 5）
 - [ ] **remote URL を `4bitcom_HandM` に更新**（現在は旧名 `4bitcom` を指し、GitHub のリダイレクト頼み。→ [D-27](decisions.md#d-27)）
 
 ### ② G7・G9：CI と運用の器

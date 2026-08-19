@@ -3,7 +3,7 @@
 **迷ったらこのファイルに戻ってくれば大丈夫です。**
 他の文書は全部「必要になったときに引くもの」なので、頭から読む必要はありません。
 
-**最終更新**: 2026-08-20（`.python-version` の追加と `.gitignore` の修正を反映）
+**最終更新**: 2026-08-20（**ディレクトリ骨格が完成。`uv run pytest` が `1 passed` になり、G6 の「器」が全部そろいました**。あわせて **clone 先の注意**（§7-8）を追加）
 
 ---
 
@@ -26,7 +26,9 @@
 | pytest（`uv add --dev pytest`） | ✅ **完了（8/19）。** `uv.lock` に pytest 9.1.1 が入った |
 | remote URL → `4bitcom_HandM` | ✅ 完了（`git remote -v` で確認済み。計画書 §13 ①） |
 | `.python-version`（`3.11.13`） | ✅ **完了（8/20）。** `uv sync` で `.venv` を 3.11.13 で作り直し済み（Blender 5.0.1 の内蔵版と patch まで一致） |
-| ディレクトリの骨格・コード | ⬜ まだ ← **いまのボトルネックはここ**（`src/` も `tests/` も無いので、`uv run pytest` は「テスト0件」で終わる） |
+| ディレクトリの骨格 | ✅ **完了（8/20）。** `src/recon3d/` の7パッケージ＋`tests/`＋`tools/` を作成。**`uv run pytest` が `1 passed`**（[計画書 §6-2](plan.md) の完了判定を満たした） |
+| `import recon3d` | ✅ **通った（8/20）。** `[build-system]`（hatchling）で editable install（[計画書 §6-3](plan.md)・[D-38](decisions.md#d-38)） |
+| **G6（基盤）の「器」** | ✅ **全部そろいました。** ここから先は**中身の実装**（W01 ペアプロ#1 の `io/coords.py`・`io/cameras.py` から） |
 
 ### 8/20 までに進んだこと
 
@@ -34,8 +36,13 @@
 - `uv add --dev pytest` 相当が入り、`uv.lock` が再生成された（pytest 9.1.1）
 - `.gitignore` の `data/` を `/data/` に修正（8/20）。`tests/data/` が push できる状態になった
 - **`.python-version`（`3.11.13`）を追加（8/20）。** `uv sync` が 3.11.13 を取得して `.venv` を作り直し、`uv run python -V` が 3.11.13 を返すことを確認済み。`uv.lock` は変化なし
-- **これで G6 の「器」は残り1つ**：**ディレクトリ骨格＋`import recon3d` を通す設定**
-- **Discuss.md 8/19 の指摘は ①②が解消、③（`uv run pytest` が exit code 5）は骨格待ちで未解決です**
+- **骨格の範囲を [計画書 §6-2](plan.md) に明文化（8/20）。** 「`__init__.py` と `.gitkeep` だけ置いて `uv run pytest` が `1 passed` になるところまで」。**個別モジュール（`dlt.py` など）の空ファイルは作らない**
+- **`import recon3d` の通し方を確定（8/20）。** `pyproject.toml` に `[build-system]`（hatchling）を足して **editable install** させる方式を採用（→ [計画書 §6-3](plan.md)）。pytest の `pythonpath` 案は不採用
+- **ディレクトリ骨格を作成（8/20）。** `src/recon3d/{io,geometry,solvers,vision,mesh,fusion,viz}/__init__.py`・`tests/test_import.py`・`tests/{fixtures,data}/`・`tools/`。**`uv run pytest` → `1 passed`**、`uv run python -c "import recon3d"` も通ることを mac で確認済み
+- **Discuss.md 8/19 の指摘は ①②③すべて解消しました**（③の `uv run pytest` が exit code 5 だった件は、smoke test が1件通ったことで解消）
+
+
+> ⚠️ **他の端末は `git pull` のあと `uv sync` を1回流してください。** `pyproject.toml` に `[build-system]` が入ったので、プロジェクト自身が editable install されます（`uv.lock` も `virtual` → `editable` の1行だけ変わっています）。
 
 ### 8/16 に決まったこと
 
@@ -68,13 +75,15 @@
 
 **担当者は書きません。** 取れる人が取ってください（[計画書 §3-2](plan.md)）。詳細は [計画書 §13](plan.md) のチェックリスト。
 
-### 🔴 最優先：G6（基盤）— これが終わるまで他が動けない
+### ✅ G6（基盤）の「器」は完了しました（8/20）
+
+**1〜5 は全部終わっています。** ここから先に進んでよい状態です。**次にやることは下の「G7・G9」と「ペアプロ#1」です。**
 
 1. ~~**`.gitattributes` を置いて push**~~ **✅ 完了（8/17）。** [計画書 §7-3](plan.md) の6行（`eol=lf` ＋ バイナリ5種）まで入ったので、**W02 の実データ投入前の宿題も消えた**
 2. ~~`pyproject.toml`（Python 3.11 指定）、`uv sync`、`uv.lock` をコミット~~ **✅ 完了（8/17）**
 3. ~~**`.gitignore` を置く**~~ **✅ 完了（8/19）＋ `/data/` への修正も完了（8/20）。** `tests/data/`（CI用にコミットする分。[計画書 §6](plan.md)）を巻き込まないことを確認済み
 4. ~~**`pyproject.toml` に pytest を足す**~~ **✅ 完了（8/19。pytest 9.1.1）**
-5. 🔴 **ディレクトリの骨格**（[計画書 §6](plan.md)）← **いまはここが最優先。** **`src/recon3d/` を作る前に、`import recon3d` が通る設定を決める**（`[build-system]` を足すか、pytest の `pythonpath` を張るか）
+5. ~~**ディレクトリの骨格**（範囲は [計画書 §6-2](plan.md)）~~ **✅ 完了（8/20）。** `[build-system]` の追加 → `src/recon3d/` の7パッケージ → `tests/test_import.py` の3手順が終わり、**`uv run pytest` が `1 passed`**。**中身の実装（`dlt.py` など）はここには含みません**。各ジャンルの担当週に、実装する人が作ります
 5-b. ~~**`.python-version` に `3.11.13` を書く**~~ **✅ 完了（8/20）。** ⚠️ **他の端末は `git pull` のあと `uv sync` を1回流してください**（`.venv` が 3.11.13 で作り直されます）
 
 ### 次に：G7・G9（CIと運用の器）
@@ -89,7 +98,7 @@
 
 ### 全員
 
-10. clone して、**自分の環境で `uv sync` と `uv run pytest` が通るか確認**（**5 が終わってから**。`tests/` がまだ無いので、いま回しても「0 件収集」で終わります）
+10. clone して、**自分の環境で `uv sync` と `uv run pytest` が通るか確認**（**いま回せます。`1 passed` になれば成功**。Windows / Ubuntu の2台がまだ未確認です ← **ここが次の宿題**）
 11. **Git の練習1時間**。branch → PR → レビュー → merge を1周します
 
 ### 全員でやること
