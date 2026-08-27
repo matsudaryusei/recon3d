@@ -1,1 +1,1 @@
-git switch -c でブランチを作りました
+git switch -c でブランチを作りました.
