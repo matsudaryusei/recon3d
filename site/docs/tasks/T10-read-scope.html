@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>T10 — スコープと撤退ラインに目を通す</title>
+<link rel="stylesheet" href="../../assets/style.css">
+</head>
+<body>
+<header class="topbar">
+  <div class="topbar-inner">
+    <nav class="crumbs"><a href="../../index.html">ドキュメント</a><span class="sep">/</span><a href="README.html">tasks/</a></nav>
+    <span class="src">docs/tasks/T10-read-scope.md</span>
+  </div>
+</header>
+<div class="layout">
+  <details class="toc"><summary class="toc-title">目次</summary><ul><li class="lv2"><a href="#なぜやるのか">なぜやるのか</a></li><li class="lv2"><a href="#読むもの1計画書-3-8-スコープの明示-planmds3-8">読むもの1：計画書 §3-8 スコープの明示</a></li><li class="lv2"><a href="#読むもの2計画書-12-撤退ライン-planmds12">読むもの2：計画書 §12 撤退ライン</a></li><li class="lv2"><a href="#完了判定">完了判定</a></li><li class="lv2"><a href="#つまずいたら">つまずいたら</a></li><li class="lv2"><a href="#終わったら">終わったら</a></li></ul></details>
+  <main class="page">
+<h1 id="t10--スコープと撤退ラインに目を通す">T10 — スコープと撤退ラインに目を通す<a class="hash" href="#t10--スコープと撤退ラインに目を通す" aria-label="このセクションへのリンク">#</a></h1>
+<p><a href="../next.html">← 次にやること一覧に戻る</a></p>
+<div class="table-wrap"><table class="md table--headless"><thead><tr><th></th><th></th></tr></thead><tbody><tr><td>ジャンル</td><td><strong>全員</strong></td></tr><tr><td>目安時間</td><td>15分</td></tr><tr><td>前提</td><td>なし</td></tr><tr><td>作るもの</td><td><strong>なし（読むだけ）。</strong> ただし最後に3つ答えてもらいます</td></tr><tr><td>出どころ</td><td><a href="../plan.html#s3-8">計画書 §3-8</a>（スコープ） ／ <a href="../plan.html#s12">§12</a>（撤退ライン）</td></tr></tbody></table></div>
+<hr>
+<blockquote><p><strong>読みながら分からない言葉が出たら</strong> → <a href="../glossary.html">用語集</a>。<strong><code>点群</code>・<code>メッシュ</code>・<code>バンドル調整</code>・<code>Visual Hull</code> あたりが出ます。</strong></p></blockquote>
+<h2 id="なぜやるのか">なぜやるのか<a class="hash" href="#なぜやるのか" aria-label="このセクションへのリンク">#</a></h2>
+<p><strong>このプロジェクトは18週あります。</strong> 途中で「思っていたのと違う」が出ると、そこまでの時間が無駄になります。</p>
+<p><strong>そうならないように、線引きを先に文章にしてあります。</strong> 読むのは2か所だけです。<strong>15分で終わります。</strong></p>
+<hr>
+<h2 id="読むもの1計画書-3-8-スコープの明示-planmds3-8">読むもの1：<a href="../plan.html#s3-8">計画書 §3-8 スコープの明示</a><a class="hash" href="#読むもの1計画書-3-8-スコープの明示-planmds3-8" aria-label="このセクションへのリンク">#</a></h2>
+<p><strong>5行の表です。</strong> 特に見るのはこの2つ：</p>
+<div class="table-wrap"><table class="md"><thead><tr><th></th><th>中身</th></tr></thead><tbody><tr><td><strong>やらないこと</strong></td><td><strong>リアルタイム描画・ゲームエンジン連携は扱わない。</strong> 静止画20枚を一括処理して立体を作り、精度を数値で測るのが本体</td></tr><tr><td><strong>自作の範囲</strong></td><td><strong>反復解法・最適化・幾何アルゴリズムは自作する</strong>（ここがプロジェクトの芯）。<strong>行列積・I/O・画像前処理はライブラリに任せる</strong></td></tr></tbody></table></div>
+<blockquote><p><strong>「リアルタイムに動くものを作りたい」と思っていた場合、ここで言ってください。</strong> L4（余力があれば）に「ボクセルが削られる過程のビューア」を置いてあるので、<strong>受け皿はあります。</strong></p></blockquote>
+<hr>
+<h2 id="読むもの2計画書-12-撤退ライン-planmds12">読むもの2：<a href="../plan.html#s12">計画書 §12 撤退ライン</a><a class="hash" href="#読むもの2計画書-12-撤退ライン-planmds12" aria-label="このセクションへのリンク">#</a></h2>
+<p><strong>4段階と、2回の判定日です。</strong></p>
+<div class="table-wrap"><table class="md"><thead><tr><th>段階</th><th>到達内容</th></tr></thead><tbody><tr><td><strong>L4</strong></td><td>統合 ＋ 実験 ＋ ビューア/GUI ＋ ドキュメント一式（理想）</td></tr><tr><td><strong>L3</strong></td><td>統合パイプライン完成、Blender 出力、比較実験 E1–E7（<strong>これが目標</strong>）</td></tr><tr><td><strong>L2</strong></td><td>④のみ（既知のカメラ姿勢で Visual Hull）でメッシュ生成（合格ライン）</td></tr><tr><td><strong>L1</strong></td><td>①のみ、自作バンドル調整で点群生成＋収束実験（最低保証）</td></tr></tbody></table></div>
+<p><strong>判定日</strong>：</p>
+<ul><li><strong>★2026-11-01（W11 終了時）</strong>：バンドル調整が収束しているか？ <strong>収束しなければ L2 に落とす</strong></li><li><strong>★2026-11-29（W15 終了時）</strong>：メッシュが出ているか？ <strong>破綻していれば L1 に落とす</strong></li></ul>
+<blockquote><p><strong>なぜ先に決めてあるのか</strong>：「もう少し頑張れば」で判断を先延ばしにすると、<strong>最後に何も残らない</strong>からです。
+<strong>L1 でも L2 でも、それ単体で成果物になるように組んであります。</strong> 落とすことは失敗ではありません。</p></blockquote>
+<hr>
+<h2 id="完了判定">完了判定<a class="hash" href="#完了判定" aria-label="このセクションへのリンク">#</a></h2>
+<p><strong>下の3つに、自分の言葉で答えてください。</strong> 答え先は <a href="../../Discuss.html">Discuss.md</a> か、<a href="T02-oral-decisions.html">T02 の口頭確認</a>の場です。</p>
+<ul><li class="task"><input type="checkbox" disabled> <strong>1.</strong> このプロジェクトで「やらないこと」を1つ挙げられる</li><li class="task"><input type="checkbox" disabled> <strong>2.</strong> 11/1 の判定で「収束していなかった」場合、<strong>何をどう切り替えるか</strong>を説明できる</li><li class="task"><input type="checkbox" disabled> <strong>3.</strong> <strong>納得できない点・不安な点があるか。</strong> 無ければ「無い」でよい</li></ul>
+<blockquote><p><strong>3 が本題です。</strong> <a href="../plan.html#s14">計画書 §14</a> の 13 番に「保留のまま流れやすいので最後に必ず聞く」と書いてあるのはこの項目です。</p></blockquote>
+<hr>
+<h2 id="つまずいたら">つまずいたら<a class="hash" href="#つまずいたら" aria-label="このセクションへのリンク">#</a></h2>
+<div class="table-wrap"><table class="md"><thead><tr><th>症状</th><th>対処</th></tr></thead><tbody><tr><td><strong>読んでも言葉が分からない</strong></td><td><a href="../glossary.html">用語集</a> を並べて開く。<strong><code>点群</code>・<code>メッシュ</code>・<code>バンドル調整</code>・<code>Visual Hull</code> の4つだけ</strong>分かれば読めます</td></tr><tr><td><strong>L1〜L4 の違いがピンとこない</strong></td><td><strong>「何が成果物として残るか」で見る。</strong> L1＝点群と収束実験、L2＝メッシュ、L3＝＋比較実験。<strong>どれも「何も残らない」にはなりません</strong></td></tr><tr><td><strong>納得できない点があるが、言い出しにくい</strong></td><td><strong>言ってください。それがこのタスクの目的です。</strong> <a href="../plan.html#s14">計画書 §14</a> の 13 に「保留のまま流れやすいので、最後に必ず聞く」と明記してあります</td></tr><tr><td><strong>どう書けばいいか分からない</strong></td><td>1行で構いません。例：「リアルタイムで動くものを作れると思っていた」「11/1 は早すぎると感じる」</td></tr><tr><td><strong>特に思い当たらない</strong></td><td><strong>「無い」と書けば完了です。</strong> 無理に出す必要はありません</td></tr></tbody></table></div>
+<h2 id="終わったら">終わったら<a class="hash" href="#終わったら" aria-label="このセクションへのリンク">#</a></h2>
+<ol><li><a href="../next.html">次にやること</a> の T10 の状態を <code>✅ 完了（名前・日付）</code> に書き換える</li><li><strong>3 で何か出たら、それは記録に値します。</strong> <a href="../progress.html">進捗ログ</a> か <a href="../../Discuss.html">Discuss.md</a> に残してください</li></ol>
+  </main>
+</div>
+<footer class="foot">
+  <p>このページは <code>docs/tasks/T10-read-scope.md</code> から自動生成しています。編集は md 側で。</p>
+</footer>
+</body>
+</html>

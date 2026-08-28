@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>T06 — ラベルを登録して Projects ボードを1枚作る</title>
+<link rel="stylesheet" href="../../assets/style.css">
+</head>
+<body>
+<header class="topbar">
+  <div class="topbar-inner">
+    <nav class="crumbs"><a href="../../index.html">ドキュメント</a><span class="sep">/</span><a href="README.html">tasks/</a></nav>
+    <span class="src">docs/tasks/T06-labels-and-board.md</span>
+  </div>
+</header>
+<div class="layout">
+  <details class="toc"><summary class="toc-title">目次</summary><ul><li class="lv2"><a href="#なぜやるのか">なぜやるのか</a></li><li class="lv2"><a href="#ステップ1ラベルを登録する">ステップ1：ラベルを登録する</a></li><li class="lv3"><a href="#gh-コマンドが使える場合速い">gh コマンドが使える場合（速い）</a></li><li class="lv3"><a href="#gh-が無い場合web-でやる">gh が無い場合（Web でやる）</a></li><li class="lv2"><a href="#ステップ2既定のラベルを片付ける">ステップ2：既定のラベルを片付ける</a></li><li class="lv2"><a href="#ステップ3projects-ボードを1枚作る">ステップ3：Projects ボードを1枚作る</a></li><li class="lv2"><a href="#ステップ4いま残っているタスクを-issue-にする">ステップ4：いま残っているタスクを Issue にする</a></li><li class="lv2"><a href="#完了判定">完了判定</a></li><li class="lv2"><a href="#つまずいたら">つまずいたら</a></li><li class="lv2"><a href="#終わったら">終わったら</a></li></ul></details>
+  <main class="page">
+<h1 id="t06--ラベルを登録して-projects-ボードを1枚作る">T06 — ラベルを登録して Projects ボードを1枚作る<a class="hash" href="#t06--ラベルを登録して-projects-ボードを1枚作る" aria-label="このセクションへのリンク">#</a></h1>
+<p><a href="../next.html">← 次にやること一覧に戻る</a></p>
+<div class="table-wrap"><table class="md table--headless"><thead><tr><th></th><th></th></tr></thead><tbody><tr><td>ジャンル</td><td><strong>G9 ドキュメント・運用</strong></td></tr><tr><td>目安時間</td><td><strong>45分</strong>（ラベルとボードで15分、Issue 10件で30分。<strong>Issue は3件だけ先に作る手もあります</strong>）</td></tr><tr><td>前提</td><td>リポジトリ設定の変更権限（<strong>2026-08-16 に取得済み</strong>）</td></tr><tr><td>作るもの</td><td>GitHub のラベル17個と Projects ボード1枚（ファイルは増えません）</td></tr><tr><td>仕様の出どころ</td><td><a href="../plan.html#s8-3">計画書 §8-3</a></td></tr></tbody></table></div>
+<hr>
+<blockquote><p><strong>先に読むもの</strong>：特にありません。<strong>コマンドを貼るだけです。</strong></p></blockquote>
+<h2 id="なぜやるのか">なぜやるのか<a class="hash" href="#なぜやるのか" aria-label="このセクションへのリンク">#</a></h2>
+<p><strong>「誰がやるか」を決めない運用（<a href="../plan.html#s3-2">計画書 §3-2</a>）は、代わりに「何の作業か」が一目で分かる必要があります。</strong></p>
+<p>いまラベルは GitHub の既定（<code>bug</code> <code>enhancement</code> など）しかなく、<strong>ジャンル G1〜G9 が登録されていません。</strong> Issue を切っても分類できない状態です。</p>
+<hr>
+<h2 id="ステップ1ラベルを登録する">ステップ1：ラベルを登録する<a class="hash" href="#ステップ1ラベルを登録する" aria-label="このセクションへのリンク">#</a></h2>
+<h3 id="gh-コマンドが使える場合速い"><code>gh</code> コマンドが使える場合（速い）<a class="hash" href="#gh-コマンドが使える場合速い" aria-label="このセクションへのリンク">#</a></h3>
+<p><code>gh --version</code> が通るか確認してください。通るなら<strong>下をそのままターミナルに貼り付けます。</strong></p>
+<pre><code class="lang-bash"># ジャンル（§3-3）— 青
+gh label create "G1:数理コア"     --color 1D76DB --description "DLT・三角測量・バンドル調整・ソルバ" --force
+gh label create "G2:3DCG"         --color 1D76DB --description "Blender・合成データ生成" --force
+gh label create "G3:画像処理"     --color 1D76DB --description "セグメンテーション・特徴点" --force
+gh label create "G4:メッシュ"     --color 1D76DB --description "Marching Cubes・簡略化・平滑化・テクスチャ" --force
+gh label create "G5:ボクセル統合" --color 1D76DB --description "ボクセル彫刻・点群による補正" --force
+gh label create "G6:基盤IO"       --color 1D76DB --description "cameras.json・座標変換・CLI・環境" --force
+gh label create "G7:テストCI"     --color 1D76DB --description "pytest・GitHub Actions" --force
+gh label create "G8:実験可視化"   --color 1D76DB --description "E1〜E7・グラフ・デモ" --force
+gh label create "G9:ドキュメント" --color 1D76DB --description "README・メモ・Issue運用・進捗" --force
+
+# フェーズ — 紫
+gh label create "phase:0" --color 5319E7 --description "技術検証 W01-W03" --force
+gh label create "phase:1" --color 5319E7 --description "要件定義・基本設計 W04-W05" --force
+gh label create "phase:2" --color 5319E7 --description "数理コアの自作 W06-W11" --force
+gh label create "phase:3" --color 5319E7 --description "Visual Hull統合とメッシュ化 W12-W15" --force
+gh label create "phase:4" --color 5319E7 --description "評価実験 W16-W18" --force
+
+# 特殊
+gh label create "pair"             --color FBCA04 --description "ペアプロ対象（2人で同時に作業する）" --force
+gh label create "blocked"          --color B60205 --description "他のタスク待ちで進められない" --force
+gh label create "good-first-issue" --color 0E8A16 --description "新しく入った人向け" --force</code></pre>
+<blockquote><p><code>--force</code> は「同じ名前があれば上書き」。<strong>何度流しても壊れません。</strong></p></blockquote>
+<h3 id="gh-が無い場合web-でやる"><code>gh</code> が無い場合（Web でやる）<a class="hash" href="#gh-が無い場合web-でやる" aria-label="このセクションへのリンク">#</a></h3>
+<ol><li>リポジトリの <strong><code>Issues</code> タブ</strong> → 右上の <strong><code>Labels</code></strong></li><li><strong><code>New label</code></strong> を押す</li><li>上のコマンドの <code>"..."</code> がラベル名、<code>--color</code> の6桁が色（<code>#</code> は入れない）、<code>--description</code> が説明</li><li><strong>17個ぶん繰り返す</strong></li></ol>
+<p><strong><code>gh</code> を入れておくと今後も楽です</strong>（<code>brew install gh</code> → <code>gh auth login</code>）。</p>
+<hr>
+<h2 id="ステップ2既定のラベルを片付ける">ステップ2：既定のラベルを片付ける<a class="hash" href="#ステップ2既定のラベルを片付ける" aria-label="このセクションへのリンク">#</a></h2>
+<p><strong>GitHub が最初から作る <code>duplicate</code> <code>invalid</code> <code>wontfix</code> などは使いません。</strong> 残っていると選ぶときに邪魔なので消してよいです。</p>
+<pre><code class="lang-bash">gh label delete "duplicate" --yes
+gh label delete "invalid"   --yes
+gh label delete "wontfix"   --yes
+gh label delete "question"  --yes
+gh label delete "help wanted" --yes</code></pre>
+<p><strong><code>bug</code> <code>enhancement</code> <code>documentation</code> は残してよい</strong>（併用して困りません）。</p>
+<hr>
+<h2 id="ステップ3projects-ボードを1枚作る">ステップ3：Projects ボードを1枚作る<a class="hash" href="#ステップ3projects-ボードを1枚作る" aria-label="このセクションへのリンク">#</a></h2>
+<ol><li>リポジトリの <strong><code>Projects</code> タブ</strong> → <strong><code>New project</code></strong></li><li>テンプレートは <strong><code>Board</code></strong> を選ぶ</li><li>名前：<strong><code>3D復元 開発ボード</code></strong></li><li><strong>列（Status）を4つにする</strong>（<a href="../plan.html#s8-3">計画書 §8-3</a>）：</li></ol>
+<div class="table-wrap"><table class="md"><thead><tr><th>列</th><th>意味</th></tr></thead><tbody><tr><td><code>Todo</code></td><td>切ったが未着手</td></tr><tr><td><code>In Progress</code></td><td>誰かが着手中（<strong>Assignee がここで初めて入る</strong>）</td></tr><tr><td><code>In Review</code></td><td>PR を出してレビュー待ち</td></tr><tr><td><code>Done</code></td><td>マージ済み</td></tr></tbody></table></div>
+<p>既定では <code>Todo</code> / <code>In Progress</code> / <code>Done</code> の3列なので、<strong><code>In Review</code> を1つ足します</strong>（列見出しの <code>+</code> から）。</p>
+<hr>
+<h2 id="ステップ4いま残っているタスクを-issue-にする">ステップ4：いま残っているタスクを Issue にする<a class="hash" href="#ステップ4いま残っているタスクを-issue-にする" aria-label="このセクションへのリンク">#</a></h2>
+<p><strong><a href="../next.html">次にやること</a> の表にある T01〜T10 を、そのまま Issue にします。</strong></p>
+<p>1つずつ手で作ってもよいですが、<code>gh</code> があるなら：</p>
+<pre><code class="lang-bash">gh issue create \
+  --title "T01 ペアプロ#1：座標系と cameras.json を決めて実装する" \
+  --body "手順書: docs/tasks/T01-pairpro1-io.md" \
+  --label "G6:基盤IO" --label "phase:0" --label "pair"</code></pre>
+<p><strong>残り9件も同じ形で作ります。</strong> ラベルの対応：</p>
+<div class="table-wrap"><table class="md"><thead><tr><th>Issue</th><th>ラベル</th></tr></thead><tbody><tr><td>T01 ペアプロ#1</td><td><code>G6:基盤IO</code> <code>phase:0</code> <code>pair</code></td></tr><tr><td>T02 口頭で決める4件</td><td><code>G9:ドキュメント</code> <code>phase:0</code></td></tr><tr><td>T03 CI の雛形</td><td><code>G7:テストCI</code> <code>phase:0</code></td></tr><tr><td>T04 ブランチ保護</td><td><code>G7:テストCI</code> <code>phase:0</code></td></tr><tr><td>T05 Git の練習</td><td><code>G9:ドキュメント</code> <code>phase:0</code> <code>good-first-issue</code></td></tr><tr><td>T06 ラベルとボード</td><td><code>G9:ドキュメント</code> <code>phase:0</code></td></tr><tr><td>T07 マスク方式の候補</td><td><code>G3:画像処理</code> <code>phase:0</code></td></tr><tr><td>T08 Blender 入口メモ</td><td><code>G2:3DCG</code> <code>phase:0</code> <code>good-first-issue</code></td></tr><tr><td>T09 3Dモデル探し</td><td><code>G2:3DCG</code> <code>phase:0</code> <code>good-first-issue</code></td></tr><tr><td>T10 スコープを読む</td><td><code>G9:ドキュメント</code> <code>phase:0</code> <code>good-first-issue</code></td></tr></tbody></table></div>
+<p><strong>作った Issue をボードの <code>Todo</code> に入れます</strong>（Issue ページ右の <code>Projects</code> から選ぶ）。</p>
+<blockquote><p>⚠️ <strong>Assignee（担当者）はいま入れません。</strong> <a href="../plan.html#s3-2">計画書 §3-2</a> のとおり、<strong>着手する時点で自分を入れる</strong>運用です。<strong>未着手の Issue に担当者が入っていないのは正常</strong>です。</p></blockquote>
+<hr>
+<h2 id="完了判定">完了判定<a class="hash" href="#完了判定" aria-label="このセクションへのリンク">#</a></h2>
+<ul><li class="task"><input type="checkbox" disabled> <code>Issues</code> → <code>Labels</code> に <strong><code>G1:数理コア</code> 〜 <code>G9:ドキュメント</code> の9個</strong>が並んでいる</li><li class="task"><input type="checkbox" disabled> <code>phase:0</code> 〜 <code>phase:4</code> の5個がある</li><li class="task"><input type="checkbox" disabled> <code>pair</code> / <code>blocked</code> / <code>good-first-issue</code> の3個がある</li><li class="task"><input type="checkbox" disabled> <code>Projects</code> に <strong><code>3D復元 開発ボード</code></strong> があり、列が <strong><code>Todo</code> / <code>In Progress</code> / <code>In Review</code> / <code>Done</code></strong> の4つ</li><li class="task"><input type="checkbox" disabled> <strong>T01〜T10 の Issue が10件</strong>でき、全部が <code>Todo</code> にあり、<strong>全部にジャンルのラベルが付いている</strong></li><li class="task"><input type="checkbox" disabled> <strong>どの Issue にも Assignee が入っていない</strong></li><li class="task"><input type="checkbox" disabled> <strong><a href="../next.html">next.md</a> の「この表と GitHub Issue の使い分け」を読み、以降は着手の記録を Issue 側に寄せることを全員が把握している</strong></li></ul>
+<hr>
+<h2 id="つまずいたら">つまずいたら<a class="hash" href="#つまずいたら" aria-label="このセクションへのリンク">#</a></h2>
+<div class="table-wrap"><table class="md"><thead><tr><th>症状</th><th>対処</th></tr></thead><tbody><tr><td><code>gh: command not found</code></td><td><code>brew install gh</code>（mac）／<a href="https://cli.github.com/" class="ext" target="_blank" rel="noopener">GitHub CLI</a> を入れる。<strong>入れずに Web でやっても構いません</strong>（ステップ1の後半）</td></tr><tr><td><code>gh auth login</code> を求められる</td><td>ブラウザが開くので、そこで許可します。<strong>1回だけ</strong></td></tr><tr><td><strong><code>HTTP 403</code> / 権限が無いと言われる</strong></td><td>リポジトリ設定の変更権限が要ります。<strong>2026-08-16 に取得済み</strong>のはずなので、通らなければ関口に相談</td></tr><tr><td><strong>ラベル名の日本語が文字化けする</strong></td><td>ターミナルの文字コードの問題。<strong>Web の画面から作れば確実</strong>です</td></tr><tr><td><code>already exists</code> と出る</td><td><code>--force</code> を付けているので上書きされます。<strong>エラーではありません</strong></td></tr><tr><td><strong><code>Projects</code> タブが見当たらない</strong></td><td><code>Settings</code> → <code>General</code> → <code>Features</code> で <code>Projects</code> にチェックが入っているか確認</td></tr><tr><td><strong><code>gh project create</code> が権限エラーになる</strong></td><td>Projects は別スコープが要ります。<code>gh auth refresh -s project</code>、または<strong>Web で作るほうが早い</strong></td></tr><tr><td>Issue を10件も手で作るのがつらい</td><td><strong>T01〜T03 の3件だけ先に作れば十分</strong>です。残りは着手するときに作れば構いません</td></tr></tbody></table></div>
+<h2 id="終わったら">終わったら<a class="hash" href="#終わったら" aria-label="このセクションへのリンク">#</a></h2>
+<ol><li><a href="../progress.html">進捗ログ</a> の今週の表に <strong>G9 の行</strong>を1行足す</li><li><a href="../next.html">次にやること</a> の T06 の状態を <code>✅ 完了</code> に書き換える</li><li><strong><a href="../../Discuss.html">Discuss.md</a> に1行</strong>：「Issue を<strong>（実際に作った件数）</strong>件切りました。<strong>取るときは Assignee に自分を入れて <code>In Progress</code> へ。</strong> <code>next.md</code> の表は、完了したときに <code>✅</code> を付けるだけでよくなりました」</li></ol>
+  </main>
+</div>
+<footer class="foot">
+  <p>このページは <code>docs/tasks/T06-labels-and-board.md</code> から自動生成しています。編集は md 側で。</p>
+</footer>
+</body>
+</html>

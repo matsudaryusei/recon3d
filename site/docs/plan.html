@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>多視点画像とシルエットを統合した3D形状復元システム — 開発計画書</title>
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+<header class="topbar">
+  <div class="topbar-inner">
+    <nav class="crumbs"><a href="../index.html">ドキュメント</a></nav>
+    <span class="src">docs/plan.md</span>
+  </div>
+</header>
+<div class="layout">
+  <details class="toc"><summary class="toc-title">目次</summary><ul><li class="lv2"><a href="#index">索引 — 何を知りたいか から引く</a></li><li class="lv2"><a href="#s-prereq">前提情報</a></li><li class="lv2"><a href="#s-env">実測済みの環境情報</a></li><li class="lv2"><a href="#s0">0. 本書で確定したこと</a></li><li class="lv2"><a href="#s1">1. 前提条件（確定情報）</a></li><li class="lv2"><a href="#s2">2. データ取得方針</a></li><li class="lv2"><a href="#s3">3. 作業ジャンルと進め方</a></li><li class="lv2"><a href="#s4">4. 座標系の規約</a></li><li class="lv2"><a href="#s5">5. cameras.json スキーマ</a></li><li class="lv2"><a href="#s6">6. リポジトリ構成</a></li><li class="lv2"><a href="#s7">7. 環境の再現</a></li><li class="lv2"><a href="#s8">8. ブランチ戦略とIssue運用</a></li><li class="lv2"><a href="#s9">9. テスト戦略とCI</a></li><li class="lv2"><a href="#s10">10. 週次カレンダー（18週）</a></li><li class="lv2"><a href="#s11">11. 評価実験の設計</a></li><li class="lv2"><a href="#s12">12. リスク管理：撤退ライン</a></li><li class="lv2"><a href="#s13">13. 着工前チェックリスト（W01 初日）</a></li><li class="lv2"><a href="#s14">14. 松田に確認・相談すべき事項【2026-08-16 更新】</a></li><li class="lv2"><a href="#s15">15. 成果の語り口</a></li><li class="lv2"><a href="#s16">16. 未決定として残る項目</a></li><li class="lv2"><a href="#s-appendix">付録A：本計画で参照した引き継ぎ資料の節</a></li></ul></details>
+  <main class="page">
+<h1 id="多視点画像とシルエットを統合した3d形状復元システム--開発計画書">多視点画像とシルエットを統合した3D形状復元システム — 開発計画書<a class="hash" href="#多視点画像とシルエットを統合した3d形状復元システム--開発計画書" aria-label="このセクションへのリンク">#</a></h1>
+<blockquote><p><strong>📖 これは「引くための本」です。頭から読む必要はありません。</strong>
+何をすればいいか迷ったら、まず <strong><a href="README.html">README.md</a></strong> を開いてください。
+本書は「決まったこと」だけを書いています。<strong>なぜそう決めたか</strong>は <a href="decisions.html">決定記録</a> にあります。</p></blockquote>
+<p><strong>作成日</strong>: 2026-08-14 ／ <strong>最終更新</strong>: 2026-08-24（§13① のチェックリストを実物照合の結果に更新。<strong>§13④ の3台確認が完了し、§6-2 の骨格が確定</strong>）
+<strong>位置づけ</strong>: 全ての設計判断と18週の実行計画。<strong>このプロジェクトの正典。</strong></p>
+<hr>
+<h2 id="index">索引 — 何を知りたいか から引く<a class="hash" href="#index" aria-label="このセクションへのリンク">#</a></h2>
+<p><strong>本書は頭から読むものではありません。</strong> 下の左列に近いものを探して、右のリンクへ飛んでください。</p>
+<h3 id="よく引かれるもの">よく引かれるもの<a class="hash" href="#よく引かれるもの" aria-label="このセクションへのリンク">#</a></h3>
+<div class="table-wrap"><table class="md"><thead><tr><th>知りたいこと</th><th>節</th></tr></thead><tbody><tr><td><strong>どのジャンルの作業があるか（G1〜G9）</strong></td><td><a href="#s3-3">§3-3 作業ジャンル一覧</a></td></tr><tr><td><strong>座標系はどう決まっているか</strong></td><td><a href="#s4-1">§4-1 OpenCV規約</a> ／ <a href="#s4-2">§4-2 Blender との変換</a></td></tr><tr><td><strong><code>cameras.json</code> の形</strong></td><td><a href="#s5-1">§5-1 スキーマ</a> ／ <a href="#s5-2">§5-2 各フィールドの役割</a></td></tr><tr><td><strong>どのファイルをどこに置くか</strong></td><td><a href="#s6">§6 リポジトリ構成</a></td></tr><tr><td><strong><code>import recon3d</code> が通らない</strong></td><td><a href="#s6-3">§6-3 パッケージとして扱う</a> ／ <a href="#s7-8">§7-8 同期フォルダを避ける</a></td></tr><tr><td><strong>ブランチ名・PR の書き方</strong></td><td><a href="#s8-1">§8-1 ブランチ</a> ／ <a href="#s8-2">§8-2 PRの規約</a></td></tr><tr><td><strong>Issue のラベル</strong></td><td><a href="#s8-3">§8-3 Issue の粒度</a></td></tr><tr><td><strong>どんなテストを書くのか</strong></td><td><a href="#s9-1">§9-1 3層のテスト</a></td></tr><tr><td><strong>いつ何をやる予定か</strong></td><td><a href="#s10">§10 週次カレンダー</a></td></tr><tr><td><strong>どこまでやったら「完成」か</strong></td><td><a href="#s12">§12 撤退ライン</a></td></tr><tr><td><strong>いま何が残っているか</strong></td><td><a href="#s13">§13 チェックリスト</a> ／ <strong>手順は <a href="next.html">next.md</a></strong></td></tr><tr><td><strong>まだ決まっていないこと</strong></td><td><a href="#s16">§16 未決定項目</a></td></tr></tbody></table></div>
+<h3 id="制約前提を確かめたいとき">制約・前提を確かめたいとき<a class="hash" href="#制約前提を確かめたいとき" aria-label="このセクションへのリンク">#</a></h3>
+<div class="table-wrap"><table class="md"><thead><tr><th>知りたいこと</th><th>節</th></tr></thead><tbody><tr><td>Python のバージョンはなぜ 3.11 か</td><td><a href="#s7-2">§7-2</a></td></tr><tr><td>使ってよいライブラリ</td><td><a href="#s7-5">§7-5 ライブラリ構成</a></td></tr><tr><td><strong>Blender スクリプトで <code>pip install</code> できない理由</strong></td><td><a href="#s7-4">§7-4 依存制約</a></td></tr><tr><td>開発機のスペックと、そこから来る制約</td><td><a href="#s7-6">§7-6</a></td></tr><tr><td><strong>参加者が未経験の項目</strong>（入口の整備）</td><td><a href="#s7-7">§7-7</a> → 資料は <a href="learning.html">learning.md</a></td></tr><tr><td>Windows で改行が壊れる話</td><td><a href="#s7-3">§7-3 <code>.gitattributes</code></a></td></tr><tr><td><strong>やらないこと（スコープ）</strong></td><td><a href="#s3-8">§3-8</a></td></tr><tr><td>被写体に凹みが必須な理由</td><td><a href="#s2">§2 被写体の設計要件</a></td></tr></tbody></table></div>
+<h3 id="全節一覧">全節一覧<a class="hash" href="#全節一覧" aria-label="このセクションへのリンク">#</a></h3>
+<div class="table-wrap"><table class="md"><thead><tr><th></th><th>節</th><th></th><th>節</th></tr></thead><tbody><tr><td></td><td><a href="#s-prereq">前提情報</a></td><td><strong>8</strong></td><td><a href="#s8">ブランチ戦略とIssue運用</a></td></tr><tr><td></td><td><a href="#s-env">実測済みの環境情報</a></td><td></td><td><a href="#s8-1">8-1 ブランチ</a></td></tr><tr><td><strong>0</strong></td><td><a href="#s0">本書で確定したこと</a></td><td></td><td><a href="#s8-2">8-2 PRの規約</a></td></tr><tr><td><strong>1</strong></td><td><a href="#s1">前提条件</a></td><td></td><td><a href="#s8-3">8-3 Issue の粒度</a></td></tr><tr><td><strong>2</strong></td><td><a href="#s2">データ取得方針</a></td><td><strong>9</strong></td><td><a href="#s9">テスト戦略とCI</a></td></tr><tr><td><strong>3</strong></td><td><a href="#s3">作業ジャンルと進め方</a></td><td></td><td><a href="#s9-1">9-1 3層のテスト</a></td></tr><tr><td></td><td><a href="#s3-1">3-1 工数は既に飽和している</a></td><td></td><td><a href="#s9-2">9-2 CI</a></td></tr><tr><td></td><td><a href="#s3-2">3-2 分担の単位はジャンル</a></td><td><strong>10</strong></td><td><a href="#s10">週次カレンダー（18週）</a></td></tr><tr><td></td><td><a href="#s3-3">3-3 作業ジャンル一覧</a></td><td><strong>11</strong></td><td><a href="#s11">評価実験の設計</a></td></tr><tr><td></td><td><a href="#s3-4">3-4 共同作業の形</a></td><td><strong>12</strong></td><td><a href="#s12">リスク管理：撤退ライン</a></td></tr><tr><td></td><td><a href="#s3-5">3-5 ジャンルをまたぐ接続点</a></td><td><strong>13</strong></td><td><a href="#s13">着工前チェックリスト</a></td></tr><tr><td></td><td><a href="#s3-6">3-6 運用ルール</a></td><td><strong>14</strong></td><td><a href="#s14">確認・相談すべき事項</a></td></tr><tr><td></td><td><a href="#s3-7">3-7 知識共有の仕組み</a></td><td><strong>15</strong></td><td><a href="#s15">成果の語り口</a></td></tr><tr><td></td><td><a href="#s3-8">3-8 スコープの明示</a></td><td><strong>16</strong></td><td><a href="#s16">未決定として残る項目</a></td></tr><tr><td><strong>4</strong></td><td><a href="#s4">座標系の規約</a></td><td></td><td><a href="#s-appendix">付録A 引き継ぎ資料の節</a></td></tr><tr><td></td><td><a href="#s4-1">4-1 OpenCV規約に統一</a></td><td></td><td></td></tr><tr><td></td><td><a href="#s4-2">4-2 Blender との変換</a></td><td></td><td></td></tr><tr><td></td><td><a href="#s4-3">4-3 規約を破れなくする仕組み</a></td><td></td><td></td></tr><tr><td><strong>5</strong></td><td><a href="#s5"><code>cameras.json</code> スキーマ</a></td><td></td><td></td></tr><tr><td></td><td><a href="#s5-1">5-1 スキーマ</a></td><td></td><td></td></tr><tr><td></td><td><a href="#s5-2">5-2 各フィールドの役割</a></td><td></td><td></td></tr><tr><td></td><td><a href="#s5-3">5-3 読み書きと検証</a></td><td></td><td></td></tr><tr><td><strong>6</strong></td><td><a href="#s6">リポジトリ構成</a></td><td></td><td></td></tr><tr><td></td><td><a href="#s6-1">6-1 この構成の要点</a></td><td></td><td></td></tr><tr><td></td><td><a href="#s6-2">6-2 骨格作りの範囲</a></td><td></td><td></td></tr><tr><td></td><td><a href="#s6-3">6-3 <code>import recon3d</code> の通し方</a></td><td></td><td></td></tr><tr><td><strong>7</strong></td><td><a href="#s7">環境の再現</a></td><td></td><td></td></tr><tr><td></td><td><a href="#s7-1">7-1 <code>uv</code> を採用</a></td><td></td><td></td></tr><tr><td></td><td><a href="#s7-2">7-2 Python は 3.11 に固定</a></td><td></td><td></td></tr><tr><td></td><td><a href="#s7-3">7-3 <code>.gitattributes</code></a></td><td></td><td></td></tr><tr><td></td><td><a href="#s7-4">7-4 Blenderの依存制約</a></td><td></td><td></td></tr><tr><td></td><td><a href="#s7-5">7-5 ライブラリ構成</a></td><td></td><td></td></tr><tr><td></td><td><a href="#s7-6">7-6 実行環境と設計制約</a></td><td></td><td></td></tr><tr><td></td><td><a href="#s7-7">7-7 前提スキルと入口の整備</a></td><td></td><td></td></tr><tr><td></td><td><a href="#s7-8">7-8 同期フォルダを避ける</a></td><td></td><td></td></tr></tbody></table></div>
+<blockquote><p><strong>知らない言葉が出てきたら → <a href="glossary.html">用語集</a>。</strong>
+<strong>読んでも書けそうにないときは → <a href="learning.html">学びの入口</a>。</strong></p></blockquote>
+<hr>
+<h2 id="s-prereq">前提情報<a class="hash" href="#s-prereq" aria-label="このセクションへのリンク">#</a></h2>
+<div class="table-wrap"><table class="md"><thead><tr><th>項目</th><th>内容</th></tr></thead><tbody><tr><td>位置づけ</td><td>大学の授業・PBLとは<strong>無関係</strong>。完全な自主プロジェクト</td></tr><tr><td>松田の環境</td><td><strong>Windows 11 Education 25H2（ビルド 26200.8973）／ノートPC</strong>。<strong>メモリ 16GB・Core i7-1360P・空き 82.6GB</strong>。Blender 5.0.1 / 内蔵Python 3.11.13（numpy 1.26.4）。GPUは内蔵の Intel Iris Xe。Git経験は浅い（詳細は §7-6・§7-7）</td></tr><tr><td>スコープの合意</td><td><strong>リアルタイム描画を扱わないことは全員が了承済み（2026-08-16）。</strong> 詳細は §3-8</td></tr><tr><td>松田の合意状況</td><td>テーマには<strong>合意済み</strong>。<strong>2026-08-16 に確認事項へ回答済み。着工をブロックする未回答はない</strong></td></tr><tr><td>関口の環境</td><td><strong>Ubuntu 主 / Mac mini 補助</strong></td></tr><tr><td>リポジトリ</td><td>松田のアカウントに <strong>private で作成済み・共有済み</strong>。完成後に public 化</td></tr><tr><td>2人の同期</td><td><strong>対面で頻繁に会える</strong></td></tr><tr><td>着工</td><td>2026年8月中（W01 = 2026-08-17 の週）</td></tr></tbody></table></div>
+<h2 id="s-env">実測済みの環境情報<a class="hash" href="#s-env" aria-label="このセクションへのリンク">#</a></h2>
+<h3 id="関口側">関口側<a class="hash" href="#関口側" aria-label="このセクションへのリンク">#</a></h3>
+<p><strong>主環境：Ubuntu（2026-08-15 確定）</strong></p>
+<div class="table-wrap"><table class="md"><thead><tr><th>項目</th><th>実測値</th><th>含意</th></tr></thead><tbody><tr><td>CPU</td><td><strong>Intel Core i7-1360P（第13世代）／16スレッド</strong></td><td>モバイル向けP系。<strong>Numba・並列化の価値が高い</strong>（§7-5）</td></tr><tr><td>メモリ</td><td><strong>16 GiB</strong></td><td><strong>256³ のチャンク分割が関口側でも必須</strong>（§7-6）。余裕はない</td></tr><tr><td>GPU</td><td>CPU内蔵（Iris Xe 相当）</td><td>独立GPUなし。<strong>GPUに依存する高速化は選択肢から外す</strong></td></tr><tr><td>Blender</td><td><strong>導入しない（確定）</strong></td><td><strong>Blender関連は全て松田に任せる。</strong> 影響は下記「Blenderを持たないことの影響」</td></tr></tbody></table></div>
+<p><strong>補助環境：Mac mini（2026-08-14 実測）</strong></p>
+<div class="table-wrap"><table class="md"><thead><tr><th>項目</th><th>実測値</th><th>含意</th></tr></thead><tbody><tr><td>システム Python</td><td>3.13.15</td><td>プロジェクトは <code>uv</code> が 3.11 を別途取得するため問題なし</td></tr><tr><td><code>uv</code></td><td><code>~/.local/bin/uv</code> に導入済み</td><td>§7-1 の環境再現方針はそのまま実行可能</td></tr><tr><td><code>git</code></td><td><code>/usr/bin/git</code></td><td>—</td></tr></tbody></table></div>
+<blockquote><p><strong>⚠ 重要：2台は「16GB・内蔵GPU・Core i7-1360P」で完全に同一構成だった（2026-08-16 確定）。</strong>
+松田の回答により、<strong>CPU型番・メモリ容量とも関口のUbuntu機と同じ</strong>であることが判明した。つまり<strong>このプロジェクトに「重い処理を逃がせるマシン」は存在しない。</strong> ボクセル解像度・レンダリング枚数・バンドル調整の規模は、すべてこの前提で決める。処理時間の目標（§10「全パイプライン10分以内」）もモバイルCPU基準で置くこと。
+<strong>利点もある</strong>：性能差がないため、<strong>片方で測った処理時間がもう片方でもそのまま通用する</strong>。E7（実装方式の速度比較）の測定を2台に分担できる。
+<strong>→ 根拠: 決定記録 <a href="decisions.html#d-21">D-21</a>・<a href="decisions.html#d-32">D-32</a></strong></p></blockquote>
+<p><strong>Blenderを持たないことの影響（関口側）</strong></p>
+<div class="table-wrap"><table class="md"><thead><tr><th>影響</th><th>対応</th></tr></thead><tbody><tr><td><code>tools/blender_*.py</code> を実行・動作確認できない</td><td><strong>動作確認は全て松田のローカル</strong>（§9-2 の方針どおり。CIからも除外済み）</td></tr><tr><td>Blenderスクリプト（G2）のレビューが「読むだけ」になる</td><td>Approve規約（§3-2）は維持するが、<strong>Blender固有部分は「設計と入出力の妥当性」をレビュー対象とし、挙動の検証は Blender を持つ人に委ねる</strong></td></tr><tr><td>「<code>cameras.json</code> の書き出し」を Blender内で書けない</td><td><strong>G6 と G2 に分ける。</strong> <code>io/cameras.py</code> 本体（純Python・Blender不要でテスト可能）は G6、それをBlenderスクリプトから呼ぶ接続部は G2。<strong>§7-4 の「bpy + numpy のみに依存させる」制約が、この分割を成立させている</strong></td></tr></tbody></table></div>
+<h3 id="松田側2026-08-15-受領blender_system-system-infotxt--2026-08-16-補完松田の回答q-bn2">松田側（2026-08-15 受領＝<code>blender_system/system-info.txt</code> ／ 2026-08-16 補完＝松田の回答（Q-b・N2））<a class="hash" href="#松田側2026-08-15-受領blender_system-system-infotxt--2026-08-16-補完松田の回答q-bn2" aria-label="このセクションへのリンク">#</a></h3>
+<div class="table-wrap"><table class="md"><thead><tr><th>項目</th><th>実測値</th><th>含意</th></tr></thead><tbody><tr><td>Blender</td><td><strong>5.0.1</strong>（2025-12-15 Release / hash <code>a3db93c5b259</code>）</td><td><strong>LTS ではない。</strong> 期間中はバージョン固定（<strong>松田了承済み・2026-08-16</strong>）（§7-6）</td></tr><tr><td>内蔵 Python</td><td><strong>3.11.13</strong> ／ <strong>numpy 1.26.4 導入済み（2026-08-16 確認）</strong></td><td><strong>プロジェクトの Python を 3.11 に確定</strong>（§7-2）。<strong>§7-4 の「bpy + numpy のみ」制約が成立することを確認済み</strong></td></tr><tr><td>OS</td><td><strong>Windows 11 Education 25H2</strong>（ビルド 26200.8973 / 64bit）</td><td><code>.gitattributes</code> による改行コード対策（§7-3）は当初計画どおり必須</td></tr><tr><td>GPU</td><td>Intel Iris Xe Graphics（内蔵） / OpenGL バックエンド。<strong>Cycles のデバイス欄に選択可能なGPUは無し（2026-08-16 確認）</strong></td><td><strong>Cycles は CPU レンダリング確定 → 合成データ生成は EEVEE 既定</strong>（§7-6・<a href="decisions.html#d-19">D-19</a>）</td></tr><tr><td>CPU</td><td><strong>Core i7-1360P（第13世代・AVX2 対応）</strong></td><td><strong>関口のUbuntu機と同一。</strong> Numba による高速化（§7-5）は有効</td></tr><tr><td>メモリ</td><td><strong>16 GB（うち 15.6 GB 使用可能）</strong></td><td><strong>ボクセル 256³ を既定として維持できる</strong>（チャンク分割は引き続き必須。§7-6・<a href="decisions.html#d-32">D-32</a>）</td></tr><tr><td>ストレージ空き</td><td><strong>82.6 GB</strong></td><td>20方向×複数データセットのレンダリング出力を置いても余裕がある</td></tr><tr><td>筐体</td><td><strong>ノートPC</strong></td><td>長時間レンダリング時の発熱・クロック低下を、処理時間の実測（W03）で織り込む</td></tr></tbody></table></div>
+<p><strong>次に何をするかは <a href="README.html">README.md</a> を見てください。</strong></p>
+<hr>
+<h2 id="s0">0. 本書で確定したこと<a class="hash" href="#s0" aria-label="このセクションへのリンク">#</a></h2>
+<p>引き継ぎ資料からの変更点と新規決定を先に列挙する。</p>
+<div class="table-wrap"><table class="md"><thead><tr><th>項目</th><th>決定</th><th>節</th></tr></thead><tbody><tr><td>評価用データ</td><td><strong>Blender合成データで着工</strong>し、Phase 0 最終週に実写を1セット通す</td><td>§2</td></tr><tr><td>役割分担</td><td><strong>人ではなく「作業ジャンル」（G1〜G9）で管理する（2026-08-16 改訂）。</strong> 誰がやるかは着手する場面で決める。ペアプロ3か所のみ固定</td><td>§3-2・§3-3</td></tr><tr><td>座標系</td><td><strong>OpenCV規約に統一</strong>。変換は <code>io/coords.py</code> の1ファイルに閉じ込める</td><td>§4</td></tr><tr><td><code>cameras.json</code></td><td>スキーマ確定。<code>source</code> フィールドで真値/推定値を切り替える</td><td>§5</td></tr><tr><td>リポジトリ</td><td><strong>単一リポジトリ</strong>。モジュール境界＝担当境界</td><td>§6</td></tr><tr><td>環境</td><td><code>uv</code> + <strong>Python 3.11 固定（2026-08-15 に実機確認で確定）</strong>。<code>.gitattributes</code> で改行コードLF固定</td><td>§7</td></tr><tr><td>松田の実行環境</td><td>Blender 5.0.1 / Windows 11 / 内蔵GPU。<strong>合成データ生成は EEVEE を既定とする</strong></td><td>§7-6</td></tr><tr><td>ブランチ</td><td><code>main</code> のみ。PR必須、squash merge</td><td>§8</td></tr><tr><td>CI</td><td>GitHub Actions で Ubuntu + Windows の pytest</td><td>§9</td></tr><tr><td>期間</td><td><strong>2026-08-17 着工、18週で 2026-12-20</strong>。超過分は5〜6か月枠（〜2027年2月）で吸収</td><td>§10</td></tr><tr><td><strong>松田への確認</strong></td><td><strong>2026-08-16 に Part 1・Part 2 の回答を受領。テーマ確定（<a href="decisions.html#d-30">D-30</a>）／ボクセル 256³ 維持（<a href="decisions.html#d-32">D-32</a>）／レンダリング設計は追加実験 E8 の候補として受ける（採否は W04。<a href="decisions.html#d-31">D-31</a>）</strong></td><td>§14・§7-7</td></tr></tbody></table></div>
+<h3 id="引き継ぎ資料の記述で修正が必要だった点">引き継ぎ資料の記述で修正が必要だった点<a class="hash" href="#引き継ぎ資料の記述で修正が必要だった点" aria-label="このセクションへのリンク">#</a></h3>
+<ol><li><strong>§6「ターンテーブルの回転角が真値になる」は、カメラ姿勢の真値であって形状の真値ではない。</strong> 実写だけでは Hausdorff 距離の比較対象（真値メッシュ）が存在しないため、§7 Phase 1 の数値目標「Hausdorff距離 ○mm以下」が立てられない。→ 合成データで解決（§2）。</li><li><strong>§5 の役割分担（人ごとの固定割り当て）は採らない。</strong> 作業ジャンル（G1〜G9）を定義し、誰がやるかは着手時に決める形に組み替えた（§3）。</li><li><strong>§4-4 のメッシュ平滑化を関口の単独担当にするのは配分として逆。</strong> 離散ラプラシアン作用素は離散微分幾何の中心的な道具であり、松田の専門と重なる。→ 共同担当に変更（§3）。</li></ol>
+<hr>
+<h2 id="s1">1. 前提条件（確定情報）<a class="hash" href="#s1" aria-label="このセクションへのリンク">#</a></h2>
+<div class="table-wrap"><table class="md"><thead><tr><th>項目</th><th>内容</th></tr></thead><tbody><tr><td>開発者A</td><td>関口（応用数理・数値線形代数）。開発マシンは <strong>Ubuntu 主 / Mac mini 補助</strong></td></tr><tr><td>開発者B</td><td>松田（3DCG）。<strong>Windows</strong>。<strong>Python歴は数か月・主言語はC。Git は clone / commit / push まで</strong>（§7-7）</td></tr><tr><td>位置づけ</td><td>大学の授業・PBLとは<strong>無関係</strong>。完全な自主プロジェクト</td></tr><tr><td>目的</td><td>① <strong>GitHubでの共同開発実績</strong>（PR・レビュー・CIの履歴が残ること） ② <strong>数理とCGの中身を自作して理解すること</strong>（ライブラリに丸投げしない） ③ <strong>動く成果物と、精度を数値で示した実験結果</strong></td></tr><tr><td>リポジトリ</td><td>松田のアカウントに <strong>private</strong> で作成済み・共有済み。完成後に public 化</td></tr><tr><td>同期</td><td>対面で頻繁に会える</td></tr><tr><td>着工</td><td>2026年8月中</td></tr><tr><td>総工数</td><td>実装の積み上げは <strong>315人時</strong>。<strong>2人なら週8.75h、3人なら週5.8h</strong>（§3-1）。資料1 §1 の想定（週6〜10時間）の範囲内</td></tr></tbody></table></div>
+<hr>
+<h2 id="s2">2. データ取得方針<a class="hash" href="#s2" aria-label="このセクションへのリンク">#</a></h2>
+<h3 id="決定blender合成データで着工しphase-0-最終週に実写を1セット通す">決定：Blender合成データで着工し、Phase 0 最終週に実写を1セット通す<a class="hash" href="#決定blender合成データで着工しphase-0-最終週に実写を1セット通す" aria-label="このセクションへのリンク">#</a></h3>
+<h3 id="用語">用語<a class="hash" href="#用語" aria-label="このセクションへのリンク">#</a></h3>
+<ul><li><strong>レンダリング</strong>: Blender内に3Dモデルを置き、仮想カメラから「写真を撮る」こと。出力は通常の画像ファイル。</li><li><strong>真値メッシュ（ground truth mesh）</strong>: 「正解の3D形状」。復元精度を測るための比較対象。</li><li><strong>Hausdorff距離</strong>: 2つの3D形状のズレの指標。「復元形状の各点から正解形状までの最大距離」。単位はmm。</li></ul>
+<h3 id="合成データで得られるもの">合成データで得られるもの<a class="hash" href="#合成データで得られるもの" aria-label="このセクションへのリンク">#</a></h3>
+<p>Blenderに既知の3Dモデルを置き、カメラを円周上に20方向配置してレンダリングすると、以下が<strong>全て正解付きで</strong>手に入る。</p>
+<div class="table-wrap"><table class="md"><thead><tr><th>出力</th><th>用途</th></tr></thead><tbody><tr><td>画像 20枚</td><td>パイプラインの入力</td></tr><tr><td><strong>カメラ行列</strong>（Blenderが知っている）</td><td>姿勢推定（DLT・バンドル調整）の答え合わせ</td></tr><tr><td><strong>元の3Dモデル</strong></td><td>真値メッシュ。Hausdorff距離の比較対象</td></tr><tr><td><strong>シルエット画像</strong></td><td>セグメンテーションの答え合わせ</td></tr></tbody></table></div>
+<blockquote><p><strong>→ 採用理由（真値が手に入る／デバッグが切り分けられる／今日から着工できる）と、却下した代替案: 決定記録 <a href="decisions.html#d-01">D-01</a></strong></p></blockquote>
+<h3 id="既知のリスクと対策">既知のリスクと対策<a class="hash" href="#既知のリスクと対策" aria-label="このセクションへのリンク">#</a></h3>
+<p><strong>合成画像は綺麗すぎる。</strong> ノイズも影のムラもなく特徴点が理想的に取れるため、実写に移った瞬間に精度が落ちる。</p>
+<p>対策として、<strong>Phase 0 の最終週（W3）に実写を1セットだけ通す</strong>。精度は問わず、「自分たちの被写体で特徴点が何点取れるか」の実測値だけを取る。実写の本格導入は Phase 3（W12）から。</p>
+<h3 id="被写体の設計要件重要">被写体の設計要件（重要）<a class="hash" href="#被写体の設計要件重要" aria-label="このセクションへのリンク">#</a></h3>
+<blockquote><p><strong>必ず「凹んだ形状」を含む被写体を使うこと。合成データも同様。</strong></p></blockquote>
+<div class="table-wrap"><table class="md"><thead><tr><th>条件</th><th>失敗する手法</th></tr></thead><tbody><tr><td>無地でテクスチャのない面</td><td>① 多視点復元（特徴点が取れず点群に穴が空く）</td></tr><tr><td>凹んだ形状</td><td>④ シルエット復元（原理的に削れない）</td></tr></tbody></table></div>
+<p><strong>マグカップはこの両方を満たす</strong>（陶器の無地の面＋内側の凹み）。</p>
+<blockquote><p><strong>→ なぜ凹みが必須なのか（最重要実験 E5 の成立条件）: 決定記録 <a href="decisions.html#d-02">D-02</a></strong></p></blockquote>
+<p>推奨する合成データセット：</p>
+<div class="table-wrap"><table class="md"><thead><tr><th>データセット</th><th>目的</th></tr></thead><tbody><tr><td><code>synthetic_cup</code></td><td>主データ。凹み＋無地面を持つマグカップ相当</td></tr><tr><td><code>synthetic_bunny</code></td><td>副データ。<strong>①（多視点復元）が最も有利な条件</strong>＝<strong>テクスチャが豊富で、凹みが少ない</strong>被写体。<strong>①単独の上限性能の確認用</strong></td></tr></tbody></table></div>
+<blockquote><p>⚠️ <strong>モデル名についての注意（2026-08-24 訂正）</strong>：<code>synthetic_bunny</code> は<strong>データセットの呼び名</strong>であって、Stanford Bunny をそのまま使う指定ではない。
+<strong>Stanford Bunny 自体は無彩色のスキャンデータでテクスチャを持たず、耳の間・顎の下に凹部もある。</strong> そのまま使うと「①が最も有利な条件」にならないので、
+<strong>テクスチャを別途貼るか、条件を満たす別のモデルを選ぶこと</strong>（→ <a href="tasks/T09-find-3d-model.html">T09</a>）。</p></blockquote>
+<hr>
+<h2 id="s3">3. 作業ジャンルと進め方<a class="hash" href="#s3" aria-label="このセクションへのリンク">#</a></h2>
+<blockquote><p><strong>【2026-08-16 改訂】分担の単位を「人」から「作業ジャンル」に変えた。</strong>
+以前は「関口が主担当のモジュール／松田が主担当のモジュール」という表を持っていたが、<strong>廃止した。</strong> 理由と経緯は <a href="decisions.html#d-36">D-36</a>。
+<strong>本節は「どんな作業があるか」だけを定義する。誰がやるかは、その作業に着手する場面で決める。</strong></p></blockquote>
+<h3 id="s3-1">3-1. 前提：工数は既に飽和している<a class="hash" href="#s3-1" aria-label="このセクションへのリンク">#</a></h3>
+<div class="table-wrap"><table class="md"><thead><tr><th>項目</th><th>概算</th></tr></thead><tbody><tr><td>DLT・三角測量</td><td>30h</td></tr><tr><td>バンドル調整（Schur補元＋LM＋CG法）</td><td>60h</td></tr><tr><td>ボクセル彫刻（行列化・高速化含む）</td><td>25h</td></tr><tr><td>Marching Cubes</td><td>20h</td></tr><tr><td>ラプラシアン平滑化</td><td>20h</td></tr><tr><td>合成データ生成器</td><td>20h</td></tr><tr><td>セグメンテーション・特徴点</td><td>25h</td></tr><tr><td>テクスチャ投影・UV展開</td><td>25h</td></tr><tr><td>I/O・CLI・テスト・CI</td><td>30h</td></tr><tr><td>評価実験</td><td>40h</td></tr><tr><td>ドキュメント</td><td>20h</td></tr><tr><td><strong>合計</strong></td><td><strong>315h</strong></td></tr></tbody></table></div>
+<p><strong>この 315h は「何人でやるか」に依らない総量。</strong> 人数で割ると1人あたりの負荷が出る。</p>
+<div class="table-wrap"><table class="md"><thead><tr><th>人数</th><th>1人あたり週</th><th>備考</th></tr></thead><tbody><tr><td>2人</td><td><strong>8.75h</strong></td><td>現状。引き継ぎ資料 §1 の想定（週6〜10時間）の範囲内</td></tr><tr><td>3人</td><td>5.8h</td><td><strong>増員するならこの線。</strong> ただしレビューと同期のコストが増えるため、単純な割り算より少し悪くなる</td></tr><tr><td>4人</td><td>4.4h</td><td>ジャンル数（§3-3 の9個）に対して細かく割りすぎる。<strong>同じジャンルを複数人で持つ形になる</strong></td></tr></tbody></table></div>
+<p><strong>ただしこの見積もりにデバッグ時間は含まれていない。</strong> 数値計算のデバッグは実装の1〜2倍かかるのが普通であり、実質は450〜500h規模になりうる。超過分は §1 が許容する「余裕があれば5〜6か月」（〜2027年2月）で吸収し、それでも足りなければ §12 の撤退ラインで判定する。</p>
+<p><strong>この制約から、「全てのコードを全員で書く」という運用は採れない。</strong> だから「共有するかしないか」ではなく「<strong>どこを、どの濃さで共有するか</strong>」を設計する（§3-4）。</p>
+<blockquote><p><strong>→ 根拠・試算・デバッグ時間の扱い: 決定記録 <a href="decisions.html#d-03">D-03</a>・<a href="decisions.html#d-04">D-04</a></strong></p></blockquote>
+<h3 id="s3-2">3-2. 分担の単位は「人」ではなく「ジャンル」<a class="hash" href="#s3-2" aria-label="このセクションへのリンク">#</a></h3>
+<p><strong>事前に「誰がどのモジュールを持つか」を決めない。</strong> §3-3 に<strong>作業ジャンル</strong>の一覧だけを置き、<strong>その作業に着手する場面が来たときに、誰がやるかをその場で決める。</strong></p>
+<div class="table-wrap"><table class="md"><thead><tr><th></th><th>内容</th></tr></thead><tbody><tr><td><strong>事前に決めておくこと</strong></td><td><strong>どんな作業があるか</strong>（ジャンル）、<strong>何が前提知識か</strong>、<strong>いつ必要になるか</strong>、<strong>どのくらい重いか</strong></td></tr><tr><td><strong>その場で決めること</strong></td><td><strong>誰がやるか。</strong> 1人でやるか、2人で分けるか、ペアで書くか</td></tr></tbody></table></div>
+<p><strong>決め方</strong></p>
+<ol><li><strong>週1回の対面で、次週に着手するジャンルを見る</strong>（§8-3 のIssue切りと同じ場）</li><li><strong>やりたい人が取る。</strong> 手が挙がらなければ、前提知識が近い人が取る</li><li><strong>決まったらIssueに担当者とジャンルのラベルを付ける。</strong> これが唯一の記録</li><li><strong>重いジャンルは分割してよい。</strong> 「Marching Cubes のルックアップテーブルだけ」のような切り出しは歓迎</li></ol>
+<p><strong>固定しないことのほうが重要</strong></p>
+<blockquote><p><strong>同じジャンルを同じ人が持ち続ける必要はない。</strong> 週ごとに変わってよい。</p></blockquote>
+<ul><li>得意・不得意の実像は、やってみるまで分からない</li><li><strong>平日はほぼ毎日会えるため、その場の会話で「じゃあそこは自分がやる」と決まることが多くなる</strong>（§3-4）。事前の表がその会話に勝つ理由はない</li><li><strong>人が増えたときに、表を書き直さずに済む</strong></li></ul>
+<p><strong>規約：Approveコメントに要約を必須化する</strong></p>
+<blockquote><p>PRのApproveコメントには、<strong>「このPRが何をしているか、自分の言葉で1〜3行」</strong>を必ず書く。</p></blockquote>
+<p>書けないなら、書けるまで質問する。対面で会えるので、その場で聞けばよい。<strong>分担を固定しないぶん、「自分が書いていない部分を読む」機会がこの規約に集約される。</strong></p>
+<blockquote><p><strong>→ 人からジャンルへ変えた理由: 決定記録 <a href="decisions.html#d-36">D-36</a>・<a href="decisions.html#d-09">D-09</a></strong></p></blockquote>
+<h3 id="s3-3">3-3. 作業ジャンル一覧<a class="hash" href="#s3-3" aria-label="このセクションへのリンク">#</a></h3>
+<p><strong>これが分担表の代わり。</strong> 担当者の欄は無い。</p>
+<div class="table-wrap"><table class="md"><thead><tr><th>#</th><th>ジャンル</th><th>中身</th><th>主に触る場所</th><th>前提知識</th><th>時期</th><th>工数</th></tr></thead><tbody><tr><td><strong>G1</strong></td><td><strong>数理コア</strong></td><td>DLT・三角測量・バンドル調整・CG法・前処理・LM・Schur補元</td><td><code>geometry/</code> <code>solvers/</code></td><td>線形代数、最小二乗、最適化</td><td>W06–W11</td><td><strong>90h</strong></td></tr><tr><td><strong>G2</strong></td><td><strong>3DCG・データ生成</strong></td><td>Blenderでのシーン構築、レンダリング、マスク出力、カメラ行列と真値メッシュの書き出し</td><td><code>tools/blender_*.py</code></td><td>Blender、<code>bpy</code></td><td>W02–W03、以降随時</td><td><strong>20h</strong></td></tr><tr><td><strong>G3</strong></td><td><strong>画像処理</strong></td><td>セグメンテーション、背景差分、特徴点検出とマッチング</td><td><code>vision/</code></td><td>OpenCV、画像処理の基礎</td><td>W06–W09</td><td><strong>25h</strong></td></tr><tr><td><strong>G4</strong></td><td><strong>メッシュ処理</strong></td><td>Marching Cubes、簡略化（QEM）、ラプラシアン平滑化、UV展開、テクスチャ投影</td><td><code>mesh/</code></td><td>幾何、少し線形代数</td><td>W10–W15</td><td><strong>65h</strong></td></tr><tr><td><strong>G5</strong></td><td><strong>ボクセル・統合</strong></td><td>ボクセル彫刻（行列化・チャンク分割）、点群による凹み補正</td><td><code>geometry/carving.py</code> <code>fusion/</code></td><td>配列演算、メモリの勘所</td><td>W12–W13</td><td><strong>25h</strong></td></tr><tr><td><strong>G6</strong></td><td><strong>基盤・I/O</strong></td><td><code>cameras.json</code> の読み書きと検証、座標変換、CLI、環境構築（<code>uv</code>・<code>pyproject.toml</code>）</td><td><code>io/</code> <code>tools/run_pipeline.py</code></td><td>Python、<strong>規約を守る几帳面さ</strong></td><td><strong>W01</strong> から</td><td><strong>30h</strong>（G7 込み）</td></tr><tr><td><strong>G7</strong></td><td><strong>テスト・CI</strong></td><td>合成シーンによる単体テスト、OpenCV版との照合、E2E、GitHub Actions</td><td><code>tests/</code> <code>.github/</code></td><td>pytest</td><td>W01 から通期</td><td>（G6 に含む）</td></tr><tr><td><strong>G8</strong></td><td><strong>評価実験・可視化</strong></td><td>E1〜E7 の実施、グラフ・図表の作成、デモ動画</td><td><code>docs/experiments/</code> <code>viz/</code></td><td>Matplotlib、<strong>測ったものを説明する力</strong></td><td>W16–W18</td><td><strong>40h</strong></td></tr><tr><td><strong>G9</strong></td><td><strong>ドキュメント・運用</strong></td><td>README、解説メモ、Issue運用、進捗記録</td><td><code>docs/</code></td><td>—</td><td>通期</td><td><strong>20h</strong></td></tr><tr><td></td><td></td><td></td><td></td><td></td><td><strong>合計</strong></td><td><strong>315h</strong></td></tr></tbody></table></div>
+<p><strong>ジャンルの粒度について</strong></p>
+<ul><li><strong>G1 と G4 は重い。</strong> 分割して複数人で持つことを前提にしてよい</li><li><strong>G6 は最初にやる必要がある</strong>（W01）。ここが決まらないと他の全ジャンルが動けない</li><li><strong>G2 は Blender が要る。</strong> 現在この環境を持っているのは1人だけなので、<strong>実行と動作確認はその人に寄る</strong>（§7-6）</li><li><strong>G9 は「誰かがやる」ではなく「書いた人が書く」。</strong> 実装した本人が、その場で1〜2行残す（§8-3）</li></ul>
+<h3 id="s3-4">3-4. 共同作業の形<a class="hash" href="#s3-4" aria-label="このセクションへのリンク">#</a></h3>
+<p><strong>前提：平日はほぼ毎日会える。相手が作業しているところを見ている時間が長い。</strong></p>
+<p>この条件では、<strong>「同席しているか」と「同じコードを書いているか」は別の軸</strong>である。混同すると設計を誤るので、分けて考える。</p>
+<h4 id="軸1同席するかいつどこで">軸1：同席するか（<code>いつ・どこで</code>）<a class="hash" href="#軸1同席するかいつどこで" aria-label="このセクションへのリンク">#</a></h4>
+<div class="table-wrap"><table class="md"><thead><tr><th></th><th>内容</th><th>throughput への影響</th></tr></thead><tbody><tr><td><strong>同席作業</strong> ★既定</td><td><strong>同じ場所で、各自が自分の作業をする。</strong> 詰まったらその場で聞く。相手の画面が視界に入る</td><td><strong>ほぼゼロ。</strong> 全員が自分の作業を進めているため</td></tr><tr><td>非同席</td><td>各自の都合の時間に作業する</td><td>ゼロ</td></tr></tbody></table></div>
+<p><strong>同席作業を既定とする。</strong> これは費用がほぼ掛からないのに、質問の敷居が下がり、相手が何をしているかが自然に分かるという利点だけがある。<strong>このプロジェクトで最も割の良い共同作業の形。</strong></p>
+<h4 id="軸2同じコードを書くか何を">軸2：同じコードを書くか（<code>何を</code>）<a class="hash" href="#軸2同じコードを書くか何を" aria-label="このセクションへのリンク">#</a></h4>
+<div class="table-wrap"><table class="md"><thead><tr><th>濃さ</th><th>形</th><th>どこで使うか</th></tr></thead><tbody><tr><td><strong>強</strong></td><td><strong>ペアプロ</strong>。1つのコードを2人で書く</td><td><strong>下表の3か所のみ</strong>（throughput が半分になるため）</td></tr><tr><td>中</td><td><strong>ジャンルを分けて書く。</strong> 同じジャンル内でも「この関数はこっち」と切り分ける</td><td><strong>通常の運用</strong>（§3-2・§3-3）</td></tr><tr><td>弱</td><td>レビューのみ</td><td>前提知識の差が大きく、手が出しにくいところ</td></tr></tbody></table></div>
+<p><strong>この2軸は独立している。</strong> 同席していても、普段は各自が別のファイルを書いている（＝同席 × 中）。それが通常の姿。</p>
+<blockquote><p><strong>→ 同席を既定にする根拠と、そこで生じる副作用: 決定記録 <a href="decisions.html#d-29">D-29</a></strong></p></blockquote>
+<p><strong>「強」（ペアプロ）に当たる箇所は3つだけ。</strong></p>
+<div class="table-wrap"><table class="md"><thead><tr><th>箇所</th><th>想定時間</th><th>時期</th></tr></thead><tbody><tr><td><strong><code>cameras.json</code> I/O と座標系変換</strong></td><td>2h × 1回</td><td><strong>W02</strong>（W01 から持ち越し。→ <a href="tasks/T01-pairpro1-io.html">T01</a>）</td></tr><tr><td><strong>ボクセル彫刻の行列化</strong></td><td>2h × 2回</td><td>W12</td></tr><tr><td><strong>離散ラプラシアン <code>L</code> の構成と求解</strong></td><td>2h × 3回</td><td>W14</td></tr></tbody></table></div>
+<p>計12時間。総予算の約4%。<strong>これ以上は増やせない。</strong></p>
+<blockquote><p><strong>→ 3か所を選んだ理由・コスト比較・W01 が動かせない理由: 決定記録 <a href="decisions.html#d-06">D-06</a></strong></p></blockquote>
+<h3 id="s3-5">3-5. ジャンルをまたぐ接続点<a class="hash" href="#s3-5" aria-label="このセクションへのリンク">#</a></h3>
+<p><strong>分担を固定しないぶん、「ここだけは全員が同じ認識でいる必要がある」箇所を明示する。</strong></p>
+<div class="table-wrap"><table class="md"><thead><tr><th>接続点</th><th>なぜ重要か</th><th>扱い</th></tr></thead><tbody><tr><td><strong><code>io/coords.py</code>（座標変換）</strong></td><td>ここを間違えると、<strong>全ジャンルの出力が静かに壊れる</strong>（§4）</td><td><strong>ペアプロで作る（W01）。</strong> 以降、変換をここ以外に書いたらテストで落ちる</td></tr><tr><td><strong><code>io/cameras.py</code> と <code>cameras.json</code></strong>（§5）</td><td>G2（データ生成）と G1（数理コア）の唯一の受け渡し口</td><td><strong>ペアプロで作る（W01）。</strong> 触るPRは必ず複数人でレビュー</td></tr><tr><td><strong><code>mesh/smooth.py</code> → <code>solvers/cg.py</code></strong></td><td>G4（メッシュ）が作った疎行列を G1（数理コア）が解く。ジャンルが実際に噛み合う唯一の点</td><td><strong>ペアプロで作る（W14）</strong></td></tr></tbody></table></div>
+<p><strong>この3つが §3-4 のペアプロ枠と一致している。</strong> 偶然ではなく、<strong>ジャンル間の接続点だからペアで作る</strong>という設計。</p>
+<h3 id="s3-6">3-6. 運用ルール<a class="hash" href="#s3-6" aria-label="このセクションへのリンク">#</a></h3>
+<ol><li><strong>着手する前に、Issueに「ジャンル」と「担当者」を書く。</strong> 同席していれば決めるのは口頭で足りるが、<strong>決まった内容はIssueかPRのコメントに残す</strong>（§8-3）。</li><li><strong>1つのIssueは1人が持つ。</strong> 複数人で書くなら、<strong>片方のブランチにコミットを積む</strong>か、そこ宛に小さなPRを出す。<code>main</code> 宛のPRはIssueの担当者が出す。</li><li><strong>「これをやりたい」はいつでも言ってよい。</strong> 週1の対面Issue切り（§8-3）を待つ必要もない。<strong>入れ替えた事実だけ記録に残す。</strong></li><li><strong>手が空いたら、<code>Todo</code> から取る。</strong> 「自分の担当ジャンルではないから待つ」という状態を作らない。</li><li><strong>前提知識が足りないジャンルを取ってもよい。</strong> そのときは §3-7 の解説メモを先に1本読む／書いてもらう。</li></ol>
+<blockquote><p><strong>→ ジャンル単位にした理由と、そこで失うもの: 決定記録 <a href="decisions.html#d-36">D-36</a></strong></p></blockquote>
+<h3 id="s3-7">3-7. 知識共有の仕組み<a class="hash" href="#s3-7" aria-label="このセクションへのリンク">#</a></h3>
+<p><strong>分担を固定しないなら、知識の偏りを埋める仕組みが要る。</strong> 対面で会えるため重い仕組みは不要。3つだけ。</p>
+<ol><li><strong><code>docs/notes/</code> に短い解説メモ。</strong> 前提知識のない人向け、A4半ページ程度。1本30分。<strong>そのジャンルを最初に触った人が書く。</strong><ul><li>数理側の例：「SVDで <code>Ap=0</code> を解くとはどういうことか」「条件数とは何か」「なぜバンドル調整でSchur補元を使うのか」</li><li>幾何・CG側の例：「cotan重みとは何で、なぜ一様重みより形が崩れないか」「UV展開とは何をしているか」「Marching Cubes の原理」「マスクの作り方」</li><li><strong>これは同時にREADMEと、外部に説明するときの下書きになる。</strong></li></ul></li><li><strong>PRの説明文は、そのジャンルを知らない人が読む前提で書く。</strong> §3-2 のApprove規約と対になる。</li><li><strong>月1回、自分が触っていないジャンルを1つ「説明してもらう」時間（30分）。</strong> 理解の抜けが見つかる。</li></ol>
+<h3 id="s3-8">3-8. スコープの明示（新しく参加する人へ）<a class="hash" href="#s3-8" aria-label="このセクションへのリンク">#</a></h3>
+<p><strong>先に知っておいてほしい線引き。</strong> 「思っていたのと違う」を後から起こさないために書いてある。</p>
+<div class="table-wrap"><table class="md"><thead><tr><th></th><th>内容</th></tr></thead><tbody><tr><td><strong>やること</strong></td><td><strong>静止画の一括処理。</strong> 写真20枚を入力し、カメラ位置を推定し、立体を復元し、精度を数値で測る</td></tr><tr><td><strong>やらないこと</strong></td><td><strong>リアルタイム描画・ゲームエンジン連携は扱わない。</strong> 受け皿として「ボクセルが削られる過程のビューア」を L4（余力があれば）に置いてあるだけ（§12）</td></tr><tr><td><strong>言語</strong></td><td><strong>Python 単一。</strong> 遅い箇所は Numba・行列化・チャンク分割で対処する。<strong>C++ 等は導入しない</strong>（→ <a href="decisions.html#d-32">D-32</a>）</td></tr><tr><td><strong>自作の範囲</strong></td><td><strong>反復解法・最適化・幾何アルゴリズムは自作する</strong>（ここが本プロジェクトの芯）。<strong>行列積やI/O、画像前処理はライブラリに任せる</strong>（§7-5）</td></tr><tr><td><strong>完成の定義</strong></td><td>L3（統合パイプライン＋比較実験）が目標。<strong>うまくいかない場合の落としどころも先に決めてある</strong>（§12）</td></tr></tbody></table></div>
+<hr>
+<h2 id="s4">4. 座標系の規約<a class="hash" href="#s4" aria-label="このセクションへのリンク">#</a></h2>
+<p>引き継ぎ資料 §10-5 が「事故が起きやすい」と警告した箇所。<strong>規約を決めることより、規約を破れない構造を作ることが本質。</strong></p>
+<h3 id="s4-1">4-1. 決定：OpenCV規約に統一<a class="hash" href="#s4-1" aria-label="このセクションへのリンク">#</a></h3>
+<div class="table-wrap"><table class="md"><thead><tr><th>対象</th><th>規約</th></tr></thead><tbody><tr><td>世界座標系</td><td>右手系、<strong>+Z が上</strong>（ターンテーブルの回転軸）、原点は回転台の中心</td></tr><tr><td>カメラ座標系</td><td><strong>OpenCV規約</strong>：+X 右、+Y 下、<strong>+Z が光軸の前方</strong></td></tr><tr><td>画像座標系</td><td><strong>OpenCV規約</strong>：原点は左上ピクセルの中心、+u 右、+v 下</td></tr><tr><td>外部パラメータの向き</td><td><strong>world → camera</strong>。すなわち <code>X_cam = R · X_world + t</code></td></tr></tbody></table></div>
+<p>世界座標の「+Z 上」だけは Blender と揃える（Blenderも +Z 上の右手系）。これで<strong>世界座標の変換は不要</strong>になり、変換が必要なのはカメラ座標と画像座標だけになる。</p>
+<blockquote><p><strong>→ OpenCV規約を選んだ理由・世界座標だけ Blender に揃える理由: 決定記録 <a href="decisions.html#d-10">D-10</a></strong></p></blockquote>
+<h3 id="s4-2">4-2. Blender との変換<a class="hash" href="#s4-2" aria-label="このセクションへのリンク">#</a></h3>
+<p>Blenderのカメラは <strong>−Z 方向を見て、+Y が上</strong>。OpenCVは <strong>+Z 方向を見て、+Y が下</strong>。Y軸とZ軸の符号が逆。</p>
+<pre><code class="lang-python">C = np.diag([1.0, -1.0, -1.0])
+
+R_cv = C @ R_blender
+t_cv = C @ t_blender</code></pre>
+<p>画像の縦方向も逆（Blender/OpenGLは左下原点）：</p>
+<pre><code class="lang-python">v_cv = H - 1 - v_blender</code></pre>
+<h3 id="s4-3">4-3. 規約を破れなくする仕組み<a class="hash" href="#s4-3" aria-label="このセクションへのリンク">#</a></h3>
+<blockquote><p><strong><code>src/recon3d/io/coords.py</code> の中の関数以外では、座標変換を一切書かない。</strong></p></blockquote>
+<p><code>diag(1,-1,-1)</code> や <code>H - 1 - v</code> が他のファイルに現れたら規約違反。機械的に検出する：</p>
+<pre><code class="lang-python"># tests/test_conventions.py
+def test_no_stray_coordinate_conversion():
+    """io/coords.py 以外に座標変換のリテラルが現れないことを確認する。
+    src/ 全体を走査し、diag(1, -1, -1) 相当のパターンを検出したら失敗。"""</code></pre>
+<p><strong>ペアプロ対象（§3-4）。</strong></p>
+<blockquote><p><strong>→ なぜ規約ではなく構造で縛るのか・想定している事故の形: 決定記録 <a href="decisions.html#d-11">D-11</a></strong></p></blockquote>
+<hr>
+<h2 id="s5">5. <code>cameras.json</code> スキーマ<a class="hash" href="#s5" aria-label="このセクションへのリンク">#</a></h2>
+<p>引き継ぎ資料 §10-3 で最優先とされた項目。①と④の唯一の接続点。</p>
+<h3 id="s5-1">5-1. スキーマ<a class="hash" href="#s5-1" aria-label="このセクションへのリンク">#</a></h3>
+<pre><code class="lang-json">{
+  "schema_version": "1.0",
+
+  "convention": {
+    "world_up": "+Z",
+    "handedness": "right",
+    "camera": "opencv",
+    "image_origin": "top_left",
+    "extrinsic_form": "world_to_camera"
+  },
+
+  "image_size": { "width": 1920, "height": 1080 },
+
+  "intrinsics": {
+    "fx": 1600.0, "fy": 1600.0,
+    "cx": 960.0,  "cy": 540.0,
+    "distortion": {
+      "model": "opencv_radtan",
+      "k1": 0.0, "k2": 0.0, "p1": 0.0, "p2": 0.0, "k3": 0.0
+    }
+  },
+
+  "views": [
+    {
+      "image": "images/img_000.png",
+      "mask":  "masks/img_000.png",
+      "R": [[1,0,0],[0,1,0],[0,0,1]],
+      "t": [0.0, 0.0, 0.5],
+      "source": "turntable_gt",
+      "turntable_angle_deg": 0.0,
+      "reprojection_error_px": null
+    }
+  ],
+
+  "meta": {
+    "generated_by": "tools/blender_render.py",
+    "generated_at": "2026-08-20T10:00:00+09:00",
+    "dataset": "synthetic_cup_20views"
+  }
+}</code></pre>
+<h3 id="s5-2">5-2. 各フィールドの役割<a class="hash" href="#s5-2" aria-label="このセクションへのリンク">#</a></h3>
+<div class="table-wrap"><table class="md"><thead><tr><th>フィールド</th><th>役割</th></tr></thead><tbody><tr><td><code>convention</code> ブロック</td><td>規約をデータファイル自身に埋め込む。読み込み時に検証し、想定と違えば例外を投げる</td></tr><tr><td><code>extrinsic_form</code></td><td><code>world→camera</code> かその逆かを文字列で持つ。<code>R</code> と <code>Rᵀ</code> の取り違えを防ぐ</td></tr><tr><td><strong><code>source</code></strong></td><td><code>"turntable_gt"</code> / <code>"dlt"</code> / <code>"bundle_adjusted"</code>。<strong>真値と推定値の切り替えがこの1フィールドで済み、下流のコードを変更せずに実験条件を切り替えられる</strong></td></tr><tr><td><code>mask</code></td><td>画像・マスク・カメラ行列を <code>cameras.json</code> 1ファイルから全部たどれるようにする</td></tr></tbody></table></div>
+<blockquote><p><strong>→ 各判断の根拠・<code>source</code> が撤退ラインの切り替えコストをゼロにしている件: 決定記録 <a href="decisions.html#d-12">D-12</a></strong></p></blockquote>
+<h3 id="s5-3">5-3. 読み書きと検証<a class="hash" href="#s5-3" aria-label="このセクションへのリンク">#</a></h3>
+<p><code>src/recon3d/io/cameras.py</code> に、<code>dataclass</code> ベースの読み書き＋検証を置く。<strong>pydantic等の追加依存は入れない</strong>（→ <a href="decisions.html#d-17">D-17</a>）。</p>
+<p>検証項目：</p>
+<div class="table-wrap"><table class="md"><thead><tr><th>項目</th><th>検出できる事故</th></tr></thead><tbody><tr><td><code>schema_version</code> が既知か</td><td>仕様変更の取り違え</td></tr><tr><td><code>convention</code> が想定と一致するか</td><td>規約違いのデータの混入</td></tr><tr><td><code>RᵀR ≈ I</code></td><td>回転行列の破損</td></tr><tr><td><strong><code>det(R) ≈ +1</code></strong></td><td><strong>座標変換の符号ミス（−1なら鏡映）</strong></td></tr></tbody></table></div>
+<hr>
+<h2 id="s6">6. リポジトリ構成<a class="hash" href="#s6" aria-label="このセクションへのリンク">#</a></h2>
+<p><strong>単一リポジトリ</strong>とする（→ <a href="decisions.html#d-13">D-13</a>）。</p>
+<pre><code>&lt;repo-name&gt;/
+├── pyproject.toml            # uv 管理・Python 3.11 固定・[build-system]（§6-3）
+├── uv.lock                   # コミットする（3台の環境同一性の根拠）
+├── .gitattributes            # * text=auto eol=lf   ← Windows対策
+├── .gitignore
+├── .github/workflows/ci.yml
+├── Discuss.md                # 非同期の連絡場所（対面でないときの連絡）
+├── HowToPush.md              # Git 操作の手引き（旧 ルート `README.md`）
+│
+├── docs/
+│   ├── README.md             # ★入口。現在地と次の一手
+│   ├── plan.md               # 本書（仕様・日程）
+│   ├── decisions.md          # 決定の理由（D-01〜）
+│   ├── progress.md           # 週次の実働記録
+│   ├── conventions.md        # 座標系規約（§4）          ← 2人
+│   ├── schema/cameras.md     # cameras.json 仕様（§5）    ← 2人
+│   ├── requirements.md       # 数値目標（Phase 1で作成）  ← 2人
+│   ├── notes/                # 相手向け解説メモ（§3-7）  ← 2人
+│   ├── experiments/          # 実験ログ・グラフ           ← 関口
+│   └── internal/             # 手続き・履歴用（読まなくてよい）
+│
+├── blender_system/
+│   └── system-info.txt       # 松田の Blender 環境の原本（§7-6）
+│
+├── src/recon3d/
+│   ├── io/                   # ★共有境界。ここだけ2人でレビュー
+│   │   ├── cameras.py        #   cameras.json 読み書き・検証
+│   │   ├── coords.py         #   ★座標変換はここだけ
+│   │   └── mesh_io.py        #   ply / obj
+│   │
+│   ├── geometry/             # ← 関口
+│   │   ├── dlt.py            #   姿勢推定（SVDによる同次最小二乗）
+│   │   ├── triangulate.py    #   三角測量・条件数
+│   │   ├── bundle.py         #   バンドル調整（ヤコビアン構成）
+│   │   └── carving.py        #   ボクセル彫刻（ペアプロ）
+│   │
+│   ├── solvers/              # ← 関口
+│   │   ├── cg.py             #   共役勾配法
+│   │   ├── preconditioner.py #   Jacobi / ILU(0)
+│   │   ├── lm.py             #   Levenberg-Marquardt
+│   │   └── schur.py          #   Schur補元による縮小
+│   │
+│   ├── vision/               # ← 松田
+│   │   ├── features.py       #   特徴点検出・マッチング
+│   │   └── segment.py        #   セグメンテーション・背景差分
+│   │
+│   ├── mesh/                 # ← 松田
+│   │   ├── marching_cubes.py
+│   │   ├── laplacian.py      #   ★L の構成（ペアプロ）
+│   │   ├── smooth.py         #   平滑化（solvers/cg.py を呼ぶ）
+│   │   ├── simplify.py       #   メッシュ簡略化
+│   │   └── texture.py        #   UV・テクスチャ投影
+│   │
+│   ├── fusion/               # 統合処理
+│   │   └── carve_refine.py   #   点群による凹み部分の補正
+│   │
+│   └── viz/                  # ← 松田
+│
+├── tools/
+│   ├── blender_render.py     # ★Blender内蔵Pythonで実行  ← 松田
+│   ├── blender_export.py     # ★同上（最終メッシュの取り込み）
+│   └── run_pipeline.py       # CLI エントリポイント
+│
+├── data/                     # .gitignore（実データはコミットしない）
+│   ├── synthetic_cup/
+│   ├── synthetic_bunny/
+│   └── real_mug/
+│
+└── tests/
+    ├── fixtures/
+    │   └── synthetic_scene.py   # ★画像なしの合成シーン生成（後述）
+    ├── data/                    # 小さな合成データセット（CI用・コミットする）
+    ├── test_conventions.py
+    ├── test_geometry/
+    ├── test_solvers/
+    ├── test_mesh/
+    └── test_e2e.py</code></pre>
+<h3 id="s6-1">6-1. この構成の要点<a class="hash" href="#s6-1" aria-label="このセクションへのリンク">#</a></h3>
+<ul><li><strong>モジュール境界＝ジャンル境界</strong>（§3-3）。<code>geometry/</code>＝G1、<code>vision/</code>＝G3、<code>mesh/</code>＝G4 のように1対1で対応させてあるため、<strong>別のジャンルを進めている人と同じ行を編集することがない。</strong> 同じジャンルを複数人で持つときは §3-6 の運用ルール1・2に従う。</li><li><strong><code>io/</code> だけが共有境界。</strong> ここを触るPRのみ必ず2人でレビューする。ペアプロ3か所のうち2か所（<code>coords.py</code>、<code>cameras.py</code>）がここに集中している。</li><li><strong><code>mesh/smooth.py</code> が <code>solvers/cg.py</code> を呼ぶ</strong>のが、G4（メッシュ処理）と G1（数理コア）が実際に接続する唯一の点（§3-5）。<code>laplacian.py</code> で作った疎行列を、CG法が解く。</li></ul>
+<blockquote><p><strong>→ 境界の引き方の設計意図: 決定記録 <a href="decisions.html#d-13">D-13</a>・<a href="decisions.html#d-05">D-05</a></strong></p></blockquote>
+<h3 id="s6-2">6-2. 骨格作りの範囲（W01・§13① の「ディレクトリ骨格を作成」）<a class="hash" href="#s6-2" aria-label="このセクションへのリンク">#</a></h3>
+<p><strong>上のツリーは完成時の姿であり、W01 で全部作るものではない。</strong> 骨格作りのゴールは<strong>「空の器を置いて <code>uv run pytest</code> が通る状態にすること」</strong>の1点とする。いまのボトルネックは <code>src/</code> も <code>tests/</code> も無いために <code>uv run pytest</code> が <strong>exit code 5（テスト0件）</strong>で終わることなので、ここが解消すれば骨格は完了と判定してよい。</p>
+<p><strong>作るもの（これで全部）</strong></p>
+<pre><code>src/recon3d/__init__.py
+src/recon3d/{io,geometry,solvers,vision,mesh,fusion,viz}/__init__.py
+tests/test_import.py          # import recon3d するだけの smoke test
+tests/fixtures/.gitkeep
+tests/data/.gitkeep
+tools/.gitkeep
+docs/{notes,schema,experiments}/.gitkeep</code></pre>
+<ul><li><code>__init__.py</code> は<strong>空でよい</strong>。中身を書くのは各ジャンルの担当週。</li><li><code>.gitkeep</code> を置くのは、<strong>Git が空ディレクトリを追跡しない</strong>ため。中身が入った時点で消してよい。</li><li><strong>完了判定</strong>：<code>uv sync</code> のあと <code>uv run pytest</code> が <strong><code>1 passed</code>（exit code 0）</strong> で終わること。3台（Windows / Ubuntu / mac）で確認する（§13④）。</li></ul>
+<p><strong>作らないもの</strong></p>
+<div class="table-wrap"><table class="md"><thead><tr><th>作らない</th><th>理由</th></tr></thead><tbody><tr><td><code>io/cameras.py</code>・<code>geometry/dlt.py</code> など<strong>個別モジュールの空ファイル</strong></td><td>着手時に「空ファイルを消して作り直す」無駄なコンフリクトが出る。ファイルは<strong>担当週に、実装する人が作る</strong>（<code>io/coords.py</code>・<code>io/cameras.py</code> は W01 ペアプロ#1、以降は §10 の週次カレンダーに従う）</td></tr><tr><td><strong>中身の実装</strong></td><td>骨格は器だけ。実装は各ジャンルの作業</td></tr><tr><td><code>data/</code> 配下</td><td><code>.gitignore</code> の <code>/data/</code> で除外済み。<strong>各自がローカルに作る</strong>（<code>tests/data/</code> は除外対象外なのでコミットする）</td></tr><tr><td><code>.github/workflows/ci.yml</code></td><td>骨格ではなく <strong>G7</strong>（§13②）の仕事</td></tr></tbody></table></div>
+<h3 id="s6-3">6-3. <code>import recon3d</code> の通し方：プロジェクトをパッケージとして扱う<a class="hash" href="#s6-3" aria-label="このセクションへのリンク">#</a></h3>
+<p><strong><code>pyproject.toml</code> に <code>[build-system]</code> を足す</strong>（2026-08-20 採用）。<code>uv sync</code> がプロジェクトを <strong>editable install</strong>（<code>src/</code> を編集したら即反映される形でインストール）するため、<code>import recon3d</code> がどこからでも通る。</p>
+<pre><code class="lang-toml">[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/recon3d"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]</code></pre>
+<ul><li>⚠️ <strong><code>packages = ["src/recon3d"]</code> の明示は必須。</strong> <code>[project] name</code> が <code>4bitcom-HandM</code> でパッケージ名 <code>recon3d</code> と一致しないため、書かないと hatchling がビルド対象を見つけられず <strong><code>uv sync</code> が失敗する</strong>。</li><li><strong>採らなかった案</strong>：pytest の <code>pythonpath = ["src"]</code> を張る方式。設定は1行で済むが、<strong>通るのは pytest 実行中だけ</strong>で、<code>uv run python tools/run_pipeline.py</code>（§6 の CLI エントリポイント）では <code>import recon3d</code> が通らない。<strong>CLI を持つ計画なので採らない。</strong></li><li><strong><code>uv.lock</code> は1行変化する</strong>（<code>source = { virtual = "." }</code> → <code>source = { editable = "." }</code>）。依存関係は増えないので、<strong>この差分はコミットしてよい</strong>。</li><li><strong>他の端末は <code>git pull</code> のあと <code>uv sync</code> を1回流すこと</strong>（editable install が入る）。</li><li>⚠️ <strong><code>src/recon3d/</code> が無い状態で先に <code>uv sync</code> してしまった端末は、<code>uv sync</code> だけでは直らない。</strong> editable install が「中身なし」で固定され、以降の <code>uv sync</code> は <code>Audited</code> と言って再ビルドしない。<strong><code>uv sync --reinstall-package 4bitcom-handm</code> を1回流すこと</strong>（<code>git pull</code> で <code>src/</code> ごと受け取る端末では起きない）。</li></ul>
+<blockquote><p><strong>→ この方式を選んだ理由・<code>pythonpath</code> 案を却下した理由: 決定記録 <a href="decisions.html#d-38">D-38</a></strong></p></blockquote>
+<hr>
+<h2 id="s7">7. 環境の再現<a class="hash" href="#s7" aria-label="このセクションへのリンク">#</a></h2>
+<h3 id="s7-1">7-1. <code>uv</code> を採用<a class="hash" href="#s7-1" aria-label="このセクションへのリンク">#</a></h3>
+<pre><code class="lang-bash">uv sync          # 環境構築（初回・以降とも同じコマンド）
+uv run pytest    # テスト実行</code></pre>
+<p><strong><code>uv.lock</code> は必ずコミットする。</strong> これが3台（Ubuntu / Mac / Windows）の環境同一性の根拠になる（→ <a href="decisions.html#d-14">D-14</a>）。</p>
+<h3 id="s7-2">7-2. Python は 3.11 に固定【2026-08-15 確定】<a class="hash" href="#s7-2" aria-label="このセクションへのリンク">#</a></h3>
+<p><strong>松田の実機で確認済み。Blender 5.0.1 の内蔵Pythonが 3.11.13。</strong></p>
+<pre><code>Blender: 5.0.1  (branch: blender-v5.0-release, hash: a3db93c5b259, 2025-12-15 Release)
+Python : 3.11.13 (MSC v.1929 64 bit AMD64)
+出典   : blender_system/system-info.txt（松田提出・2026-08-15）</code></pre>
+<p><strong>設定</strong>: <code>pyproject.toml</code> に <code>requires-python = "&gt;=3.11,&lt;3.12"</code>、<code>.python-version</code> に <code>3.11.13</code>（<code>[build-system]</code> は §6-3）。Mac mini のシステムPythonは 3.13.15 だが、<code>uv</code> が 3.11 を別途取得するため問題ない。</p>
+<p><strong>運用上の注意：Blender 5.0.x は LTS ではない。</strong></p>
+<blockquote><p><strong>開発期間中（〜2026-12）は Blender を 5.0.x に固定する。</strong> 更新が必要になった場合は、更新前に相談する。</p></blockquote>
+<blockquote><p><strong>→ 3.11 でなければならない理由・仮決めから確定までの経緯: 決定記録 <a href="decisions.html#d-15">D-15</a></strong></p></blockquote>
+<h3 id="s7-3">7-3. Windows対策：<code>.gitattributes</code> を初日に置く<a class="hash" href="#s7-3" aria-label="このセクションへのリンク">#</a></h3>
+<pre><code>* text=auto eol=lf
+*.png binary
+*.jpg binary
+*.ply binary
+*.obj binary
+*.blend binary</code></pre>
+<p><strong>誰かが clone する前に、最初に置いておく項目</strong>（→ <a href="decisions.html#d-16">D-16</a>）。</p>
+<p>あわせて、パス操作は全て <code>pathlib.Path</code> を使う（文字列連結や <code>/</code> のハードコードを禁止）。</p>
+<h3 id="s7-4">7-4. Blenderスクリプトの依存制約（重要）<a class="hash" href="#s7-4" aria-label="このセクションへのリンク">#</a></h3>
+<p><code>tools/blender_render.py</code> は <strong>Blender内蔵のPythonで実行される</strong>ため、<code>uv</code> で入れた <code>scipy</code> 等は使えない。</p>
+<blockquote><p><strong><code>tools/blender_*.py</code> は <code>bpy</code> と <code>numpy</code> のみに依存させる。<code>io/cameras.py</code> も同様。</strong></p></blockquote>
+<p>§5-3 で pydantic を採用せず <code>dataclass</code> にしたのはこの制約のため（→ <a href="decisions.html#d-17">D-17</a>）。<del>Blender内蔵Pythonに numpy が入っていることは W01 に実機確認する。</del> → <strong>✅ 2026-08-16 確認済み（numpy 1.26.4）。この制約は成立する。</strong></p>
+<h3 id="s7-5">7-5. ライブラリ構成<a class="hash" href="#s7-5" aria-label="このセクションへのリンク">#</a></h3>
+<div class="table-wrap"><table class="md"><thead><tr><th>用途</th><th>ライブラリ</th><th>主に使うジャンル（§3-3）</th></tr></thead><tbody><tr><td>数値計算基盤</td><td>NumPy, SciPy (sparse)</td><td>G1・G5</td></tr><tr><td>画像処理・特徴点</td><td>OpenCV</td><td>G3</td></tr><tr><td>点群・メッシュ</td><td>Open3D</td><td>G4</td></tr><tr><td>3D出力・データ生成</td><td>Blender Python API (<code>bpy</code>)</td><td>G2</td></tr><tr><td>可視化・グラフ</td><td>Matplotlib</td><td>G8</td></tr><tr><td>テスト</td><td>pytest</td><td>G7（全ジャンルが書く）</td></tr><tr><td>高速化（必要時）</td><td>Numba</td><td>G1・G5</td></tr></tbody></table></div>
+<p><strong>自作とライブラリの線引き</strong>（引き継ぎ資料 §8 から維持）</p>
+<div class="table-wrap"><table class="md"><thead><tr><th>レイヤ</th><th>扱い</th></tr></thead><tbody><tr><td>BLASレベル（行列積、ノルム、疎行列matvec）</td><td>NumPy / SciPy に任せる</td></tr><tr><td><strong>反復解法（CG法、前処理、収束判定）</strong></td><td><strong>自作</strong></td></tr><tr><td><strong>最適化（Gauss-Newton、LM、Schur補元）</strong></td><td><strong>自作</strong></td></tr><tr><td><strong>幾何アルゴリズム（DLT、三角測量、ボクセル彫刻）</strong></td><td><strong>自作</strong></td></tr><tr><td>I/O、可視化、画像前処理</td><td>ライブラリに任せる</td></tr></tbody></table></div>
+<blockquote><p><strong>→ この線引きの根拠・C++/Rust を採用しない理由: 決定記録 <a href="decisions.html#d-18">D-18</a></strong></p></blockquote>
+<hr>
+<h3 id="s7-6">7-6. 松田の実行環境と、そこから来る設計制約【2026-08-15 追加 / 2026-08-16 更新】<a class="hash" href="#s7-6" aria-label="このセクションへのリンク">#</a></h3>
+<p>出典は <code>blender_system/system-info.txt</code>（松田提出）と、<strong>松田の回答（2026-08-16）</strong>。<strong>環境まわりで疑義が出たら <code>blender_system/system-info.txt</code> を参照し、そこに無い項目は本人に聞き直すこと</strong>（回答シートは反映後に削除済み。§14）。</p>
+<h4 id="確定した環境">確定した環境<a class="hash" href="#確定した環境" aria-label="このセクションへのリンク">#</a></h4>
+<div class="table-wrap"><table class="md"><thead><tr><th>項目</th><th>値</th></tr></thead><tbody><tr><td>Blender</td><td>5.0.1（Release, 2025-12-15, hash <code>a3db93c5b259</code>）。<strong>期間中 5.0.x 維持を松田が了承（2026-08-16）</strong></td></tr><tr><td>内蔵 Python</td><td>3.11.13 ／ <strong>numpy 1.26.4（2026-08-16 実機確認）</strong></td></tr><tr><td>OS</td><td><strong>Windows 11 Education 25H2 / ビルド 26200.8973 / 64bit</strong>（<code>platform</code> 表記は <code>Windows-10-10.0.26200-SP0</code>）</td></tr><tr><td>インストール先</td><td><code>C:\Program Files\Blender Foundation\Blender 5.0\</code>（<strong>WSLではなく素のWindows</strong>。WSLは未使用と回答）</td></tr><tr><td>ユーザースクリプト</td><td><code>C:\Users\&lt;user&gt;\AppData\Roaming\Blender Foundation\Blender\5.0\scripts\</code></td></tr><tr><td>GPU</td><td>Intel Iris Xe Graphics（<strong>内蔵GPU</strong>）/ ドライバ 32.0.101.7085 / OpenGL 4.6</td></tr><tr><td>Blender GPUバックエンド</td><td>OpenGL</td></tr><tr><td><strong>Cycles の計算デバイス</strong></td><td><strong>選択可能なGPUデバイスは存在しない（2026-08-16 確認）。</strong> タブに CUDA / OptiX / HIP / oneAPI は並ぶが、<strong>該当デバイスは0件</strong>。→ <strong>CPU レンダリング確定</strong></td></tr><tr><td>CPU</td><td><strong>Core i7-1360P（第13世代）</strong>。<strong>AVX2</strong> 対応</td></tr><tr><td>メモリ</td><td><strong>16 GB</strong>（15.6 GB 使用可能）</td></tr><tr><td>ストレージ空き</td><td><strong>82.6 GB</strong></td></tr><tr><td>筐体</td><td><strong>ノートPC</strong>（デバイス名 <code>DESKTOP-UF5CNFK</code>）</td></tr><tr><td>Blender の UI 言語</td><td><strong>日本語</strong></td></tr><tr><td>開発環境（Blender外）</td><td>エディタ <strong>VSCode</strong> ／ ターミナル <strong>Git Bash</strong> ／ WSL なし ／ Windows側に <strong>Python 3.14.6</strong> が別途導入済み</td></tr><tr><td>同梱ライブラリ</td><td>FFmpeg（avcodec 61）、OpenVDB 12.0.0、USD 0.25.8、Alembic 1.8.3、OpenImageIO 3.0.9、OpenColorIO 2.4.2</td></tr><tr><td>有効アドオン（標準外）</td><td><code>vrm</code> 3.21.0、<code>mmd_tools</code> 4.5.8、<code>rokoko-studio-live-blender</code> 1.4.3</td></tr><tr><td>有効アドオン（I/O）</td><td><code>io_scene_fbx</code> 5.14.0、<code>io_scene_gltf2</code> 5.0.21、<code>io_anim_bvh</code>、<code>io_mesh_uv_layout</code>、<code>io_curve_svg</code></td></tr></tbody></table></div>
+<h4 id="この環境から来る決定">この環境から来る決定<a class="hash" href="#この環境から来る決定" aria-label="このセクションへのリンク">#</a></h4>
+<div class="table-wrap"><table class="md"><thead><tr><th>#</th><th>決定</th><th>根拠</th></tr></thead><tbody><tr><td>1</td><td><strong>合成データ生成の既定レンダラは EEVEE。</strong> Cycles はレンダリング品質の影響を見る追加実験でのみ使う。<strong>2026-08-16 に GPU デバイスが無いことが確認され、根拠が確定した</strong></td><td><a href="decisions.html#d-19">D-19</a></td></tr><tr><td>2</td><td><strong>マスク出力時は View Transform を <code>Standard</code> に設定する。</strong> スクリプトから明示的に設定し、UI設定に依存させない。マスクは後処理の閾値ではなく Blender 側で直接出力する</td><td><a href="decisions.html#d-20">D-20</a></td></tr><tr><td>3</td><td><strong><code>geometry/carving.py</code> はボクセルをチャンク分割して投影する。</strong> 全ボクセルを一度に <code>4×N</code> へ展開しない。チャンクサイズは外部パラメータにする</td><td><a href="decisions.html#d-21">D-21</a></td></tr><tr><td>4</td><td><strong>L4 のリアルタイムビューアは、内蔵GPU前提で控えめに見積もる</strong>（解像度か更新頻度を落とす）</td><td><a href="decisions.html#d-08">D-08</a></td></tr><tr><td>5</td><td><strong>ボクセル解像度は 256³ を既定として維持する</strong>（メモリ16GB確定。ただしチャンク分割は必須のまま）</td><td><a href="decisions.html#d-32">D-32</a></td></tr><tr><td>6</td><td><strong>マスクの生成方式は、候補を1枚にまとめてから W02 に2人で決める</strong>（<strong>Blender でマスク処理を経験したメンバーがいないため</strong>、D-20 の「手法はBlender担当に委ねる」を改訂）</td><td><a href="decisions.html#d-35">D-35</a></td></tr></tbody></table></div>
+<p>決定2・6は <code>tools/blender_render.py</code>（松田）、決定3・5はペアプロ#2（W12）の設計項目に含める。<strong>ボクセル解像度の最終確定（256³ を維持できるか）は W12 に実測で行う</strong>（§16）。</p>
+<h4 id="好材料">好材料<a class="hash" href="#好材料" aria-label="このセクションへのリンク">#</a></h4>
+<div class="table-wrap"><table class="md"><thead><tr><th>分かったこと</th><th>使い道</th></tr></thead><tbody><tr><td>glTF / FBX エクスポータが有効</td><td>資料3 Q21 の「Webで見られる形式で出力」が追加準備なしで実現できる</td></tr><tr><td>FFmpeg 同梱</td><td>デモ動画の書き出しが Blender 内で完結する</td></tr><tr><td>OpenVDB 12.0.0 同梱</td><td>ボクセルを Blender 側で可視化・検証できる。自作 Marching Cubes の目視検証に使える</td></tr><tr><td><code>io_mesh_uv_layout</code> が有効</td><td>UV展開結果の確認がすぐできる</td></tr></tbody></table></div>
+<hr>
+<h3 id="s7-7">7-7. 参加者の前提スキルと、入口の整備【2026-08-16 追加】<a class="hash" href="#s7-7" aria-label="このセクションへのリンク">#</a></h3>
+<p><strong>ジャンル制（§3-2）は「誰でもどのジャンルも取れる」ことを前提にしている。</strong> そのためには<strong>入口の段差を先に均しておく必要がある。</strong> 参加者の前提はここに書く（優劣の話ではなく、工程の組み方に効くため）。</p>
+<h4 id="現在の参加者の前提2026-08-16-時点">現在の参加者の前提（2026-08-16 時点）<a class="hash" href="#現在の参加者の前提2026-08-16-時点" aria-label="このセクションへのリンク">#</a></h4>
+<div class="table-wrap"><table class="md"><thead><tr><th>項目</th><th>状況</th></tr></thead><tbody><tr><td>Python</td><td><strong>歴が数か月のメンバーがいる</strong>（主言語は C）。numpy / OpenCV / Open3D / bpy / pytest・型ヒント・dataclass はいずれも未経験</td></tr><tr><td>Git</td><td><strong>clone / commit / push まで。</strong> branch・PR・レビュー・conflict 解決・rebase・<code>.gitignore</code> は未経験。<strong>W01 に練習時間1時間の要望あり</strong></td></tr><tr><td>Blender</td><td>使用経験はあるが、<strong>Scripting タブと CLI レンダリング（<code>blender --background</code>）は未経験。</strong> レンダリングエンジンの設定・ライト・カメラも深くは触っていない。<strong>マスク処理は経験なし</strong>（→ <a href="decisions.html#d-35">D-35</a>）</td></tr><tr><td>3Dモデル</td><td><strong>既存の配布モデルを読み込んで使う形が主</strong>（→ 合成データの元モデルは配布モデルの調達を既定にする）</td></tr><tr><td><strong>開発方針</strong></td><td><strong>「本開発では生成AIを用いたコーディングを控えたい」</strong>という申告がある。<strong>この方針は尊重する</strong>（→ <a href="decisions.html#d-33">D-33</a>）</td></tr></tbody></table></div>
+<h4 id="入口の整備誰がやってもよい作業として置く">入口の整備（誰がやってもよい作業として置く）<a class="hash" href="#入口の整備誰がやってもよい作業として置く" aria-label="このセクションへのリンク">#</a></h4>
+<div class="table-wrap"><table class="md"><thead><tr><th>#</th><th>やること</th><th>効く場面</th></tr></thead><tbody><tr><td>1</td><td><strong>W01 に Git の練習を1時間取る</strong>（branch → PR → レビュー → squash merge を1周）</td><td>§8-1 の「Approve必須は W03 から」と対になる</td></tr><tr><td>2</td><td><strong>Python に不慣れな人の最初の1本は <code>tools/blender_render.py</code>（G2）にする。</strong> ライブラリ知識が要らず、bpy と numpy だけで書ける（§7-4）</td><td>W02</td></tr><tr><td>3</td><td><strong><code>docs/notes/</code> に「Blender の Scripting タブと CLI レンダリングの入口」を1本置く</strong>（§3-7）</td><td><strong>W02 中</strong>（→ <a href="tasks/T08-blender-entry-note.html">T08</a>）</td></tr><tr><td>4</td><td><strong>PR レビューでは「Python としての書き方」も指摘対象に含める</strong>（型ヒント・<code>pathlib</code>・dataclass）</td><td>通期</td></tr><tr><td>5</td><td><strong>生成AIを使わない前提で初速を見込む。</strong> 見積もり（315h）は変えないが、<strong>Phase 0（夏休み中）の前倒しで吸収する</strong></td><td>W01–W03</td></tr></tbody></table></div>
+<blockquote><p><strong>注意：これは「担当を減らす」理由にはしない。</strong> ジャンルはやりたい人が取る（§3-2）。<strong>入口の段差を均すのであって、中身を取り上げるのではない</strong>（→ <a href="decisions.html#d-33">D-33</a>）。</p></blockquote>
+<h3 id="s7-8">7-8. リポジトリを同期フォルダの下に置かない【2026-08-20 追加】<a class="hash" href="#s7-8" aria-label="このセクションへのリンク">#</a></h3>
+<p><strong>iCloud Drive / OneDrive / Dropbox / Google Drive の同期フォルダ配下に clone しないこと。</strong> ローカルの作業ディレクトリに置く（例：<code>~/Projects/4bitcom</code>）。<strong>同期は Git がやるので、ファイル同期サービスは不要どころか有害。</strong></p>
+<p><strong>実際に起きたこと（2026-08-20・mac）</strong></p>
+<div class="table-wrap"><table class="md"><thead><tr><th>現象</th><th>中身</th></tr></thead><tbody><tr><td><code>uv run pytest</code> が <code>ModuleNotFoundError: No module named 'recon3d'</code></td><td>直前まで <code>1 passed</code> だったのに、数分後に落ちるようになった</td></tr><tr><td>原因</td><td><code>uv</code> は <code>.venv</code> に macOS の <strong><code>hidden</code> フラグ</strong>を付ける（正常）。<strong>iCloud Drive がそのフラグを <code>.venv</code> 配下の全ファイルに伝播させ</strong>、<code>site-packages/*.pth</code> まで hidden になった</td></tr><tr><td>なぜ import が壊れるか</td><td>CPython の <code>site.py</code>（<code>addpackage</code>）は <strong><code>hidden</code> が付いた <code>.pth</code> を読み飛ばす</strong>。editable install のパスを教えるファイルが無視され、<code>src/</code> が <code>sys.path</code> に入らなくなる</td></tr><tr><td>手で直せない</td><td><code>chflags nohidden</code> で外しても、<strong>1分ほどで iCloud が付け直す</strong>（<code>.venv</code> 内 691 ファイルすべて）</td></tr><tr><td>併発</td><td><code>.venv/lib 2</code> という <strong>iCloud の衝突コピー</strong>が生成されていた</td></tr></tbody></table></div>
+<p><strong>対処</strong>: リポジトリを <code>~/Projects/4bitcom</code> へ移動し、<code>.venv</code> を作り直した（<code>rm -rf .venv &amp;&amp; uv sync</code>）。移動後は <code>hidden</code> 0 件、<code>uv run pytest</code> は <code>1 passed</code>。<strong><code>.git/</code> ごと移動するので remote 設定・追跡ブランチはそのまま生きる</strong>（<code>git remote -v</code> と <code>git ls-remote</code> で確認済み）。</p>
+<blockquote><p>⚠️ <strong>Windows の OneDrive も同じ罠がある</strong>（<code>デスクトップ</code>・<code>ドキュメント</code> が既定で OneDrive 配下になっていることが多い）。<strong>clone 先が同期フォルダでないかを最初に確かめること。</strong></p></blockquote>
+<blockquote><p><strong>→ 判断の記録: <a href="decisions.html#d-39">D-39</a></strong></p></blockquote>
+<hr>
+<h2 id="s8">8. ブランチ戦略とIssue運用<a class="hash" href="#s8" aria-label="このセクションへのリンク">#</a></h2>
+<h3 id="s8-1">8-1. ブランチ<a class="hash" href="#s8-1" aria-label="このセクションへのリンク">#</a></h3>
+<p><strong><code>main</code> のみを長期ブランチとする</strong>（→ <a href="decisions.html#d-22">D-22</a>）。</p>
+<div class="table-wrap"><table class="md"><thead><tr><th>項目</th><th>決定</th></tr></thead><tbody><tr><td><code>main</code></td><td>保護。直push禁止、PR必須</td></tr><tr><td>ブランチ名</td><td><code>feat/&lt;module&gt;-&lt;topic&gt;</code> / <code>fix/&lt;...&gt;</code> / <code>docs/&lt;...&gt;</code> / <code>exp/&lt;...&gt;</code></td></tr><tr><td>例</td><td><code>feat/solvers-cg</code>、<code>feat/mesh-marching-cubes</code>、<code>exp/e2-angle-condition-number</code></td></tr><tr><td>マージ</td><td><strong>squash merge に統一</strong>（履歴が読みやすい。public化後に読まれる前提）</td></tr><tr><td>Approve</td><td>他のメンバーのApprove必須。<strong>ただし W1〜W2 は必須にせず、W3から必須化</strong>（全員がGitに慣れるまで）</td></tr></tbody></table></div>
+<h3 id="s8-2">8-2. PRの規約<a class="hash" href="#s8-2" aria-label="このセクションへのリンク">#</a></h3>
+<ol><li><strong>PRの説明文は、相手の専門外を前提に書く。</strong> 「何を」「なぜ」を1〜3段落。</li><li><strong>Approveコメントには「このPRが何をしているか、自分の言葉で1〜3行」を書く。</strong> 形式的なLGTMを構造的に禁止する（§3-2）。</li><li>1 PR = 1 Issue = 1トピック。複数のことを混ぜない。</li></ol>
+<h3 id="s8-3">8-3. Issue の粒度<a class="hash" href="#s8-3" aria-label="このセクションへのリンク">#</a></h3>
+<blockquote><p><strong>1 Issue = 1 PR = 1〜2週で終わる単位。</strong></p></blockquote>
+<p>Phase単位のIssue（例：「Phase 2 を完了する」）は作らない。</p>
+<p><strong>ラベル</strong></p>
+<div class="table-wrap"><table class="md"><thead><tr><th>種類</th><th>値</th></tr></thead><tbody><tr><td><strong>ジャンル（§3-3）</strong></td><td><code>G1:数理コア</code> <code>G2:3DCG</code> <code>G3:画像処理</code> <code>G4:メッシュ</code> <code>G5:ボクセル統合</code> <code>G6:基盤IO</code> <code>G7:テストCI</code> <code>G8:実験可視化</code> <code>G9:ドキュメント</code></td></tr><tr><td>フェーズ</td><td><code>phase:0</code> 〜 <code>phase:4</code></td></tr><tr><td>特殊</td><td><code>pair</code>（ペアプロ対象）、<code>blocked</code>、<code>good-first-issue</code>（<strong>新しく入った人向け</strong>）</td></tr></tbody></table></div>
+<p><strong>運用</strong></p>
+<ul><li>GitHub Projects のボードを1枚：<code>Todo</code> / <code>In Progress</code> / <code>In Review</code> / <code>Done</code></li><li><strong>Issue には必ずジャンルのラベルを付ける。担当者（Assignee）は着手する時点で入れる</strong>（§3-2）。<strong>未着手のIssueに担当者が入っていないのは正常</strong></li><li><strong>週1回、対面15分で次週分のIssueを切る。</strong> 会えるという条件を活かす</li><li>対面で決めたことは、その場でIssueかPRにコメントとして残す。<strong>GitHub上に議論が残らないと、後から「なぜこうしたか」が誰にも分からなくなる</strong></li></ul>
+<hr>
+<h2 id="s9">9. テスト戦略とCI<a class="hash" href="#s9" aria-label="このセクションへのリンク">#</a></h2>
+<h3 id="s9-1">9-1. 3層のテスト<a class="hash" href="#s9-1" aria-label="このセクションへのリンク">#</a></h3>
+<p><strong>第1層：単体テスト（画像不要の合成シーン）</strong></p>
+<p><code>tests/fixtures/synthetic_scene.py</code> に、<strong>画像を一切使わない合成データ生成器</strong>を置く。</p>
+<pre><code class="lang-python">def make_scene(n_points=100, n_cameras=20, noise_px=0.0, seed=0):
+    """3D点をランダム生成し、既知のカメラ行列で投影する。
+    戻り値: (points_3d, cameras, observations_2d)  — すべて正解が既知
+    """</code></pre>
+<p><strong>これが Phase 2 の主力テストになる。</strong> 対象：<code>geometry/dlt.py</code>、<code>geometry/triangulate.py</code>、<code>geometry/bundle.py</code>、<code>solvers/*</code></p>
+<p>ソルバのテストは解析的な正解と照合する（例：CG法は対称正定値な小行列に対して n 回以内に厳密解に到達する）。</p>
+<p><strong>第2層：リファレンス回帰テスト</strong></p>
+<p>OpenCV版と自作版の結果を許容誤差付きで照合する。</p>
+<div class="table-wrap"><table class="md"><thead><tr><th>自作</th><th>リファレンス</th></tr></thead><tbody><tr><td><code>geometry/dlt.py</code></td><td><code>cv2.solvePnP</code></td></tr><tr><td><code>geometry/triangulate.py</code></td><td><code>cv2.triangulatePoints</code></td></tr><tr><td><code>solvers/cg.py</code></td><td><code>scipy.sparse.linalg.cg</code></td></tr></tbody></table></div>
+<p><strong>第3層：E2Eテスト</strong></p>
+<p><code>tests/data/</code> に置いた小さな合成データセット（低解像度・8枚程度、数MB以内）を通し、Hausdorff距離が閾値以下であることを確認する。CIで回せる軽さにする。</p>
+<blockquote><p><strong>→ 第1層が主力になる理由・Phase 0 でライブラリ版を先に作る理由: 決定記録 <a href="decisions.html#d-23">D-23</a></strong></p></blockquote>
+<h3 id="s9-2">9-2. CI<a class="hash" href="#s9-2" aria-label="このセクションへのリンク">#</a></h3>
+<p><strong>GitHub Actions で、push時に Ubuntu と Windows の2環境で <code>pytest</code> を実行。</strong></p>
+<pre><code class="lang-yaml"># .github/workflows/ci.yml （骨子）
+strategy:
+  matrix:
+    os: [ubuntu-latest, windows-latest]
+steps:
+  - uses: actions/checkout@v4
+  - uses: astral-sh/setup-uv@v3
+  - run: uv sync
+  - run: uv run pytest</code></pre>
+<p><strong>Blender依存のテスト（<code>tools/blender_*.py</code>）はCIから除外する。</strong> これらは松田のローカルで手動確認とする。</p>
+<blockquote><p><strong>→ 導入理由（実利・就活）とBlender除外の理由: 決定記録 <a href="decisions.html#d-24">D-24</a></strong></p></blockquote>
+<hr>
+<h2 id="s10">10. 週次カレンダー（18週）<a class="hash" href="#s10" aria-label="このセクションへのリンク">#</a></h2>
+<p><strong>着工 2026-08-17（月）、Phase 4 完了 2026-12-20。</strong></p>
+<div class="table-wrap"><table class="md"><thead><tr><th>週</th><th>期間</th><th>Phase</th></tr></thead><tbody><tr><td>W01–W03</td><td>08-17 〜 09-06</td><td>Phase 0：技術検証</td></tr><tr><td>W04–W05</td><td>09-07 〜 09-20</td><td>Phase 1：要件定義・基本設計</td></tr><tr><td>W06–W11</td><td>09-21 〜 11-01</td><td>Phase 2：数理コアの自作</td></tr><tr><td>W12–W15</td><td>11-02 〜 11-29</td><td>Phase 3：Visual Hull統合とメッシュ化</td></tr><tr><td>W16–W18</td><td>11-30 〜 12-20</td><td>Phase 4：評価実験</td></tr></tbody></table></div>
+<blockquote><p><strong>注意：Phase 2（W06以降）は大学の後期授業期間と重なる。</strong> 最も重い6週間が最も忙しい時期に当たるため、Phase 0–1（夏休み中）でできる作業は前倒しすること。</p></blockquote>
+<h3 id="phase-0技術検証w01w03">Phase 0：技術検証（W01–W03）<a class="hash" href="#phase-0技術検証w01w03" aria-label="このセクションへのリンク">#</a></h3>
+<p>目的は<strong>実測値を得ることだけ</strong>。ドキュメントは最小限。</p>
+<div class="table-wrap"><table class="md"><thead><tr><th>週</th><th>ジャンル</th><th>やること</th></tr></thead><tbody><tr><td><strong>W01</strong></td><td><strong>G6・G7</strong></td><td>リポジトリ受け取り・<code>uv</code> 環境構築（<strong>Python 3.11.13 固定</strong>）・<code>pyproject.toml</code>・<strong><code>.gitattributes</code></strong>・CI雛形・<strong>ディレクトリ骨格（範囲は §6-2）</strong>をpush。<strong>Windows で <code>uv sync</code> と <code>uv run pytest</code> が通ることの確認</strong></td></tr><tr><td></td><td><strong>G6（ペアプロ#1・2h）</strong></td><td><code>docs/conventions.md</code>・<code>docs/schema/cameras.md</code> を書き、<code>io/coords.py</code>・<code>io/cameras.py</code> を実装</td></tr><tr><td></td><td><strong>G9</strong></td><td><strong>Git 練習（1h）</strong>：branch → PR → レビュー → squash merge を1周する（§7-7・§8-1）</td></tr><tr><td><strong>W02</strong></td><td><strong>G1・G3（ライブラリ版）</strong></td><td>OpenCV既存関数で一直線パイプラインを通す（SIFT → <code>solvePnP</code> → <code>triangulatePoints</code> → Open3D表示）</td></tr><tr><td></td><td><strong>G7</strong></td><td><code>tests/fixtures/synthetic_scene.py</code>（画像なしの合成シーン）を実装</td></tr><tr><td></td><td><strong>G2</strong></td><td><code>tools/blender_render.py</code> を実装（<strong>EEVEE 既定・View Transform は Standard</strong>。§7-6）。<code>synthetic_cup</code> を20方向レンダリングし、<code>images/</code>・<code>masks/</code>・<code>cameras.json</code>（<code>source: turntable_gt</code>）・<code>gt_mesh.ply</code> を出力</td></tr><tr><td><strong>W03</strong></td><td><strong>G8</strong></td><td>合成データにライブラリ版を通し、<strong>再投影誤差・点群密度・処理時間を実測</strong></td></tr><tr><td></td><td><strong>G2・G3</strong></td><td><strong>実写を1セット撮影</strong>（<strong>スマホ・チェッカーボードは所持済み。三脚・回転台・背景布・照明は未所持</strong>なので代用で回す。§14-14）。特徴点が何点取れるかを実測</td></tr></tbody></table></div>
+<blockquote><p><strong>W01 の G6 は最優先。</strong> ここが終わるまで他ジャンルが動けない（§3-3）。<strong><code>.gitattributes</code> は誰かが clone する前に置くこと</strong>（§7-3）。
+<strong>W02 以降は G1／G2 が並行して走る。</strong> 接続点は <code>cameras.json</code> だけなので、互いの完成を待つ必要はない。</p></blockquote>
+<p><strong>W01 完了時点で、引き継ぎ資料 §5 の「Phase 1：<code>cameras.json</code> の仕様だけ確定」が完了する。</strong> 以降、①と④は並行して進められる。</p>
+<p><strong>W03 の成果物</strong>：Phase 1 の数値目標の根拠となる実測値一式。</p>
+<h3 id="phase-1要件定義基本設計w04w05">Phase 1：要件定義・基本設計（W04–W05）<a class="hash" href="#phase-1要件定義基本設計w04w05" aria-label="このセクションへのリンク">#</a></h3>
+<div class="table-wrap"><table class="md"><thead><tr><th>週</th><th>内容</th></tr></thead><tbody><tr><td><strong>W04</strong></td><td>W03 の実測値を根拠に数値目標を設定 → <code>docs/requirements.md</code></td></tr><tr><td><strong>W05</strong></td><td>基本設計。モジュール間インターフェースの確定、テスト仕様の骨子、Phase 2 のIssueを全て発行</td></tr></tbody></table></div>
+<p><strong>数値目標の例</strong>（W03 の実測値で確定させる）：</p>
+<ul><li>カメラ角度誤差 ≤ 2.0°（真値 <code>turntable_gt</code> との比較）</li><li>再投影誤差 ≤ 1.5 px</li><li>Hausdorff距離 ≤ ○ mm（真値メッシュとの比較）</li><li>全パイプライン処理時間 ≤ 10分（20枚・ボクセル 256³）</li></ul>
+<h3 id="phase-2数理コアの自作w06w11">Phase 2：数理コアの自作（W06–W11）<a class="hash" href="#phase-2数理コアの自作w06w11" aria-label="このセクションへのリンク">#</a></h3>
+<p><strong>この6週は G1（数理コア）・G3（画像処理）・G4（メッシュ処理）が並行して走る。</strong> 3系統あるので、人数が増えたぶんはここに入れる。</p>
+<div class="table-wrap"><table class="md"><thead><tr><th>週</th><th>G1：数理コア</th><th>G3：画像処理 → G4：メッシュ処理</th></tr></thead><tbody><tr><td><strong>W06</strong></td><td><code>geometry/dlt.py</code> — SVDによる同次最小二乗 <code>Ap=0</code></td><td><code>vision/segment.py</code> — セグメンテーション・背景差分</td></tr><tr><td><strong>W07</strong></td><td><code>geometry/triangulate.py</code> — 線形最小二乗＋<strong>条件数の測定</strong></td><td>同上（実写向けの調整）</td></tr><tr><td><strong>W08</strong></td><td><code>solvers/cg.py</code> + <code>solvers/preconditioner.py</code>（Jacobi / ILU(0)）</td><td><code>vision/features.py</code> — 特徴点検出・マッチング</td></tr><tr><td><strong>W09</strong></td><td><code>geometry/bundle.py</code> — 再投影誤差とヤコビアンの構成</td><td>同上</td></tr><tr><td><strong>W10</strong></td><td><code>solvers/schur.py</code> + <code>solvers/lm.py</code> — Schur補元による縮小とLM</td><td><code>mesh/marching_cubes.py</code>（ここから G4）</td></tr><tr><td><strong>W11</strong></td><td>統合。<strong>OpenCV版との突き合わせ（第2層テスト）</strong>、回帰テスト整備（G7）</td><td><code>mesh/simplify.py</code></td></tr></tbody></table></div>
+<p><strong>★ W11 終了時：撤退ライン判定①</strong>（§12）</p>
+<h3 id="phase-3visual-hull統合とメッシュ化w12w15">Phase 3：Visual Hull統合とメッシュ化（W12–W15）<a class="hash" href="#phase-3visual-hull統合とメッシュ化w12w15" aria-label="このセクションへのリンク">#</a></h3>
+<div class="table-wrap"><table class="md"><thead><tr><th>週</th><th>内容</th></tr></thead><tbody><tr><td><strong>W12</strong></td><td><strong>ペアプロ#2（2h×2・G5）</strong>：<code>geometry/carving.py</code> — ボクセル彫刻の行列化。並行して <strong>G2 が実写データの本格取得</strong>を開始</td></tr><tr><td><strong>W13</strong></td><td>Marching Cubes 接続 → メッシュ出力（G4）。<code>fusion/carve_refine.py</code> — <strong>点群による凹み部分の補正</strong>（G5）</td></tr><tr><td><strong>W14</strong></td><td><strong>ペアプロ#3（2h×3・G4×G1）</strong>：<code>mesh/laplacian.py</code>（<code>L</code> の構成、一様重み vs cotan重み）＋ <code>mesh/smooth.py</code>（CG法で求解）</td></tr><tr><td><strong>W15</strong></td><td><code>mesh/texture.py</code> — UV展開（Blender Smart UV Project）・テクスチャ投影・Blender出力。<code>tools/run_pipeline.py</code> の完成</td></tr></tbody></table></div>
+<p><strong>★ W15 終了時：撤退ライン判定②</strong>（§12）</p>
+<h3 id="phase-4評価実験w16w18">Phase 4：評価実験（W16–W18）<a class="hash" href="#phase-4評価実験w16w18" aria-label="このセクションへのリンク">#</a></h3>
+<div class="table-wrap"><table class="md"><thead><tr><th>週</th><th>内容</th></tr></thead><tbody><tr><td><strong>W16</strong></td><td>E1（画像枚数）、E2（角度刻み vs 条件数）</td></tr><tr><td><strong>W17</strong></td><td>E3（バンドル調整の有無）、E4（前処理）、E6（LMの λ）</td></tr><tr><td><strong>W18</strong></td><td><strong>E5（①/④/統合の3条件比較）</strong>、E7（実装方式の速度）、README・ドキュメント整備</td></tr></tbody></table></div>
+<hr>
+<h2 id="s11">11. 評価実験の設計<a class="hash" href="#s11" aria-label="このセクションへのリンク">#</a></h2>
+<p>引き継ぎ資料 §7 Phase 4 を具体化し、2項目（E6・E7）を追加した。</p>
+<div class="table-wrap"><table class="md"><thead><tr><th>#</th><th>実験</th><th>独立変数</th><th>従属変数</th><th>対応する数学・教科書</th></tr></thead><tbody><tr><td><strong>E1</strong></td><td>画像枚数 vs 精度</td><td>5 / 10 / 20 / 40 枚</td><td>Hausdorff距離、再投影誤差、点群密度</td><td>—</td></tr><tr><td><strong>E2</strong></td><td>撮影角度刻み vs 条件数</td><td>5° / 10° / 20° / 45°</td><td><strong>正規方程式の条件数</strong>、奥行き方向の誤差</td><td>T&amp;B Lec. 12, 18</td></tr><tr><td><strong>E3</strong></td><td>バンドル調整の効果</td><td>有 / 無</td><td>カメラ角度誤差[deg]、再投影誤差[px]</td><td>Nocedal Ch. 10</td></tr><tr><td><strong>E4</strong></td><td>前処理の効果</td><td>なし / Jacobi / ILU(0)</td><td><strong>CG法の反復回数</strong>、計算時間</td><td>Saad Ch. 6, 9–10</td></tr><tr><td><strong>E5</strong></td><td><strong>手法比較（最重要）</strong></td><td>①のみ / ④のみ / 統合</td><td>Hausdorff距離、<strong>穴の面積</strong>、凹部の再現度</td><td>統合の妥当性の証明</td></tr><tr><td><strong>E6</strong></td><td><strong>LMの減衰項 λ</strong>（追加）</td><td>λ の初期値・更新則</td><td>収束回数、最終誤差</td><td><strong>Tikhonov 正則化と同じ構図（悪条件な最小二乗の扱い）</strong></td></tr><tr><td><strong>E7</strong></td><td>実装方式（追加）</td><td>ループ / 行列演算 / Numba</td><td>計算時間</td><td>§7-5 の高速化方針</td></tr><tr><td><strong>E8</strong></td><td><strong>レンダリング条件 vs 復元精度（候補）</strong></td><td>照明配置 / シェーディング / 露出 / 背景</td><td>マスクのIoU、特徴点数、Hausdorff距離</td><td>G2 と G8 にまたがる。<strong>採否は W04 に判断</strong>（§16）</td></tr></tbody></table></div>
+<h3 id="補足">補足<a class="hash" href="#補足" aria-label="このセクションへのリンク">#</a></h3>
+<p><strong>E2 が引き継ぎ資料 §4-2 の核心。</strong> 「カメラ間の視差角が小さいと三角測量が悪条件化し、奥行き方向の誤差が横方向より桁で大きくなる」を、条件数という数字で説明する。角度刻みを振るだけで条件数と誤差が同時に動くので、実験として非常にきれいに出る。</p>
+<p><strong>E5 には凹み形状を含む被写体が必須</strong>（§2 参照）。凸形状だけで実験すると統合の意味が数字に出ない。</p>
+<p><strong>E6 は引き継ぎ資料 §4-3 の「λ の選び方が収束性と精度を左右する」という指摘を実験化したもの。</strong> <strong>なぜ収束したのか／しなかったのかを数値で説明できる</strong>ようになるのが狙い。</p>
+<p><strong>E1・E2・E3・E5 は合成データ（真値メッシュあり）で実施する。</strong> 実写では Hausdorff 距離が測れないため、実写は「実環境でも動く」ことの実証に用いる。</p>
+<hr>
+<h2 id="s12">12. リスク管理：撤退ライン<a class="hash" href="#s12" aria-label="このセクションへのリンク">#</a></h2>
+<p>引き継ぎ資料 §9 を維持し、<strong>判定タイミングを明記</strong>した（→ <a href="decisions.html#d-25">D-25</a>）。</p>
+<div class="table-wrap"><table class="md"><thead><tr><th>段階</th><th>到達内容</th><th>判定</th></tr></thead><tbody><tr><td><strong>L4</strong></td><td>統合 + 実験 + ビューア/GUI + ドキュメント一式</td><td>理想</td></tr><tr><td><strong>L3</strong></td><td>統合パイプライン完成、Blender出力、比較実験（E1–E7）</td><td><strong>目標</strong></td></tr><tr><td><strong>L2</strong></td><td>④のみ（既知カメラ姿勢でのVisual Hull）でメッシュ生成</td><td>合格ライン</td></tr><tr><td><strong>L1</strong></td><td>①のみ、自作バンドル調整で点群生成 + 収束実験</td><td>最低保証</td></tr></tbody></table></div>
+<h3 id="判定タイミング">判定タイミング<a class="hash" href="#判定タイミング" aria-label="このセクションへのリンク">#</a></h3>
+<p><strong>★判定①：W11 終了時（2026-11-01）</strong></p>
+<ul><li>バンドル調整が収束しているか？</li><li><strong>収束しない → L2へ切り替え。</strong> <code>cameras.json</code> の <code>source</code> を <code>turntable_gt</code> に固定し、姿勢推定を回避してVisual Hullに全リソースを振る。</li><li><strong><code>source</code> フィールドがあるおかげで、この切り替えはデータの差し替えだけで済み、コード変更が不要。</strong>（§5-2）</li></ul>
+<p><strong>★判定②：W15 終了時（2026-11-29）</strong></p>
+<ul><li>メッシュが出ているか？</li><li><strong>破綻している → L1へ切り替え。</strong> ①の点群生成と収束実験（E3・E4・E6）に集中する。</li></ul>
+<p>L1 と L2 は独立して成立するため、どちらに倒れても成果物になる。</p>
+<hr>
+<h2 id="s13">13. 着工前チェックリスト（W01 初日）<a class="hash" href="#s13" aria-label="このセクションへのリンク">#</a></h2>
+<p><strong>担当者名は書かない。</strong> 着手する場面で決める（§3-2）。<strong>ただし ① は他の全てをブロックするので、最初に誰かが取ること。</strong></p>
+<blockquote><p><strong>📌 未完了の項目には、実行手順書へのリンクが付いている</strong>（2026-08-24 追加）。
+<strong>本節は「何が残っているか」の一覧、<code>docs/tasks/</code> が「どうやるか」の手順</strong>という分担にした。作業に入るときは <a href="next.html">next.md</a> から入るのが早い。</p></blockquote>
+<h3 id="①-g6基盤最優先ここが終わるまで他が動けない">① G6：基盤（最優先・ここが終わるまで他が動けない）<a class="hash" href="#①-g6基盤最優先ここが終わるまで他が動けない" aria-label="このセクションへのリンク">#</a></h3>
+<p><strong>① は 2026-08-24 の実物照合で全項目の完了を確認した</strong>（<code>git log</code> / <code>git ls-files</code> / <code>uv run pytest</code> で検証）。<strong>§13④ の3台確認も同日に完了し、§6-2 の骨格は確定した。</strong></p>
+<ul><li class="task"><input type="checkbox" disabled checked> <del>リポジトリをclone</del> → <strong>✅ 完了</strong></li><li class="task"><input type="checkbox" disabled checked> <del><strong><code>.gitattributes</code> を作成してpush</strong></del> → <strong>✅ 2026-08-17 完了</strong>（<code>* text=auto eol=lf</code> ＋ バイナリ5行。§7-3 の6行すべて）</li><li class="task"><input type="checkbox" disabled checked> <del><code>pyproject.toml</code> 作成、<strong>Python 3.11 指定</strong>、<code>.python-version</code> に <code>3.11.13</code></del> → <strong>✅ 2026-08-17／08-20 完了</strong>（<code>requires-python = "&gt;=3.11,&lt;3.12"</code>・<code>.python-version</code> = <code>3.11.13</code>）</li><li class="task"><input type="checkbox" disabled checked> <del><code>uv sync</code> で環境構築、<code>uv.lock</code> をコミット</del> → <strong>✅ 2026-08-19 完了</strong>（pytest 9.1.1 を含む）</li><li class="task"><input type="checkbox" disabled checked> <del><strong><code>pyproject.toml</code> に <code>[build-system]</code> を足す</strong></del> → <strong>✅ 2026-08-20 完了</strong>（hatchling。<code>packages = ["src/recon3d"]</code> の明示あり。<code>uv.lock</code> も <code>source = { editable = "." }</code> に変化済み）</li><li class="task"><input type="checkbox" disabled checked> <del><strong>ディレクトリ骨格を作成（範囲は §6-2）</strong></del> → <strong>✅ 2026-08-20 完了・push 済み</strong>（<code>G6フェーズ修了</code>）。§6-2 の「作らないもの」（個別モジュールの空ファイル・<code>.github/workflows/</code>・<code>data/</code>）が作られていないことも確認済み</li><li class="task"><input type="checkbox" disabled checked> <del><strong><code>tests/test_import.py</code>（smoke test）を置き、<code>uv run pytest</code> が <code>1 passed</code> になることを確認</strong></del> → <strong>✅ 2026-08-20 完了</strong>（mac で <code>1 passed</code> / exit 0。<strong>2026-08-24 に再実行して再現を確認</strong>）。<strong>3台での確認も 2026-08-24 に完了し、§6-2 の完了判定を満たした（→ ④）</strong></li><li class="task"><input type="checkbox" disabled checked> <del><strong>remote URL を <code>4bitcom_HandM</code> に更新</strong></del> → <strong>✅ 完了</strong>（<code>git remote -v</code> で確認済み。→ <a href="decisions.html#d-27">D-27</a>）</li></ul>
+<h3 id="②-g7g9ci-と運用の器">② G7・G9：CI と運用の器<a class="hash" href="#②-g7g9ci-と運用の器" aria-label="このセクションへのリンク">#</a></h3>
+<ul><li class="task"><input type="checkbox" disabled> <code>.github/workflows/ci.yml</code> の雛形 → <strong>手順: <a href="tasks/T03-ci-workflow.html">T03</a></strong></li><li class="task"><input type="checkbox" disabled> <code>main</code> ブランチの保護設定（直push禁止、PR必須）<strong>← リポジトリ設定の変更権限は取得済み（2026-08-16）</strong> → <strong>手順: <a href="tasks/T04-branch-protection.html">T04</a></strong>（<strong>T03 と T05 の後</strong>。保護すると直 push が止まるため、先に全員が PR の手順を通しておく）</li><li class="task"><input type="checkbox" disabled> GitHub Projects ボードを1枚作成、<strong>ラベルを登録（ジャンル <code>G1</code>〜<code>G9</code> と <code>phase:*</code>。§8-3）</strong> → <strong>手順: <a href="tasks/T06-labels-and-board.html">T06</a></strong></li><li class="task"><input type="checkbox" disabled> <strong><code>docs/notes/</code> に「Blender の Scripting タブと CLI レンダリングの入口」を1本置く</strong>（§7-7） → <strong>手順: <a href="tasks/T08-blender-entry-note.html">T08</a></strong></li><li class="task"><input type="checkbox" disabled> <strong>マスク生成方式の候補を1枚にまとめる</strong>（→ W02 に決める。<a href="decisions.html#d-35">D-35</a>） → <strong>手順: <a href="tasks/T07-mask-options.html">T07</a></strong></li></ul>
+<h3 id="③-g2blender-環境の確認">③ G2：Blender 環境の確認<a class="hash" href="#③-g2blender-環境の確認" aria-label="このセクションへのリンク">#</a></h3>
+<ul><li class="task"><input type="checkbox" disabled checked> <del>Blenderのバージョンと内蔵Pythonのバージョンを確認</del> → <strong>✅ 2026-08-15 完了</strong>（<code>blender_system/system-info.txt</code>。Blender 5.0.1 / Python 3.11.13）</li><li class="task"><input type="checkbox" disabled checked> <del>Blender内蔵Pythonに <code>numpy</code> が入っていることを確認</del> → <strong>✅ 2026-08-16 完了（numpy 1.26.4）。</strong> §7-4 の「bpy + numpy のみ」制約が成立する</li><li class="task"><input type="checkbox" disabled checked> <del>メモリ容量・CPU型番・ストレージ空きを報告</del> → <strong>✅ 2026-08-16 完了</strong>（16GB / i7-1360P / 82.6GB。§7-6）</li><li class="task"><input type="checkbox" disabled> <strong>合成データに使う3Dモデルの候補を探す</strong>（<strong>凹み形状が必須</strong>。配布モデルでよい。ライセンス表記を確認すること。§2・§16） → <strong>手順: <a href="tasks/T09-find-3d-model.html">T09</a></strong></li></ul>
+<blockquote><p>📌 <strong>これは作業ではなく、期間中ずっと有効な取り決め</strong>（チェックしない）:
+<strong>開発期間中は Blender 5.0.x を維持する。</strong> 了承済み。更新が必要なら事前に相談する（§7-2）。</p></blockquote>
+<h3 id="④-全員">④ 全員<a class="hash" href="#④-全員" aria-label="このセクションへのリンク">#</a></h3>
+<ul><li class="task"><input type="checkbox" disabled checked> <del>リポジトリをclone、<strong>自分の環境で <code>uv sync</code> と <code>uv run pytest</code> が通ることを確認</strong>（Windows / Ubuntu / mac のどれでも通ること）</del> → <strong>✅ 2026-08-24 完了</strong><ul><li><strong>mac：✅</strong>（2026-08-20 実測、2026-08-24 に再確認）／<strong>Windows：✅</strong>／<strong>Ubuntu：✅</strong>（2台は 2026-08-24 に関口から「うまくいった」と報告。<strong>→ §6-2 の骨格はこれで確定</strong>）</li></ul></li><li class="task"><input type="checkbox" disabled> <strong>Git の練習（1h）</strong>：branch → PR → レビュー → squash merge を1周する（§7-7） → <strong>手順: <a href="tasks/T05-git-practice.html">T05</a></strong></li><li class="task"><input type="checkbox" disabled> §3-8（スコープの明示）と §12（撤退ライン）に目を通す → <strong>手順: <a href="tasks/T10-read-scope.html">T10</a></strong></li></ul>
+<h3 id="⑤-ペアプロ12時間g6">⑤ ペアプロ#1（2時間・G6）<a class="hash" href="#⑤-ペアプロ12時間g6" aria-label="このセクションへのリンク">#</a></h3>
+<blockquote><p><strong>⏱ 2時間の割り振り・書く項目・関数のシグネチャ・完了判定は <a href="tasks/T01-pairpro1-io.html">T01 の手順書</a> にある。</strong></p></blockquote>
+<ul><li class="task"><input type="checkbox" disabled> <code>docs/conventions.md</code> を書く（§4）</li><li class="task"><input type="checkbox" disabled> <code>docs/schema/cameras.md</code> を書く（§5）</li><li class="task"><input type="checkbox" disabled> <code>src/recon3d/io/coords.py</code> を実装</li><li class="task"><input type="checkbox" disabled> <code>src/recon3d/io/cameras.py</code> を実装（<code>det(R)</code> 検証を含む）</li><li class="task"><input type="checkbox" disabled> <code>tests/test_conventions.py</code> を実装</li></ul>
+<h3 id="⑥-保留分の口頭確認15分14-の-1113-と1012-の一部">⑥ 保留分の口頭確認（15分・§14 の 11・13 と、10・12 の一部）<a class="hash" href="#⑥-保留分の口頭確認15分14-の-1113-と1012-の一部" aria-label="このセクションへのリンク">#</a></h3>
+<blockquote><p><strong>手順: <a href="tasks/T02-oral-decisions.html">T02</a></strong>（⑤ と同じ場でやる）</p></blockquote>
+<ul><li class="task"><input type="checkbox" disabled> 最終成果物として何が欲しいか</li><li class="task"><input type="checkbox" disabled> 撤退ライン L1〜L4 と判定時期（11/1・11/29）の認識合わせ</li><li class="task"><input type="checkbox" disabled> 週の進め方（曜日・連絡手段・返信速度）</li><li class="task"><input type="checkbox" disabled> メッシュ処理をどこまで自作するか</li><li class="task"><input type="checkbox" disabled> <strong>public 化のタイミング</strong>（「完成後」までは合意済み。決めるのは時期だけ。§16）</li></ul>
+<hr>
+<h2 id="s14">14. 松田に確認・相談すべき事項【2026-08-16 更新】<a class="hash" href="#s14" aria-label="このセクションへのリンク">#</a></h2>
+<p><strong>W01 中に確認 — 5〜7・9 は完了。残るは 8 のみ</strong>（→ <a href="tasks/T09-find-3d-model.html">T09</a>）</p>
+<ol><li><del>Blenderのバージョンと内蔵Pythonのバージョン</del> → <strong>✅ 2026-08-15 完了</strong>（§7-2）</li><li><del>メモリ容量・CPU型番・ストレージ空き</del> → <strong>✅ 2026-08-16 完了</strong>（16GB / i7-1360P / 82.6GB。<strong>ボクセル 256³ を維持</strong> → <a href="decisions.html#d-32">D-32</a>）</li><li><del>リポジトリの扱い</del> → <strong>✅ 2026-08-16 完了。「ここは3D復元プロジェクト用にしていい（完成後に public 化する）」。</strong> <a href="decisions.html#d-27">D-27</a> の「崩れる条件」は解消した</li><li><strong>合成データの元となる3Dモデル</strong>（凹み形状を含むマグカップ相当が必須。§2、資料3 Q18）。<strong>松田は既存モデルを読み込む派なので、配布モデルの調達で進める。ライセンスの確認だけ必要</strong></li><li><del>Blender内蔵Pythonに numpy が入っていることの確認</del> → <strong>✅ 2026-08-16 完了（1.26.4）</strong></li></ol>
+<p><strong>W01 の対面で口頭確認（2026-08-16 に保留となった分）</strong></p>
+<ol><li><strong>合成データの元モデルの具体と、最終成果物として何が欲しいか</strong>（テクスチャ付きメッシュ / .blend / glTF / デモ動画 / 復元過程の可視化動画）</li><li><strong>撤退ライン L1〜L4 と判定時期（11/1・11/29）の認識合わせ。判定の場で揉めないために事前合意が要る</strong>（§12）</li><li><strong>週の進め方</strong>（作業しやすい曜日・連絡手段・返信速度の期待値）／<strong>メッシュ処理をどこまで自作するか</strong>（Marching Cubes・メッシュ簡略化・テクスチャ投影は自作、UV展開は Blender の Smart UV Project を使う想定。§3-3）／<strong>public 化の時期</strong></li><li><strong>関口に言っておきたいこと</strong>（計画で納得できない点・無理そうな点・追加提案）。<strong>保留のまま流れやすいので、最後に必ず聞く</strong></li></ol>
+<p><strong>W03 までに確認</strong></p>
+<ol><li><strong>実写機材。所持：スマホカメラ・チェッカーボード（印刷可）。未所持：三脚・回転台・単色背景布・照明。</strong> 調達方針と予算は<strong>関口と相談したい</strong>とのこと</li><li>実写の被写体。<strong>候補：ぬいぐるみ・フィギュア・神社などの風景。</strong> → <strong>フィギュアは凹みと無地面の条件に合いやすい。ぬいぐるみは輪郭が毛羽立ちシルエット法に不利、風景はターンテーブル撮影ができないため、E5 の主対象には向かない</strong>（§2・<a href="decisions.html#d-02">D-02</a>）。W03 に1つ選ぶ</li></ol>
+<hr>
+<h2 id="s15">15. 成果の語り口<a class="hash" href="#s15" aria-label="このセクションへのリンク">#</a></h2>
+<p>引き継ぎ資料 §11 を維持しつつ、<strong>松田側の語り口を追加</strong>した。</p>
+<h3 id="就活面接両者共通">就活面接（両者共通）<a class="hash" href="#就活面接両者共通" aria-label="このセクションへのリンク">#</a></h3>
+<blockquote><p>多視点復元は無地の面で点群が欠落し、シルエット法は凹形状を復元できないという相補的な弱点があります。そこで前者で推定したカメラ姿勢を後者の彫刻に流用し、さらに点群で凹部を補正する統合パイプラインを設計しました。単独手法との比較実験で、統合により表面誤差が○%改善することを確認しています。</p></blockquote>
+<h3 id="開発手法について">開発手法について<a class="hash" href="#開発手法について" aria-label="このセクションへのリンク">#</a></h3>
+<blockquote><p>3D復元は精度が実測しないと分からないため、最初の3週間を技術検証に充て、そこで得た再投影誤差の実測値をもとに要件を定義しました。以降は設計→実装→テストの工程を切って進めています。作業を並行させるため、接続点となるファイル形式を最初のペアプログラミングで確定させ、それ以外はモジュール境界と作業ジャンルの境界を一致させることで、コンフリクトが構造的に起きない構成にしました。</p></blockquote>
+<h3 id="共同開発について2026-08-16-改訂">共同開発について（2026-08-16 改訂）<a class="hash" href="#共同開発について2026-08-16-改訂" aria-label="このセクションへのリンク">#</a></h3>
+<blockquote><p>担当を人に固定せず、<strong>作業を9つのジャンルに切って管理しました。</strong> 誰がどれをやるかは、その作業に着手する時点で決めます。専門が違うメンバーでも、前提知識と重さをジャンルごとに明示しておけば、手が空いた人が取れるためです。全部を全員で書くと工数が足りないので、共同作業の濃さを「同じ画面で書く」「ジャンルを分けて書く」「レビューのみ」の3段階に分け、<strong>事故が起きると全工程に波及する座標系の規約と、ジャンル間の接続点だけを最も濃い形（ペアプログラミング）で作りました。</strong> レビューでは「このPRが何をしているか」を自分の言葉で書くことを規約にし、形式的な承認を防いでいます。</p></blockquote>
+<h3 id="技術的な芯について">技術的な芯について<a class="hash" href="#技術的な芯について" aria-label="このセクションへのリンク">#</a></h3>
+<blockquote><p>バンドル調整の縮小系をCG法で解く部分を自作し、前処理による反復回数の変化と、視差角が小さいときの条件数悪化を測定しました。Levenberg–Marquardt の減衰項はTikhonov正則化と形式的に同一なので、λ の選び方が収束性と精度に与える影響も実験項目に含めています。ボクセル空間から Marching Cubes でメッシュを起こしたあとの平滑化では、離散ラプラシアンの重み（一様 vs cotan）で形状の歪み方がどう変わるかを、真値メッシュとの Hausdorff 距離で定量比較しました。評価用データセットは Blender で自作し、カメラ行列と真値形状を既知としたうえで、どこで誤差が入ったかを切り分けられるようにしています。</p></blockquote>
+<hr>
+<h2 id="s16">16. 未決定として残る項目<a class="hash" href="#s16" aria-label="このセクションへのリンク">#</a></h2>
+<blockquote><p><strong>決着済みの項目はこの表から外した</strong>（2026-08-24）。<strong>Python 3.11.13 の確定・メモリ 16GB とボクセル 256³ の維持・リポジトリの用途確定・<code>doc/</code>→<code>docs/</code> の改名・ファイル名の短縮・remote URL の更新</strong>は完了しており、経緯は <a href="decisions.html">決定記録</a>（<a href="decisions.html#d-27">D-27</a>・<a href="decisions.html#d-32">D-32</a>）と <a href="progress.html">進捗ログ</a> にある。</p></blockquote>
+<div class="table-wrap"><table class="md"><thead><tr><th>項目</th><th>決定時期</th><th>備考</th><th>手順</th></tr></thead><tbody><tr><td>リポジトリ名（改名の要否と新名称）</td><td><strong>public 化の直前</strong></td><td>既存 <code>4bitcom_HandM</code> をそのまま使うと決定したため、<strong>着工をブロックしない</strong>。→ <a href="decisions.html#d-27">D-27</a></td><td>—</td></tr><tr><td>合成データの元モデルの具体</td><td><strong>W02</strong>（W01 から持ち越し）</td><td>凹み形状必須。<strong>配布モデルの調達で進める</strong>（§7-7）。<strong>ライセンス確認が必要</strong></td><td><a href="tasks/T09-find-3d-model.html">T09</a></td></tr><tr><td>マスク画像の生成方法（アルファ / クリプトマット等）</td><td>W02</td><td>View Transform は Standard 固定（§7-6）。<strong>経験者がいないため、候補を1枚にまとめてから2人で決める</strong>（<a href="decisions.html#d-35">D-35</a>）</td><td><a href="tasks/T07-mask-options.html">T07</a></td></tr><tr><td><strong>E8（レンダリング条件 vs 復元精度）の採否</strong></td><td><strong>W04</strong></td><td>G2 と G8 にまたがる追加実験。<strong>W02 の実装負荷を見てから決める</strong>（§11・<a href="decisions.html#d-31">D-31</a>）</td><td>—</td></tr><tr><td>数値目標の具体値</td><td>W04</td><td>Phase 0 の実測値待ち</td><td>—</td></tr><tr><td>実写機材の調達</td><td>W03 まで</td><td>資料3 Q14。<strong>未所持は三脚・回転台・背景布・照明。予算は2人で相談</strong>（§14-14）</td><td>—</td></tr><tr><td>実写の被写体の確定</td><td>W03</td><td>候補はフィギュア・ぬいぐるみ・風景。<strong>凹み・無地面・非鏡面の条件で絞る</strong>（§14-15）</td><td>—</td></tr><tr><td>ボクセル解像度の確定（<strong>256³ で維持</strong>）</td><td>W12</td><td>処理時間の実測後。<strong>メモリ側の懸念は 16GB 確定で解消</strong>。<strong>チャンク分割実装は解像度に依らず採用</strong>（§7-6）</td><td>—</td></tr><tr><td>ボクセル投影のチャンクサイズ</td><td>W12</td><td>ペアプロ#2 で外部パラメータ化。E7 の独立変数候補</td><td>—</td></tr><tr><td>ビューア/GUI の要否と形式（L4項目）</td><td>W15</td><td>Phase 3 完了時の余力次第。<strong>内蔵GPU前提で控えめに見積もる</strong>（§7-6）</td><td>—</td></tr><tr><td>最終成果物の形式・撤退ラインの合意・週の進め方・メッシュ自作範囲</td><td><strong>W02 の対面</strong>（W01 から持ち越し）</td><td>2026-08-16 に保留となった分（§14-10〜13）</td><td><a href="tasks/T02-oral-decisions.html">T02</a></td></tr><tr><td>public 化のタイミング</td><td>Phase 4 完了後</td><td>資料3 Q8。<strong>「完成後に public 化」までは合意済み</strong>（2026-08-16）</td><td>—</td></tr><tr><td><strong>メンバーを増やすか</strong>（増やすなら誰に・どのジャンルを渡すか）</td><td>随時</td><td><strong>3人なら1人あたり週5.8h</strong>（§3-1）。新しく入る人の入口は <a href="README.html">README</a> → <a href="next.html">next.md</a> → <a href="learning.html">learning.md</a></td><td>—</td></tr></tbody></table></div>
+<hr>
+<h2 id="s-appendix">付録A：本計画で参照した引き継ぎ資料の節<a class="hash" href="#s-appendix" aria-label="このセクションへのリンク">#</a></h2>
+<div class="table-wrap"><table class="md"><thead><tr><th>本書</th><th>引き継ぎ資料</th></tr></thead><tbody><tr><td>§2 データ取得方針</td><td>§6 撮影条件、§7 Phase 0</td></tr><tr><td>§3 協働モデル</td><td>§5 役割分担、§1 期間・工数</td></tr><tr><td>§4 座標系</td><td>§10-5</td></tr><tr><td>§5 <code>cameras.json</code></td><td>§10-3、§5 インターフェース</td></tr><tr><td>§6 リポジトリ構成</td><td>§10-1</td></tr><tr><td>§7 環境</td><td>§8 技術スタック、§10-2</td></tr><tr><td>§8 ブランチ・Issue</td><td>§10-4</td></tr><tr><td>§9 テスト・CI</td><td>§8 回帰テスト、§10 その他</td></tr><tr><td>§10 カレンダー</td><td>§7 フェーズ計画</td></tr><tr><td>§11 評価実験</td><td>§7 Phase 4、§4 数理的な芯</td></tr><tr><td>§12 撤退ライン</td><td>§9</td></tr><tr><td>§15 語り口</td><td>§11</td></tr></tbody></table></div>
+  </main>
+</div>
+<footer class="foot">
+  <p>このページは <code>docs/plan.md</code> から自動生成しています。編集は md 側で。</p>
+</footer>
+</body>
+</html>

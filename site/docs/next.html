@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>次にやること</title>
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+<header class="topbar">
+  <div class="topbar-inner">
+    <nav class="crumbs"><a href="../index.html">ドキュメント</a></nav>
+    <span class="src">docs/next.md</span>
+  </div>
+</header>
+<div class="layout">
+  <details class="toc"><summary class="toc-title">目次</summary><ul><li class="lv2"><a href="#1-表残っているタスク">1. 表：残っているタスク</a></li><li class="lv3"><a href="#w02">1-b. W02 から始まる作業（手順書はまだありません）</a></li><li class="lv3"><a href="#この表と-github-issue-の使い分け">この表と GitHub Issue の使い分け</a></li><li class="lv2"><a href="#2-時間で選ぶ">2. 時間で選ぶ</a></li><li class="lv2"><a href="#3-どのタスクを取ってもやること前後の作法">3. どのタスクを取ってもやること（前後の作法）</a></li><li class="lv3"><a href="#始めるとき">始めるとき</a></li><li class="lv3"><a href="#終わったとき">終わったとき</a></li><li class="lv2"><a href="#4-このページと他の文書の関係">4. このページと他の文書の関係</a></li><li class="lv3"><a href="#手順書に答えが書いていないのはわざとです">手順書に「答え」が書いていないのは、わざとです</a></li><li class="lv2"><a href="#5-終わったタスクの置き場">5. 終わったタスクの置き場</a></li></ul></details>
+  <main class="page">
+<h1 id="次にやること">次にやること<a class="hash" href="#次にやること" aria-label="このセクションへのリンク">#</a></h1>
+<blockquote><p><strong>迷ったらまずこのページです。</strong> 表の上から順に、空いているものを1つ取るだけです。
+各タスクには<strong>手順書</strong>が付いています。リンクを開けば「何を打ち込むか」「何ができたら終わりか」まで書いてあります。</p>
+<p><strong>⚠️ この表は「W01 からの持ち越し」だけです。</strong> W02 から始まる本来の実装作業は <strong><a href="#w02">§1-b</a></strong> に別で挙げてあります。</p></blockquote>
+<p><strong>いまの状況</strong>（このブロックは、週の記録を <a href="progress.html">進捗ログ</a> に書くときに一緒に更新してください）</p>
+<p><strong>2026-08-24 / W02 初日</strong>
+G6（基盤）の器は 3台すべてで <code>uv run pytest</code> が通り、<strong>完了しました</strong>。ここから先は<strong>中身を作る作業</strong>です。
+→ 経緯は <a href="README.html">README の現在地</a>、実績は <a href="progress.html">進捗ログ</a>。</p>
+<hr>
+<h2 id="1-表残っているタスク">1. 表：残っているタスク<a class="hash" href="#1-表残っているタスク" aria-label="このセクションへのリンク">#</a></h2>
+<p><strong>担当者は書きません。取れる人が取ってください</strong>（<a href="plan.html#s3-2">計画書 §3-2</a>）。取ったら Issue に自分を入れてください。</p>
+<div class="table-wrap"><table class="md"><thead><tr><th>優先</th><th>#</th><th>タスク</th><th>ジャンル</th><th>目安</th><th>前提</th><th>状態</th></tr></thead><tbody><tr><td>🔴 <strong>最優先</strong></td><td><a href="tasks/T01-pairpro1-io.html">T01</a></td><td><strong>ペアプロ#1：座標系と <code>cameras.json</code> を決めて実装する</strong></td><td>G6 基盤・I/O</td><td>2h（2人）</td><td><strong>2人そろうこと</strong>・<code>uv run pytest</code> が通ること</td><td>⬜ 未着手</td></tr><tr><td>🔴 <strong>最優先</strong></td><td><a href="tasks/T02-oral-decisions.html">T02</a></td><td><strong>保留になっている5件を口頭で決める</strong></td><td>全員</td><td>15分</td><td><strong>2人そろうこと</strong>（T01 と同じ場でやる）</td><td>⬜ 未着手</td></tr><tr><td>🟠 高</td><td><a href="tasks/T03-ci-workflow.html">T03</a></td><td>CI（GitHub Actions）の雛形を置く</td><td>G7 テスト・CI</td><td>1h</td><td>なし</td><td>⬜ 未着手</td></tr><tr><td>🟠 高</td><td><a href="tasks/T05-git-practice.html">T05</a></td><td>Git の練習を1周する（branch → PR → merge）</td><td>全員</td><td>1h</td><td>clone 済み・<code>uv run pytest</code> が通ること</td><td>⬜ 未着手</td></tr><tr><td>🟠 高</td><td><a href="tasks/T04-branch-protection.html">T04</a></td><td><code>main</code> ブランチを保護する</td><td>G7 テスト・CI</td><td>30分</td><td><strong>T03 と T05 の両方</strong>が済んでいること</td><td>⬜ 未着手</td></tr><tr><td>🟡 中</td><td><a href="tasks/T06-labels-and-board.html">T06</a></td><td>ラベルを登録して Projects ボードを1枚作る</td><td>G9 ドキュメント・運用</td><td>45分</td><td><strong>リポジトリ設定の変更権限</strong>（取得済み）</td><td>⬜ 未着手</td></tr><tr><td>🟠 高</td><td><a href="tasks/T07-mask-options.html">T07</a></td><td>マスク生成方式の候補を1枚にまとめる（<strong>W02 中に決める</strong>）</td><td>G3 画像処理</td><td>2h</td><td>なし（Blender 不要）</td><td>⬜ 未着手</td></tr><tr><td>🟡 中</td><td><a href="tasks/T08-blender-entry-note.html">T08</a></td><td>Blender スクリプトの入口メモを1本書く</td><td>G2 3DCG</td><td>1.5h</td><td>Blender が入っている端末</td><td>⬜ 未着手</td></tr><tr><td>🟢 低</td><td><a href="tasks/T09-find-3d-model.html">T09</a></td><td>合成データ用の3Dモデルを探す（<strong>凹み形状が必須</strong>）</td><td>G2 3DCG</td><td>1h</td><td>なし</td><td>⬜ 未着手</td></tr><tr><td>🟢 低</td><td><a href="tasks/T10-read-scope.html">T10</a></td><td>スコープと撤退ラインに目を通す</td><td>全員</td><td>15分</td><td>なし</td><td>⬜ 未着手</td></tr></tbody></table></div>
+<h3 id="w02">1-b. W02 から始まる作業（手順書はまだありません）<a class="hash" href="#w02" aria-label="このセクションへのリンク">#</a></h3>
+<p><strong>上の表は W01 の持ち越しです。</strong> これとは別に、<a href="plan.html#s10">計画書 §10 Phase 0</a> は W02 の作業を次のように決めています。</p>
+<div class="table-wrap"><table class="md"><thead><tr><th>ジャンル</th><th>やること</th><th>出どころ</th></tr></thead><tbody><tr><td><strong>G1・G3</strong></td><td>OpenCV の既存関数で<strong>一直線にパイプラインを通す</strong>（SIFT → <code>solvePnP</code> → <code>triangulatePoints</code> → Open3D 表示）</td><td><a href="plan.html#s10">計画書 §10</a></td></tr><tr><td><strong>G2</strong></td><td><code>tools/blender_render.py</code> を実装。<code>synthetic_cup</code> を20方向レンダリングし、<code>images/</code>・<code>masks/</code>・<code>cameras.json</code>・<code>gt_mesh.ply</code> を出力</td><td>同上</td></tr><tr><td><strong>G7</strong></td><td><code>tests/fixtures/synthetic_scene.py</code>（画像を使わない合成シーン生成器）を実装</td><td><a href="plan.html#s9-1">計画書 §9-1</a></td></tr></tbody></table></div>
+<blockquote><p><strong>これらに手順書はまだありません。</strong> 中身が<strong>実装そのもの</strong>で、<a href="tasks/README.html">手順書に書かないと決めている範囲</a>だからです。
+<strong>先に <a href="tasks/T01-pairpro1-io.html">T01</a> を終わらせてください。</strong> 座標系と <code>cameras.json</code> が決まらないと、どれも書けません。
+取りかかるときは <a href="plan.html#s10">計画書 §10</a> と該当ジャンルの節を読み、<strong><a href="learning.html">学びの入口</a> のそのジャンルの行</strong>から始めてください。</p></blockquote>
+<hr>
+<h3 id="この表と-github-issue-の使い分け">この表と GitHub Issue の使い分け<a class="hash" href="#この表と-github-issue-の使い分け" aria-label="このセクションへのリンク">#</a></h3>
+<p><strong>二重に管理しないための取り決めです。</strong></p>
+<div class="table-wrap"><table class="md"><thead><tr><th>時期</th><th>「誰が何を作業中か」の正</th><th>この表の役割</th></tr></thead><tbody><tr><td><strong><a href="tasks/T06-labels-and-board.html">T06</a> が終わるまで</strong>（＝いま）</td><td><strong>この表</strong>。<code>🔄 作業中（名前）</code> と書く</td><td>唯一の管理表</td></tr><tr><td><strong>T06 のあと</strong></td><td><strong>GitHub Issue</strong>（Assignee と <code>In Progress</code> 列）</td><td><strong>完了したものに <code>✅</code> を付けるだけ。着手中はここを触らない</strong></td></tr></tbody></table></div>
+<p><strong>なぜ分けるか</strong>：<code>main</code> は <a href="tasks/T04-branch-protection.html">T04</a> で保護されるので、<strong>この表を1行直すだけでも PR が要ります。</strong>
+着手のたびに PR を出すのは重いので、<strong>着手の記録は Issue に寄せ、この表はタスクの PR に混ぜて <code>✅</code> にする</strong>運用にします。</p>
+<p><strong>状態の書き方</strong>: <code>⬜ 未着手</code> / <code>🔄 作業中（名前）</code> / <code>✅ 完了（日付・PR番号）</code></p>
+<hr>
+<h2 id="2-時間で選ぶ">2. 時間で選ぶ<a class="hash" href="#2-時間で選ぶ" aria-label="このセクションへのリンク">#</a></h2>
+<p><strong>「今日は◯分しかない」ときの取り方です。</strong></p>
+<div class="table-wrap"><table class="md"><thead><tr><th>空いている時間</th><th>おすすめ</th></tr></thead><tbody><tr><td><strong>15分</strong></td><td><a href="tasks/T02-oral-decisions.html">T02 口頭で決める</a> ／ <a href="tasks/T10-read-scope.html">T10 スコープを読む</a></td></tr><tr><td><strong>30分</strong></td><td><a href="tasks/T04-branch-protection.html">T04 ブランチ保護</a>（<strong>T03 と T05 の後</strong>）</td></tr><tr><td><strong>45分〜1時間</strong></td><td><a href="tasks/T03-ci-workflow.html">T03 CI の雛形</a> ／ <a href="tasks/T05-git-practice.html">T05 Git の練習</a> ／ <a href="tasks/T06-labels-and-board.html">T06 ラベルとボード</a> ／ <a href="tasks/T09-find-3d-model.html">T09 3Dモデル探し</a></td></tr><tr><td><strong>2時間・2人そろう</strong></td><td><a href="tasks/T01-pairpro1-io.html">T01 ペアプロ#1</a> ← <strong>ここが終わらないと他が先に進めません</strong></td></tr><tr><td><strong>1.5〜2時間・1人</strong></td><td><a href="tasks/T07-mask-options.html">T07 マスク方式の候補</a>（2h） ／ <a href="tasks/T08-blender-entry-note.html">T08 Blender 入口メモ</a>（1.5h）</td></tr></tbody></table></div>
+<hr>
+<h2 id="3-どのタスクを取ってもやること前後の作法">3. どのタスクを取ってもやること（前後の作法）<a class="hash" href="#3-どのタスクを取ってもやること前後の作法" aria-label="このセクションへのリンク">#</a></h2>
+<p><strong>手順書の中にも書いてありますが、共通なのでここにまとめます。</strong></p>
+<h3 id="始めるとき">始めるとき<a class="hash" href="#始めるとき" aria-label="このセクションへのリンク">#</a></h3>
+<pre><code class="lang-bash">git switch main
+git pull origin main
+uv sync                      # 依存が変わっていたときのため。毎回1回流して損はない
+git switch -c feat/&lt;何をするか&gt;   # 例: feat/ci-workflow</code></pre>
+<p>ブランチ名の付け方は <a href="plan.html#s8-1">計画書 §8-1</a>（<code>feat/</code> <code>fix/</code> <code>docs/</code> <code>exp/</code>）。</p>
+<h3 id="終わったとき">終わったとき<a class="hash" href="#終わったとき" aria-label="このセクションへのリンク">#</a></h3>
+<ol><li><strong>PR を出す。</strong> 説明文は「何を」「なぜ」を1〜3段落（<a href="plan.html#s8-2">計画書 §8-2</a>）</li><li><strong><a href="progress.html">進捗ログ</a> の今週の表に1行足す</strong>（ジャンル・実働・やったこと・PR番号）</li><li><strong>このページの表の「状態」を <code>✅ 完了</code> に書き換える</strong></li><li>計画や決定を変えたときは、<a href="progress.html#changes">進捗ログの「決定を変えた記録」</a>に1行残す（<a href="decisions.html#d-28">D-28</a>）</li></ol>
+<hr>
+<h2 id="4-このページと他の文書の関係">4. このページと他の文書の関係<a class="hash" href="#4-このページと他の文書の関係" aria-label="このセクションへのリンク">#</a></h2>
+<div class="table-wrap"><table class="md"><thead><tr><th>知りたいこと</th><th>開くもの</th></tr></thead><tbody><tr><td><strong>次に何をするか・どうやるか</strong></td><td><strong>本ページと <code>tasks/</code> の手順書</strong></td></tr><tr><td><strong>言葉の意味が分からない</strong></td><td><a href="glossary.html">用語集</a></td></tr><tr><td><strong>知識が足りなくて書けない</strong></td><td><a href="learning.html">学びの入口</a>（ジャンル別に資料3本まで）</td></tr><tr><td><strong>詰まった記録を残したい</strong></td><td><a href="notes/README.html"><code>notes/</code></a></td></tr><tr><td>いま全体のどこにいるか</td><td><a href="README.html">README</a></td></tr><tr><td>仕様・日程・決めごとの本文</td><td><a href="plan.html">計画書</a></td></tr><tr><td>なぜそう決めたか</td><td><a href="decisions.html">決定記録</a></td></tr><tr><td>実際に何をやったか（週次）</td><td><a href="progress.html">進捗ログ</a></td></tr></tbody></table></div>
+<blockquote><p><strong>手順書（<code>tasks/*.md</code>）は「やり方」だけを書く場所です。</strong> 仕様そのものは計画書に、理由は決定記録にあります。
+<strong>食い違ったときは計画書と決定記録が正</strong>です。手順書のほうを直してください。</p></blockquote>
+<blockquote><h3 id="手順書に答えが書いていないのはわざとです">手順書に「答え」が書いていないのは、わざとです<a class="hash" href="#手順書に答えが書いていないのはわざとです" aria-label="このセクションへのリンク">#</a></h3>
+<p><strong>環境構築とツール操作は全部書いてあります</strong>（詰まっても学びがないので）。
+<strong>一方で、導出・実装・設計の判断は空けてあります。</strong> そこが本プロジェクトの芯だからです（<a href="plan.html#s3-8">計画書 §3-8</a>・<a href="decisions.html#d-33">D-33</a>）。
+<strong>足りないのは知識であって答えではない</strong>ので、行き先は <a href="learning.html">学びの入口</a> に置いてあります。</p></blockquote>
+<hr>
+<h2 id="5-終わったタスクの置き場">5. 終わったタスクの置き場<a class="hash" href="#5-終わったタスクの置き場" aria-label="このセクションへのリンク">#</a></h2>
+<p><strong>完了したら表から消さず、状態を <code>✅</code> にして下に移してください。</strong> 何をやったかの一覧が残ります。</p>
+<div class="table-wrap"><table class="md"><thead><tr><th>#</th><th>タスク</th><th>完了</th></tr></thead><tbody><tr><td>—</td><td>G6：<code>.gitattributes</code> / <code>.gitignore</code> / <code>pyproject.toml</code> / <code>.python-version</code> / pytest 導入</td><td>✅ 2026-08-17〜08-20</td></tr><tr><td>—</td><td>G6：ディレクトリ骨格（<a href="plan.html#s6-2">計画書 §6-2</a> の範囲）と <code>import recon3d</code> の疎通</td><td>✅ 2026-08-20（push 済み）</td></tr><tr><td>—</td><td>全員：3台（mac / Windows / Ubuntu）で <code>uv sync</code> + <code>uv run pytest</code> が <code>1 passed</code></td><td>✅ 2026-08-24</td></tr></tbody></table></div>
+  </main>
+</div>
+<footer class="foot">
+  <p>このページは <code>docs/next.md</code> から自動生成しています。編集は md 側で。</p>
+</footer>
+</body>
+</html>

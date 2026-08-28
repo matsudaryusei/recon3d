@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>T08 — Blender スクリプトの入口メモを1本書く</title>
+<link rel="stylesheet" href="../../assets/style.css">
+</head>
+<body>
+<header class="topbar">
+  <div class="topbar-inner">
+    <nav class="crumbs"><a href="../../index.html">ドキュメント</a><span class="sep">/</span><a href="README.html">tasks/</a></nav>
+    <span class="src">docs/tasks/T08-blender-entry-note.md</span>
+  </div>
+</header>
+<div class="layout">
+  <details class="toc"><summary class="toc-title">目次</summary><ul><li class="lv2"><a href="#着手前に読むもの">着手前に読むもの</a></li><li class="lv2"><a href="#なぜやるのか">なぜやるのか</a></li><li class="lv2"><a href="#ステップ1ブランチとファイル">ステップ1：ブランチとファイル</a></li><li class="lv2"><a href="#ステップ2動作確認用のスクリプトを作る">ステップ2：動作確認用のスクリプトを作る</a></li><li class="lv2"><a href="#ステップ33つのやり方を実際に試す">ステップ3：3つのやり方を実際に試す</a></li><li class="lv3"><a href="#やり方apython-console-で1行打つ">やり方A：Python Console で1行打つ</a></li><li class="lv3"><a href="#やり方btext-editor-から実行する">やり方B：Text Editor から実行する</a></li><li class="lv3"><a href="#やり方ccliこれが本命">やり方C：CLI（これが本命）</a></li><li class="lv2"><a href="#ステップ4メモを書く">ステップ4：メモを書く</a></li><li class="lv2"><a href="#完了判定">完了判定</a></li><li class="lv2"><a href="#つまずいたら">つまずいたら</a></li><li class="lv2"><a href="#終わったら">終わったら</a></li></ul></details>
+  <main class="page">
+<h1 id="t08--blender-スクリプトの入口メモを1本書く">T08 — Blender スクリプトの入口メモを1本書く<a class="hash" href="#t08--blender-スクリプトの入口メモを1本書く" aria-label="このセクションへのリンク">#</a></h1>
+<p><a href="../next.html">← 次にやること一覧に戻る</a></p>
+<div class="table-wrap"><table class="md table--headless"><thead><tr><th></th><th></th></tr></thead><tbody><tr><td>ジャンル</td><td><strong>G2 3DCG</strong>（<a href="../plan.html#s7-7">計画書 §7-7</a> の入口整備 3）</td></tr><tr><td>目安時間</td><td>1.5時間</td></tr><tr><td>前提</td><td><strong>Blender 5.0.1 が入っている端末</strong>（現状 松田の端末のみ）</td></tr><tr><td>作るもの</td><td><strong><code>docs/notes/blender-entry.md</code></strong> と、動作確認用の <strong><code>tools/hello_bpy.py</code></strong></td></tr><tr><td>出どころ</td><td><a href="../plan.html#s7-7">計画書 §7-7</a> ／ <a href="../plan.html#s7-4">§7-4</a> ／ <a href="../plan.html#s3-7">§3-7</a></td></tr></tbody></table></div>
+<hr>
+<h2 id="着手前に読むもの">着手前に読むもの<a class="hash" href="#着手前に読むもの" aria-label="このセクションへのリンク">#</a></h2>
+<div class="table-wrap"><table class="md"><thead><tr><th>初めて出てくること</th><th>資料</th></tr></thead><tbody><tr><td><strong><code>bpy</code> の考え方</strong>（オブジェクトの取り方・設定の仕方）</td><td><a href="../learning.html">学びの入口 G2</a> の Blender API クイックスタート</td></tr><tr><td><strong>Scripting タブ</strong></td><td><a href="../learning.html">学びの入口 G2</a> の Blender マニュアル</td></tr></tbody></table></div>
+<p><strong>分からない言葉が出たら</strong> → <a href="../glossary.html">用語集</a>。</p>
+<h2 id="なぜやるのか">なぜやるのか<a class="hash" href="#なぜやるのか" aria-label="このセクションへのリンク">#</a></h2>
+<p><strong>W02 から Blender で合成データを作ります</strong>（<a href="../plan.html#s10">計画書 §10 Phase 0</a>）。そこで必要なのは、GUI の操作ではなく <strong>「スクリプトで自動的に20枚レンダリングする」</strong> ことです。</p>
+<p>いま止まっているのはこの2点：</p>
+<ol><li><strong>Scripting タブを使ったことがない</strong></li><li><strong><code>blender --background</code>（CLI レンダリング）を使ったことがない</strong></li></ol>
+<p><strong>この2つが通れば、あとは中身を書くだけになります。</strong> 詰まるのは毎回「入口」なので、<strong>入口だけ先に1本メモにして、次に見るときと、他の人が見るときに再現できるようにします。</strong></p>
+<blockquote><p><strong>重要な制約</strong>：<a href="../plan.html#s7-4">計画書 §7-4</a> は <strong>「<code>tools/blender_*.py</code> は <code>bpy</code> と <code>numpy</code> のみに依存させる」</strong>と決めています。
+<strong>これは「他に何も入っていない」という意味ではありません。</strong> Blender には <code>mathutils</code>・<code>bmesh</code>・<code>bpy_extras</code>・<code>gpu</code> などが同梱されています。
+<strong>『同梱されているものを使ってよいか』は決まっていません。</strong> 使いたくなったら、勝手に決めずに <a href="../../Discuss.html">Discuss.md</a> に出して2人で決め、<a href="../decisions.html">決定記録</a> に1行残してください（<strong><code>mathutils</code> はカメラ行列を扱うときに真っ先に欲しくなるので、実際に起きます</strong>）。
+<strong>確実に駄目なのは、<code>uv</code> 側で入れたもの</strong>（<code>scipy</code> など）と <strong><code>pip install</code> が要るもの</strong>です。<strong>メモにもこれを書いてください。</strong></p></blockquote>
+<hr>
+<h2 id="ステップ1ブランチとファイル">ステップ1：ブランチとファイル<a class="hash" href="#ステップ1ブランチとファイル" aria-label="このセクションへのリンク">#</a></h2>
+<pre><code class="lang-bash">git switch main &amp;&amp; git pull origin main
+git switch -c docs/blender-entry
+mkdir -p docs/notes</code></pre>
+<hr>
+<h2 id="ステップ2動作確認用のスクリプトを作る">ステップ2：動作確認用のスクリプトを作る<a class="hash" href="#ステップ2動作確認用のスクリプトを作る" aria-label="このセクションへのリンク">#</a></h2>
+<p><code>tools/hello_bpy.py</code> を作って、<strong>下をそのまま貼ります。</strong></p>
+<pre><code class="lang-python">"""Blender の内蔵 Python が動くことだけを確認するスクリプト。
+
+使い方:
+    blender --background --python tools/hello_bpy.py
+"""
+
+import sys
+
+import bpy
+import numpy as np
+
+print("=" * 50)
+print("Blender version :", bpy.app.version_string)
+print("Python version  :", sys.version)
+print("numpy version   :", np.__version__)
+print("シーン内のオブジェクト:", [o.name for o in bpy.data.objects])
+print("=" * 50)</code></pre>
+<p><strong>このスクリプトの役割</strong>：計画書が前提にしている「Blender 5.0.1 / Python 3.11.13 / numpy 1.26.4」が本当にその通りかを、<strong>1コマンドで再確認できるようにする</strong>ことです。</p>
+<hr>
+<h2 id="ステップ33つのやり方を実際に試す">ステップ3：3つのやり方を実際に試す<a class="hash" href="#ステップ33つのやり方を実際に試す" aria-label="このセクションへのリンク">#</a></h2>
+<p><strong>メモに書く前に、自分で1回ずつ通してください。</strong> 通らなかった箇所こそがメモに書く価値のある部分です。</p>
+<h3 id="やり方apython-console-で1行打つ">やり方A：Python Console で1行打つ<a class="hash" href="#やり方apython-console-で1行打つ" aria-label="このセクションへのリンク">#</a></h3>
+<ol><li>Blender を開く</li><li>上部のワークスペースタブから <strong><code>Scripting</code></strong> を選ぶ</li><li>左下の <strong>Python Console</strong> に打つ：</li></ol>
+<pre><code class="lang-python">import bpy
+bpy.app.version_string</code></pre>
+<p><strong>バージョン文字列が返れば成功。</strong></p>
+<h3 id="やり方btext-editor-から実行する">やり方B：Text Editor から実行する<a class="hash" href="#やり方btext-editor-から実行する" aria-label="このセクションへのリンク">#</a></h3>
+<ol><li><code>Scripting</code> タブの中央が <strong>Text Editor</strong></li><li><strong><code>New</code></strong> を押す → 上のコードを貼る</li><li><strong><code>Run Script</code> ▶</strong> を押す</li><li><strong>出力は画面には出ません。</strong> ターミナルから Blender を起動しているか、<code>Window → Toggle System Console</code>（Windows）で見ます</li></ol>
+<blockquote><p><strong>「Run Script を押したのに何も起きない」は、ほぼ全員が1回やります。</strong> print の出力先が別なだけです。<strong>この落とし穴をメモに書いてください。</strong></p></blockquote>
+<h3 id="やり方ccliこれが本命">やり方C：CLI（これが本命）<a class="hash" href="#やり方ccliこれが本命" aria-label="このセクションへのリンク">#</a></h3>
+<p><strong>ターミナルから</strong>：</p>
+<pre><code class="lang-bash"># macOS
+/Applications/Blender.app/Contents/MacOS/Blender --background --python tools/hello_bpy.py
+
+# Windows (PowerShell)
+&amp; "C:\Program Files\Blender Foundation\Blender 5.0\blender.exe" --background --python tools\hello_bpy.py
+
+# Ubuntu
+blender --background --python tools/hello_bpy.py</code></pre>
+<p><strong><code>--background</code>（略して <code>-b</code>）は「GUI を開かずに実行する」。</strong> これができると、<strong>20枚のレンダリングを1コマンドで回せます。</strong></p>
+<blockquote><p><strong>毎回フルパスを打つのは面倒なので、エイリアスを作っておくと楽です</strong>（メモに書く）:</p>
+<pre><code class="lang-bash"># ~/.zshrc に足す（macOS）
+alias blender="/Applications/Blender.app/Contents/MacOS/Blender"</code></pre></blockquote>
+<hr>
+<h2 id="ステップ4メモを書く">ステップ4：メモを書く<a class="hash" href="#ステップ4メモを書く" aria-label="このセクションへのリンク">#</a></h2>
+<p><code>docs/notes/blender-entry.md</code> に、<strong>下の骨組みで書きます。</strong></p>
+<pre><code class="lang-markdown"># Blender スクリプトの入口
+
+**対象**: Blender 5.0.1 / 内蔵 Python 3.11.13 / numpy 1.26.4
+**前提**: `pip install` はしない。`tools/blender_*.py` は `bpy` と `numpy` のみに依存させる（計画書 §7-4）。同梱の `mathutils` 等を使ってよいかは未決定
+
+## 0. まず動くことを確かめる
+
+（`tools/hello_bpy.py` を CLI で実行するコマンドを、自分の環境のフルパスで書く）
+
+期待する出力:
+（実際に出た出力を貼る）
+
+## 1. Scripting タブの使い方
+
+- タブの場所
+- Python Console と Text Editor の違い
+- **`Run Script` の出力がどこに出るか** ← 詰まりやすい
+
+## 2. CLI から実行する
+
+- `--background` の意味
+- `--python &lt;file&gt;` の意味
+- 自分の環境での blender 実行ファイルのパス
+- エイリアスの張り方
+
+## 3. よく使う bpy の入口（分かった範囲でよい）
+
+| やりたいこと | 書き方 |
+|---|---|
+| シーンのオブジェクト一覧 | `bpy.data.objects` |
+| カメラを取る | `bpy.data.objects["Camera"]` |
+| 出力先を決める | `bpy.context.scene.render.filepath = "..."` |
+| レンダリングする | `bpy.ops.render.render(write_still=True)` |
+| 背景を透明にする | `bpy.context.scene.render.film_transparent = True` |
+
+（実際に試して動いたものだけ残す。動かなかったものは「動かなかった」と書く）
+
+## 4. 詰まった点
+
+（ここが一番価値がある。素直に書く）</code></pre>
+<blockquote><p><strong>4 が本体です。</strong> 「詰まった点」を書き残すのは <a href="../../Discuss.html">Discuss.md 8/17 の関口の依頼</a>そのものです。<strong>冗長でかまいません。</strong></p></blockquote>
+<hr>
+<h2 id="完了判定">完了判定<a class="hash" href="#完了判定" aria-label="このセクションへのリンク">#</a></h2>
+<ul><li class="task"><input type="checkbox" disabled> <strong><code>blender --background --python tools/hello_bpy.py</code> が実際に動き、バージョンが3つとも表示された</strong></li><li class="task"><input type="checkbox" disabled> 表示された値が <strong>Blender 5.0.1 / Python 3.11.13 / numpy 1.26.4</strong> と一致する（違ったら<a href="../progress.html">進捗ログ</a>に書く。<strong>計画の前提が崩れます</strong>）</li><li class="task"><input type="checkbox" disabled> <code>docs/notes/blender-entry.md</code> の 0〜4 が埋まっている</li><li class="task"><input type="checkbox" disabled> <strong>「Run Script の出力がどこに出るか」が書いてある</strong></li><li class="task"><input type="checkbox" disabled> <strong>自分の環境の blender 実行ファイルのフルパスが書いてある</strong>（次に見たとき探さずに済む）</li></ul>
+<p>PR：</p>
+<pre><code class="lang-bash">git add tools/hello_bpy.py docs/notes/blender-entry.md
+git commit -m "docs(G2): Blender スクリプトの入口メモと動作確認スクリプトを追加"
+git push -u origin docs/blender-entry</code></pre>
+<hr>
+<h2 id="つまずいたら">つまずいたら<a class="hash" href="#つまずいたら" aria-label="このセクションへのリンク">#</a></h2>
+<div class="table-wrap"><table class="md"><thead><tr><th>症状</th><th>対処</th></tr></thead><tbody><tr><td><code>blender: command not found</code></td><td>フルパスで打つ。パスは Blender の <code>About</code> か、アプリの場所から確認</td></tr><tr><td><code>ModuleNotFoundError: No module named 'numpy'</code></td><td><strong>前提が崩れています。</strong> 8/16 に numpy 1.26.4 を確認しているので、環境が変わった可能性。<a href="../progress.html">進捗ログ</a>に書いて相談</td></tr><tr><td>Windows で print が見えない</td><td><code>Window → Toggle System Console</code></td></tr><tr><td><code>--python</code> に相対パスを渡して見つからない</td><td><strong>リポジトリのルートで実行しているか確認。</strong> 迷ったら絶対パスで渡す</td></tr></tbody></table></div>
+<hr>
+<h2 id="終わったら">終わったら<a class="hash" href="#終わったら" aria-label="このセクションへのリンク">#</a></h2>
+<ol><li><a href="../progress.html">進捗ログ</a> の今週の表に <strong>G2 の行</strong>を1行足す</li><li><a href="../next.html">次にやること</a> の T08 の状態を <code>✅ 完了</code> に書き換える</li><li><strong>続けて <a href="T09-find-3d-model.html">T09 3Dモデル探し</a> をやると、W02 の合成データ作りにそのまま入れます</strong></li></ol>
+  </main>
+</div>
+<footer class="foot">
+  <p>このページは <code>docs/tasks/T08-blender-entry-note.md</code> から自動生成しています。編集は md 側で。</p>
+</footer>
+</body>
+</html>

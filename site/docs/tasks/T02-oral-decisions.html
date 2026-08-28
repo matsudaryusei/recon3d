@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>T02 — 保留になっている5件を口頭で決める</title>
+<link rel="stylesheet" href="../../assets/style.css">
+</head>
+<body>
+<header class="topbar">
+  <div class="topbar-inner">
+    <nav class="crumbs"><a href="../../index.html">ドキュメント</a><span class="sep">/</span><a href="README.html">tasks/</a></nav>
+    <span class="src">docs/tasks/T02-oral-decisions.md</span>
+  </div>
+</header>
+<div class="layout">
+  <details class="toc"><summary class="toc-title">目次</summary><ul><li class="lv2"><a href="#なぜやるのか">なぜやるのか</a></li><li class="lv2"><a href="#決める5件">決める5件</a></li><li class="lv3"><a href="#①-最終成果物として何が欲しいか">① 最終成果物として何が欲しいか</a></li><li class="lv3"><a href="#②-撤退ライン-l1l4-と判定時期の認識合わせ">② 撤退ライン L1〜L4 と判定時期の認識合わせ</a></li><li class="lv3"><a href="#③-週の進め方">③ 週の進め方</a></li><li class="lv3"><a href="#④-メッシュ処理をどこまで自作するか">④ メッシュ処理をどこまで自作するか</a></li><li class="lv3"><a href="#⑤-public-化はいつか">⑤ public 化はいつか</a></li><li class="lv2"><a href="#ついでに聞くこと1分">ついでに聞くこと（1分）</a></li><li class="lv2"><a href="#完了判定">完了判定</a></li><li class="lv2"><a href="#つまずいたら">つまずいたら</a></li><li class="lv2"><a href="#終わったら">終わったら</a></li></ul></details>
+  <main class="page">
+<h1 id="t02--保留になっている5件を口頭で決める">T02 — 保留になっている5件を口頭で決める<a class="hash" href="#t02--保留になっている5件を口頭で決める" aria-label="このセクションへのリンク">#</a></h1>
+<p><a href="../next.html">← 次にやること一覧に戻る</a></p>
+<div class="table-wrap"><table class="md table--headless"><thead><tr><th></th><th></th></tr></thead><tbody><tr><td>ジャンル</td><td>全員</td></tr><tr><td>目安時間</td><td><strong>15分</strong>（<a href="T01-pairpro1-io.html">T01 ペアプロ#1</a> と同じ場でやる）</td></tr><tr><td>前提</td><td>2人そろうこと</td></tr><tr><td>作るもの</td><td><strong><a href="../progress.html">進捗ログ</a> への追記</strong>と、<a href="../plan.html#s14">計画書 §14</a> の 11・13 の消し込み（10・12 は一部）</td></tr><tr><td>出どころ</td><td><a href="../plan.html#s14">計画書 §14</a>（8/16 に保留になった分）</td></tr></tbody></table></div>
+<hr>
+<blockquote><p><strong>分からない言葉が出たら</strong> → <a href="../glossary.html">用語集</a>。<strong>撤退ラインの話では <code>バンドル調整</code>・<code>収束</code>・<code>メッシュ</code> が出ます。</strong></p></blockquote>
+<h2 id="なぜやるのか">なぜやるのか<a class="hash" href="#なぜやるのか" aria-label="このセクションへのリンク">#</a></h2>
+<p><strong>8/16 の確認シートで「対面で話す」ことにして保留した項目が5件あります。</strong> 保留のまま流れやすいので、<strong>T01 のペアプロが終わった直後の15分</strong>で片付けます。</p>
+<p><strong>特に「撤退ライン」は、判定の場（11/1・11/29）で認識が食い違うと揉めます。</strong> 揉めないために先に合わせるのが目的です。</p>
+<hr>
+<h2 id="決める5件">決める5件<a class="hash" href="#決める5件" aria-label="このセクションへのリンク">#</a></h2>
+<p><strong>この順に聞いてください。</strong> 下線の項目は「決まらなかった」で終わらせず、<strong>「いつまでに決めるか」だけでも決めてください。</strong></p>
+<h3 id="①-最終成果物として何が欲しいか">① 最終成果物として何が欲しいか<a class="hash" href="#①-最終成果物として何が欲しいか" aria-label="このセクションへのリンク">#</a></h3>
+<p><strong>選択肢</strong>（複数可）:</p>
+<ul><li>テクスチャ付きメッシュ（<code>.obj</code> / <code>.ply</code>）</li><li><code>.blend</code> ファイル</li><li>glTF</li><li><strong>デモ動画</strong>（回転させて見せる）</li><li><strong>復元過程の可視化動画</strong>（ボクセルが削られていく様子）</li></ul>
+<p><strong>なぜ聞くか</strong>：出したい形が決まると、<code>mesh/texture.py</code> と <code>viz/</code> にどれだけ時間を割くかが決まります。glTF なら書き出しコードが要りますが、<code>.blend</code> なら Blender 側で済みます。</p>
+<h3 id="②-撤退ライン-l1l4-と判定時期の認識合わせ">② 撤退ライン L1〜L4 と判定時期の認識合わせ<a class="hash" href="#②-撤退ライン-l1l4-と判定時期の認識合わせ" aria-label="このセクションへのリンク">#</a></h3>
+<p><a href="../plan.html#s12">計画書 §12</a> の表を<strong>その場で開いて読み合わせます。</strong></p>
+<p>確認する3点：</p>
+<ol><li><strong>目標は L3</strong>（統合パイプライン＋比較実験）で合っているか</li><li><strong>11/1 にバンドル調整が収束していなければ L2 に落とす</strong>ことに納得できるか</li><li><strong>11/29 にメッシュが破綻していれば L1 に落とす</strong>ことに納得できるか</li></ol>
+<blockquote><p><strong>「頑張ればいける」で先延ばしにしないための線です。</strong> L1 でも L2 でも成果物にはなるように組んであります。</p></blockquote>
+<h3 id="③-週の進め方">③ 週の進め方<a class="hash" href="#③-週の進め方" aria-label="このセクションへのリンク">#</a></h3>
+<ul><li>作業しやすい曜日・時間帯</li><li><strong>連絡手段</strong>（<a href="../../Discuss.html">Discuss.md</a> を使う頻度。返信までどのくらいを期待するか）</li><li>週1回15分の「次週の Issue を切る会」をいつやるか（<a href="../plan.html#s8-3">計画書 §8-3</a>）</li></ul>
+<h3 id="④-メッシュ処理をどこまで自作するか">④ メッシュ処理をどこまで自作するか<a class="hash" href="#④-メッシュ処理をどこまで自作するか" aria-label="このセクションへのリンク">#</a></h3>
+<p><strong>現在の想定</strong>（<a href="../plan.html#s3-3">計画書 §3-3</a>）:</p>
+<div class="table-wrap"><table class="md"><thead><tr><th>項目</th><th>想定</th></tr></thead><tbody><tr><td>Marching Cubes</td><td><strong>自作</strong></td></tr><tr><td>メッシュ簡略化（QEM）</td><td><strong>自作</strong></td></tr><tr><td>ラプラシアン平滑化</td><td><strong>自作</strong>（<code>solvers/cg.py</code> を呼ぶ）</td></tr><tr><td>テクスチャ投影</td><td><strong>自作</strong></td></tr><tr><td><strong>UV展開</strong></td><td><strong>Blender の Smart UV Project を使う</strong>（自作しない）</td></tr></tbody></table></div>
+<p><strong>この線引きで合っているかを確認します。</strong> 自作範囲が増えると G4 の 65h が膨らみます。</p>
+<hr>
+<h3 id="⑤-public-化はいつか">⑤ public 化はいつか<a class="hash" href="#⑤-public-化はいつか" aria-label="このセクションへのリンク">#</a></h3>
+<p><strong>「完成後に public 化する」までは 8/16 に合意済み</strong>です（<a href="../decisions.html#d-27">D-27</a>）。決めるのは<strong>時期</strong>だけ。</p>
+<ul><li><strong>Phase 4 完了後</strong>（<a href="../plan.html#s16">計画書 §16</a> の想定）でよいか</li><li>それとも<strong>もっと早く</strong>出すか（就活の時期に間に合わせたい等）</li></ul>
+<p><strong>1分で終わります。</strong> ここを飛ばすと <a href="../plan.html#s14">計画書 §14</a> の 12 が消し込めません。</p>
+<hr>
+<h2 id="ついでに聞くこと1分">ついでに聞くこと（1分）<a class="hash" href="#ついでに聞くこと1分" aria-label="このセクションへのリンク">#</a></h2>
+<p><strong><a href="../plan.html#s14">計画書 §14</a> の 13 番。</strong> 最後に必ず聞いてください：</p>
+<blockquote><p><strong>「計画で納得できない点・無理そうな点・追加でやりたいことはありますか」</strong></p></blockquote>
+<p><strong>保留のまま流れやすい項目です。</strong> ここで出た話は、その場で <a href="../../Discuss.html">Discuss.md</a> か Issue に1〜2行残してください。</p>
+<hr>
+<h2 id="完了判定">完了判定<a class="hash" href="#完了判定" aria-label="このセクションへのリンク">#</a></h2>
+<ul><li class="task"><input type="checkbox" disabled> ①〜⑤ の<strong>それぞれについて、決まったか「いつ決めるか」が決まった</strong></li><li class="task"><input type="checkbox" disabled> 決まった内容を <a href="../progress.html">進捗ログ</a> の今週の「やったこと」欄か <a href="../../Discuss.html">Discuss.md</a> に<strong>箇条書きで残した</strong></li><li class="task"><input type="checkbox" disabled> <a href="../plan.html#s14">計画書 §14</a> を更新した — <strong>11 と 13 は消し込める。10 と 12 は一部だけ</strong><ul><li><strong>10</strong> = 「元モデルの具体」＋「最終成果物」。<strong>元モデルは <a href="T09-find-3d-model.html">T09</a> の担当</strong>なので、ここで消せるのは後半だけ</li><li><strong>12</strong> = 「週の進め方」＋「メッシュ自作範囲」＋「public 化の時期」。<strong>③④⑤ で全部そろう</strong></li></ul></li><li class="task"><input type="checkbox" disabled> <strong>計画（仕様）が変わった項目があれば</strong>、<a href="../progress.html#changes">進捗ログの「決定を変えた記録」</a>に1行足した</li></ul>
+<hr>
+<h2 id="つまずいたら">つまずいたら<a class="hash" href="#つまずいたら" aria-label="このセクションへのリンク">#</a></h2>
+<div class="table-wrap"><table class="md"><thead><tr><th>症状</th><th>対処</th></tr></thead><tbody><tr><td><strong>決まらない／どちらでもよさそう</strong></td><td><strong>「いつ決めるか」だけ決めて次へ行く。</strong> 15分の枠を守るほうが大事です。決めた期日は <a href="../plan.html#s16">計画書 §16</a> に書く</td></tr><tr><td><strong>話が脱線して1件目で15分使う</strong></td><td>①〜⑤ に<strong>3分ずつ</strong>割り当てる（⑤は1分で済みます）。<strong>②（撤退ライン）だけは削らない</strong>。ここがこの15分の本題です</td></tr><tr><td><strong>相手が「特にない」で終わる</strong></td><td>選択肢を出して選んでもらう形にする。例：「成果物は動画？ メッシュファイル？ 両方？」。<strong>白紙から聞くと答えにくい</strong></td></tr><tr><td><strong>その場で意見が割れた</strong></td><td><strong>どちらが正しいかを決めようとしない。</strong> 「どういう条件ならどちらを選ぶか」を書き出して持ち帰る。判断材料が足りないだけのことが多いです</td></tr><tr><td><strong>④（メッシュの自作範囲）が判断できない</strong></td><td><strong>W10 まで先送りしてよい</strong>項目です。「W10 に決める」と書いて次へ</td></tr></tbody></table></div>
+<h2 id="終わったら">終わったら<a class="hash" href="#終わったら" aria-label="このセクションへのリンク">#</a></h2>
+<ol><li><a href="../progress.html">進捗ログ</a> の今週の表に <strong>G9 の行</strong>を1行足す</li><li><a href="../next.html">次にやること</a> の T02 の状態を <code>✅ 完了（日付）</code> に書き換える</li><li><strong>②（撤退ライン）で認識がズレていた場合は、それ自体が重要な記録です。</strong> 何がズレていたかまで書いてください</li></ol>
+  </main>
+</div>
+<footer class="foot">
+  <p>このページは <code>docs/tasks/T02-oral-decisions.md</code> から自動生成しています。編集は md 側で。</p>
+</footer>
+</body>
+</html>

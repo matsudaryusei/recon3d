@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>4bitcom</title>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<header class="topbar">
+  <div class="topbar-inner">
+    <nav class="crumbs"><a href="index.html">ドキュメント</a></nav>
+    <span class="src">HowToPush.md</span>
+  </div>
+</header>
+<div class="layout">
+  <details class="toc"><summary class="toc-title">目次</summary><ul><li class="lv2"><a href="#概要">概要</a></li><li class="lv2"><a href="#各ファイルの立ち位置と見方">各ファイルの立ち位置と見方</a></li><li class="lv2"><a href="#gitへの反映方法">gitへの反映方法</a></li></ul></details>
+  <main class="page">
+<h1 id="4bitcom">4bitcom<a class="hash" href="#4bitcom" aria-label="このセクションへのリンク">#</a></h1>
+<h2 id="概要">概要<a class="hash" href="#概要" aria-label="このセクションへのリンク">#</a></h2>
+<p>これは
+@Hinatori8
+@matsudaryusei
+の共同プロジェクトです。H &amp; M はイニシャルであり、実在する、人物 地名 団体とは一切関係ありません。</p>
+<h2 id="各ファイルの立ち位置と見方">各ファイルの立ち位置と見方<a class="hash" href="#各ファイルの立ち位置と見方" aria-label="このセクションへのリンク">#</a></h2>
+<p><strong><a href="docs/README.html">docs/README.md</a> にまとめてあります。</strong> 迷ったらそこへ。</p>
+<div class="table-wrap"><table class="md"><thead><tr><th>知りたいこと</th><th>開くもの</th></tr></thead><tbody><tr><td>次に何をするか</td><td><a href="docs/next.html">docs/next.md</a></td></tr><tr><td>言葉の意味</td><td><a href="docs/glossary.html">docs/glossary.md</a></td></tr><tr><td>仕様・日程</td><td><a href="docs/plan.html">docs/plan.md</a></td></tr><tr><td>なぜそう決めたか</td><td><a href="docs/decisions.html">docs/decisions.md</a></td></tr></tbody></table></div>
+<blockquote><p>⚠️ <strong>この手順は、<a href="docs/tasks/T04-branch-protection.html">T04（<code>main</code> ブランチの保護）</a> を入れた時点で使えなくなります。</strong>
+以降は <strong>ブランチ → PR → レビュー → merge</strong> に変わります。手順は <strong><a href="docs/tasks/T05-git-practice.html">T05 Git の練習</a></strong> にあります。
+<strong>用語（ブランチ・PR・squash merge・conflict）は <a href="docs/glossary.html">用語集</a> に1行ずつ。</strong></p></blockquote>
+<h2 id="gitへの反映方法">gitへの反映方法<a class="hash" href="#gitへの反映方法" aria-label="このセクションへのリンク">#</a></h2>
+<p>もし自分が編集する場合は、</p>
+<pre><code>git add .
+git commit -m "更新内容(変更者の名前)"
+git push origin main</code></pre>
+<p>リアルタイム同期ではないの、誰かが編集したら最新版を取得する必要がある</p>
+<pre><code>git pull origin main</code></pre>
+<p>で呼べるよ！</p>
+  </main>
+</div>
+<footer class="foot">
+  <p>このページは <code>HowToPush.md</code> から自動生成しています。編集は md 側で。</p>
+</footer>
+</body>
+</html>

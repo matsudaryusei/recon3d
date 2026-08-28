@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>T05 — Git の練習を1周する（branch → PR → レビュー → merge）</title>
+<link rel="stylesheet" href="../../assets/style.css">
+</head>
+<body>
+<header class="topbar">
+  <div class="topbar-inner">
+    <nav class="crumbs"><a href="../../index.html">ドキュメント</a><span class="sep">/</span><a href="README.html">tasks/</a></nav>
+    <span class="src">docs/tasks/T05-git-practice.md</span>
+  </div>
+</header>
+<div class="layout">
+  <details class="toc"><summary class="toc-title">目次</summary><ul><li class="lv2"><a href="#なぜやるのか">なぜやるのか</a></li><li class="lv2"><a href="#用語先にこれだけ">用語（先にこれだけ）</a></li><li class="lv2"><a href="#ステップ1ブランチを切って何か書く10分">ステップ1：ブランチを切って何か書く（10分）</a></li><li class="lv2"><a href="#ステップ2commit-して-push-する10分">ステップ2：commit して push する（10分）</a></li><li class="lv2"><a href="#ステップ3pr-を出す15分">ステップ3：PR を出す（15分）</a></li><li class="lv2"><a href="#ステップ4相手にレビューしてもらう15分">ステップ4：相手にレビューしてもらう（15分）</a></li><li class="lv2"><a href="#ステップ5squash-merge-する5分">ステップ5：squash merge する（5分）</a></li><li class="lv2"><a href="#ステップ6余裕があればコンフリクトを1回わざと起こす15分">ステップ6（余裕があれば）：コンフリクトを1回わざと起こす（15分）</a></li><li class="lv2"><a href="#完了判定">完了判定</a></li><li class="lv2"><a href="#つまずいたら">つまずいたら</a></li><li class="lv2"><a href="#終わったら">終わったら</a></li></ul></details>
+  <main class="page">
+<h1 id="t05--git-の練習を1周するbranch--pr--レビュー--merge">T05 — Git の練習を1周する（branch → PR → レビュー → merge）<a class="hash" href="#t05--git-の練習を1周するbranch--pr--レビュー--merge" aria-label="このセクションへのリンク">#</a></h1>
+<p><a href="../next.html">← 次にやること一覧に戻る</a></p>
+<div class="table-wrap"><table class="md table--headless"><thead><tr><th></th><th></th></tr></thead><tbody><tr><td>ジャンル</td><td><strong>全員</strong>（<a href="../plan.html#s7-7">計画書 §7-7</a> の入口整備 1）</td></tr><tr><td>目安時間</td><td>1時間</td></tr><tr><td>前提</td><td>clone 済み・<code>uv run pytest</code> が通ること</td></tr><tr><td>作るもの</td><td><strong>練習用の PR 1本</strong>（マージして終わり。中身は何でもよい）</td></tr><tr><td>出どころ</td><td><a href="../plan.html#s7-7">計画書 §7-7</a> ／ <a href="../plan.html#s8-1">§8-1</a>・<a href="../plan.html#s8-2">§8-2</a></td></tr></tbody></table></div>
+<hr>
+<blockquote><p><strong>先に読むもの</strong>：<a href="https://git-scm.com/book/ja/v2" class="ext" target="_blank" rel="noopener">Pro Git 日本語版の3章「ブランチ機能」</a>（1.5h）。<strong>読まずに手を動かしてもよい</strong>ですが、
+<strong>conflict が出たときに何が起きているか</strong>は3章を読んでいないと分かりません。→ <a href="../learning.html">学びの入口 G9</a></p></blockquote>
+<h2 id="なぜやるのか">なぜやるのか<a class="hash" href="#なぜやるのか" aria-label="このセクションへのリンク">#</a></h2>
+<p><strong>これまでは <code>git add</code> → <code>commit</code> → <code>push origin main</code> の3つだけで回してきました</strong>（<a href="../../HowToPush.html">HowToPush.md</a>）。
+<a href="T04-branch-protection.html">T04</a> で <code>main</code> が保護されると、<strong>この手順はもう通りません。</strong></p>
+<p><strong>本番の作業で初めて PR を出すと、慣れていないぶん実装より Git で時間が溶けます。</strong> だから<strong>中身が何でもいい練習を1本</strong>先に通します。<strong>壊しても何も困らない状態でやるのが目的です。</strong></p>
+<hr>
+<h2 id="用語先にこれだけ">用語（先にこれだけ）<a class="hash" href="#用語先にこれだけ" aria-label="このセクションへのリンク">#</a></h2>
+<div class="table-wrap"><table class="md"><thead><tr><th>用語</th><th>意味</th></tr></thead><tbody><tr><td><strong>branch（ブランチ）</strong></td><td>作業用の枝。<code>main</code> を触らずに好きなだけ commit できる</td></tr><tr><td><strong>PR（プルリクエスト）</strong></td><td>「この枝を <code>main</code> に入れてください」という申請。<strong>議論の場でもある</strong></td></tr><tr><td><strong>review（レビュー）</strong></td><td>相手の PR を読んでコメントを付けること</td></tr><tr><td><strong>squash merge</strong></td><td>枝の commit を<strong>1個にまとめて</strong> <code>main</code> に入れる方式。履歴が読みやすくなる</td></tr><tr><td><strong>conflict（コンフリクト）</strong></td><td>2人が<strong>同じ行</strong>を別々に直したとき、Git がどちらを採るか決められない状態</td></tr></tbody></table></div>
+<hr>
+<h2 id="ステップ1ブランチを切って何か書く10分">ステップ1：ブランチを切って何か書く（10分）<a class="hash" href="#ステップ1ブランチを切って何か書く10分" aria-label="このセクションへのリンク">#</a></h2>
+<pre><code class="lang-bash">git switch main
+git pull origin main
+git switch -c docs/git-practice-&lt;自分の名前&gt;     # 例: docs/git-practice-matsuda</code></pre>
+<blockquote><p><strong><code>git switch -c</code> は「ブランチを新しく作って、そこに移る」。</strong> <code>-c</code> は create。
+<strong>ブランチ名の付け方</strong>は <a href="../plan.html#s8-1">計画書 §8-1</a>（<code>feat/</code> <code>fix/</code> <code>docs/</code> <code>exp/</code>）。今回は文書なので <code>docs/</code>。</p></blockquote>
+<p><strong>練習用のファイルを作ります。</strong></p>
+<pre><code class="lang-bash">mkdir -p docs/notes</code></pre>
+<p><code>docs/notes/git-practice-&lt;自分の名前&gt;.md</code> を作って、<strong>なんでもいいので3行くらい書きます。</strong> 例：</p>
+<pre><code class="lang-markdown"># Git 練習メモ（&lt;名前&gt;）
+
+- `git switch -c` でブランチを作った
+- 分からなかったこと：</code></pre>
+<p><strong>いま自分がどこにいるか確認</strong>：</p>
+<pre><code class="lang-bash">git status            # 「On branch docs/git-practice-...」と出るはず
+git branch            # * が付いているのが今いるブランチ</code></pre>
+<hr>
+<h2 id="ステップ2commit-して-push-する10分">ステップ2：commit して push する（10分）<a class="hash" href="#ステップ2commit-して-push-する10分" aria-label="このセクションへのリンク">#</a></h2>
+<pre><code class="lang-bash">git add docs/notes/git-practice-&lt;自分の名前&gt;.md
+git status                    # 緑色で「new file:」と出れば add できている
+git commit -m "docs: Git 練習メモを追加（&lt;自分の名前&gt;）"
+git push -u origin docs/git-practice-&lt;自分の名前&gt;</code></pre>
+<blockquote><p><strong><code>-u</code> は初回だけ必要。</strong> 「このローカルブランチは origin のこのブランチに対応する」と覚えさせるオプションです。2回目以降は <code>git push</code> だけで通ります。</p></blockquote>
+<p>push すると、ターミナルに <strong>PR を作る URL が表示されます。</strong></p>
+<hr>
+<h2 id="ステップ3pr-を出す15分">ステップ3：PR を出す（15分）<a class="hash" href="#ステップ3pr-を出す15分" aria-label="このセクションへのリンク">#</a></h2>
+<p>表示された URL を開くか、GitHub のリポジトリページに出る <strong><code>Compare &amp; pull request</code></strong> を押します。</p>
+<p><strong>書くこと</strong>（<a href="../plan.html#s8-2">計画書 §8-2</a>）：</p>
+<div class="table-wrap"><table class="md"><thead><tr><th>欄</th><th>書き方</th></tr></thead><tbody><tr><td><strong>タイトル</strong></td><td>commit メッセージと同じでよい</td></tr><tr><td><strong>本文</strong></td><td><strong>「何を」「なぜ」を1〜3段落。</strong> 相手の専門外を前提に書く</td></tr></tbody></table></div>
+<p>本文の例：</p>
+<pre><code>Git の練習として、branch → PR → レビュー → squash merge を1周する。
+
+追加したのは docs/notes/ の練習メモ1本だけで、コードには影響しない。
+main のブランチ保護（T04）を入れる前に、全員が PR の手順を通しておくのが目的。</code></pre>
+<p><strong>右側の <code>Labels</code> から <code>G9:ドキュメント</code> を付けてください</strong>（<a href="T06-labels-and-board.html">T06</a> が終わっていれば選べます。まだなら飛ばしてよい）。</p>
+<hr>
+<h2 id="ステップ4相手にレビューしてもらう15分">ステップ4：相手にレビューしてもらう（15分）<a class="hash" href="#ステップ4相手にレビューしてもらう15分" aria-label="このセクションへのリンク">#</a></h2>
+<p><strong>PR の右上 <code>Reviewers</code> から相手を指定します。</strong></p>
+<p>レビューする側がやること：</p>
+<ol><li><strong><code>Files changed</code> タブを開く</strong>（何が変わったかが行単位で見える）</li><li>行の左の <strong><code>+</code> を押すとその行にコメントできる</strong></li><li>右上の <strong><code>Review changes</code></strong> → <strong><code>Approve</code></strong> を選ぶ</li><li><strong>コメント欄に「この PR が何をしているか、自分の言葉で1〜3行」を書く</strong></li></ol>
+<hr>
+<p><strong>Finish your commentsでの項目の意味</strong></p>
+<div class="table-wrap"><table class="md"><thead><tr><th>項目</th><th>説明</th></tr></thead><tbody><tr><td>Comment</td><td>承認でも変更要求でもなく、単に感想やコメントだけを残す</td></tr><tr><td>Approve</td><td>承認して、mergeできる状態にする（今、これが選ばれている）</td></tr><tr><td>Request changes</td><td>「このままではmergeしないでほしい」という意思表示。修正が必要な点を指摘するときに選ぶ</td></tr></tbody></table></div>
+<hr>
+<blockquote><p>⚠️ <strong>「LGTM」だけの承認は禁止です</strong>（<a href="../plan.html#s8-2">計画書 §8-2</a>）。
+<strong>読んでいないのに通すのを構造的に止めるためのルール</strong>で、これは練習でも守ってください。</p></blockquote>
+<p><strong>練習として、レビューする側は1つコメントを付けてください。</strong> 何でもいいです（「ここ typo」でも「読みました」でも）。コメントを受けた側は：</p>
+<pre><code class="lang-bash"># 同じブランチのまま直して、もう1回 commit → push するだけ
+git add -A
+git commit -m "docs: レビュー指摘を反映"
+git push               # -u は初回だけなので、もう要らない</code></pre>
+<p><strong>PR は自動で更新されます。</strong> 新しく PR を出し直す必要はありません。<strong>ここが一番よく誤解される点です。</strong></p>
+<hr>
+<h2 id="ステップ5squash-merge-する5分">ステップ5：squash merge する（5分）<a class="hash" href="#ステップ5squash-merge-する5分" aria-label="このセクションへのリンク">#</a></h2>
+<ol><li>PR のページ下部の <strong><code>Squash and merge</code></strong> を押す（<a href="T04-branch-protection.html">T04</a> 後はこれしか出ません）</li><li>commit メッセージを確認して <strong><code>Confirm squash and merge</code></strong></li><li><strong><code>Delete branch</code></strong> を押す（GitHub 上の枝を消す。ローカルはまだ残っています）</li></ol>
+<p><strong>手元を片付ける</strong>：</p>
+<pre><code class="lang-bash">git switch main
+git pull origin main                              # マージされた内容が降りてくる
+git branch -D docs/git-practice-&lt;自分の名前&gt;       # ローカルの枝を消す（大文字の -D）
+git branch                                        # main だけになっていれば OK</code></pre>
+<blockquote><p>⚠️ <strong>ここは <code>-d</code>（小文字）ではなく <code>-D</code>（大文字）です。</strong>
+<code>-d</code> を打つと <strong><code>error: the branch '...' is not fully merged</code></strong> と言われて消せません。<strong>壊れているのではありません。</strong></p>
+<p><strong>理由</strong>：squash merge は、枝の commit を<strong>そのまま取り込むのではなく、内容をまとめた新しい commit を1個作ります。</strong>
+そのため Git から見ると「枝の commit は <code>main</code> に入っていない」ことになり、<code>-d</code>（安全な削除）が拒否されます。
+<strong>内容は <code>main</code> に入っているので、<code>-D</code>（強制削除）で問題ありません。</strong></p></blockquote>
+<hr>
+<h2 id="ステップ6余裕があればコンフリクトを1回わざと起こす15分">ステップ6（余裕があれば）：コンフリクトを1回わざと起こす（15分）<a class="hash" href="#ステップ6余裕があればコンフリクトを1回わざと起こす15分" aria-label="このセクションへのリンク">#</a></h2>
+<p><strong>本番で必ず出会います。</strong> 慌てないために1回見ておくと違います。</p>
+<ol><li>2人が<strong>同じファイルの同じ行</strong>を、<strong>別々のブランチ</strong>で書き換える</li><li>片方を先にマージする</li><li>もう片方で <code>git switch main &amp;&amp; git pull &amp;&amp; git switch &lt;自分の枝&gt; &amp;&amp; git merge main</code></li><li><strong><code>CONFLICT</code> と出る。</strong> 該当ファイルを開くと下のようになっている：</li></ol>
+<pre><code>&lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD
+自分が書いた行
+=======
+相手が書いた行
+&gt;&gt;&gt;&gt;&gt;&gt;&gt; main</code></pre>
+<ol><li><strong><code>&lt;&lt;&lt;&lt;&lt;&lt;&lt;</code> <code>=======</code> <code>&gt;&gt;&gt;&gt;&gt;&gt;&gt;</code> の3行ごと消して、残したい内容だけにする</strong></li><li><code>git add &lt;ファイル&gt;</code> → <code>git commit</code></li></ol>
+<blockquote><p>⚠️ <strong><code>git commit</code> を <code>-m</code> なしで打つと、エディタが開きます。</strong> 既定のメッセージが入っているので、<strong>そのまま保存して閉じるだけ</strong>です。
+<strong>vim なら</strong> <code>:wq</code> と打って Enter。<strong>nano なら</strong> <code>Ctrl+O</code> → Enter → <code>Ctrl+X</code>。
+<strong>エディタを開きたくなければ <code>git commit --no-edit</code></strong> でも同じことができます。</p></blockquote>
+<hr>
+<h2 id="完了判定">完了判定<a class="hash" href="#完了判定" aria-label="このセクションへのリンク">#</a></h2>
+<ul><li class="task"><input type="checkbox" disabled> 自分の名前の練習メモが <strong><code>main</code> に入っている</strong>（GitHub 上で <code>docs/notes/</code> を見て確認）</li><li class="task"><input type="checkbox" disabled> <strong><code>main</code> 上の履歴で、その PR が1コミットにまとまっている</strong>（squash が効いている）</li><li class="task"><input type="checkbox" disabled> 相手からの <strong>Approve コメントに「自分の言葉での説明1〜3行」が入っている</strong></li><li class="task"><input type="checkbox" disabled> 手元で <code>git branch</code> が <code>main</code> だけになっている</li><li class="task"><input type="checkbox" disabled> <strong><code>git switch -c</code> / <code>git push -u</code> / <code>git branch -D</code> を、手順を見ないで打てる</strong></li></ul>
+<hr>
+<h2 id="つまずいたら">つまずいたら<a class="hash" href="#つまずいたら" aria-label="このセクションへのリンク">#</a></h2>
+<div class="table-wrap"><table class="md"><thead><tr><th>症状</th><th>対処</th></tr></thead><tbody><tr><td><strong><code>error: the branch '...' is not fully merged</code></strong></td><td><strong>squash merge の後は正常な反応です。</strong> <code>-d</code> ではなく <strong><code>-D</code></strong> を使ってください（上のステップ5の注記）</td></tr><tr><td><code>error: pathspec ... did not match</code></td><td>ブランチ名の打ち間違い。<code>git branch -a</code> で一覧を見る</td></tr><tr><td><code>Updates were rejected</code></td><td>相手が先に push している。<code>git pull --rebase</code> してから push</td></tr><tr><td><strong>間違えて <code>main</code> で作業してしまった（まだ commit していない）</strong></td><td><code>git switch -c &lt;新しい枝名&gt;</code> と打つだけで、<strong>変更を持ったまま枝に移れます。</strong> その後 commit すれば OK</td></tr><tr><td><strong>間違えて <code>main</code> に commit してしまった</strong></td><td><strong>枝に移るだけでは <code>main</code> に commit が残ります</strong>（あとで <code>git pull</code> したときに履歴が枝分かれします）。<code>git switch -c &lt;新しい枝名&gt;</code> で枝を作ってから、<strong><code>git switch main &amp;&amp; git reset --hard origin/main</code> で <code>main</code> を戻す</strong>。⚠️ <strong><code>reset --hard</code> は未コミットの変更を消す</strong>ので、<code>git status</code> が clean であることを確認してから</td></tr><tr><td>commit を1個取り消したい</td><td><code>git reset --soft HEAD~1</code>（変更は手元に残る）。<code>--hard</code> は変更ごと消えるので注意</td></tr><tr><td><strong>何が起きているか分からなくなった</strong></td><td><code>git status</code> と <code>git log --oneline -5</code> を貼って <a href="../../Discuss.html">Discuss.md</a> で聞く。<strong>自力で <code>--force</code> を試さないこと</strong></td></tr></tbody></table></div>
+<hr>
+<h2 id="終わったら">終わったら<a class="hash" href="#終わったら" aria-label="このセクションへのリンク">#</a></h2>
+<ol><li><a href="../progress.html">進捗ログ</a> の今週の表に <strong>G9 の行</strong>を1行足す</li><li><a href="../next.html">次にやること</a> の T05 の状態を <code>✅ 完了（名前・日付）</code> に書き換える</li><li><strong>練習メモに「分からなかったこと」を書いて残してください。</strong> 次に入る人向けの資料になります（<a href="../plan.html#s3-7">計画書 §3-7</a>）</li></ol>
+  </main>
+</div>
+<footer class="foot">
+  <p>このページは <code>docs/tasks/T05-git-practice.md</code> から自動生成しています。編集は md 側で。</p>
+</footer>
+</body>
+</html>

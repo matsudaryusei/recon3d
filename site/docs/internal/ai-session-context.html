@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AIセッション引き継ぎ用コンテキスト</title>
+<link rel="stylesheet" href="../../assets/style.css">
+</head>
+<body>
+<header class="topbar">
+  <div class="topbar-inner">
+    <nav class="crumbs"><a href="../../index.html">ドキュメント</a><span class="sep">/</span><span>internal/</span></nav>
+    <span class="src">docs/internal/ai-session-context.md</span>
+  </div>
+</header>
+<div class="layout">
+  <details class="toc"><summary class="toc-title">目次</summary><ul><li class="lv2"><a href="#使い方">使い方</a></li><li class="lv2"><a href="#資料セット">資料セット</a></li><li class="lv2"><a href="#新しいセッションの開始時の前提">新しいセッションの開始時の前提</a></li><li class="lv3"><a href="#分担の扱い2026-08-16-改訂重要">分担の扱い（2026-08-16 改訂・重要）</a></li><li class="lv3"><a href="#-手順書-tasks-で越えてはいけない線2026-08-24-追加最重要">⚠️ 手順書（../tasks/）で越えてはいけない線【2026-08-24 追加・最重要】</a></li><li class="lv3"><a href="#参加者についてaiが踏まえるべき前提2026-08-16-時点">参加者について、AIが踏まえるべき前提（2026-08-16 時点）</a></li><li class="lv2"><a href="#検討したが却下された提案再提案不要">検討したが却下された提案（再提案不要）</a></li><li class="lv2"><a href="#文書運用のルール">文書運用のルール</a></li><li class="lv2"><a href="#注意文書が長くなりすぎた経緯">注意：文書が長くなりすぎた経緯</a></li><li class="lv3"><a href="#2026-08-24-の増加について記録">2026-08-24 の増加について（記録）</a></li></ul></details>
+  <main class="page">
+<h1 id="aiセッション引き継ぎ用コンテキスト">AIセッション引き継ぎ用コンテキスト<a class="hash" href="#aiセッション引き継ぎ用コンテキスト" aria-label="このセクションへのリンク">#</a></h1>
+<blockquote><p><strong>⚠ これは人間が読むための文書ではありません。</strong>
+関口・松田が読む必要はありません。<strong>新しいAIセッション（Claude等）にこのプロジェクトの文脈を渡すとき</strong>に使います。
+人間向けの入口は <a href="../README.html">../README.md</a> です。</p></blockquote>
+<hr>
+<h2 id="使い方">使い方<a class="hash" href="#使い方" aria-label="このセクションへのリンク">#</a></h2>
+<p>会話履歴が失われたとき、<strong>このファイルと <code>../plan.md</code> を渡せば文脈を再構築できる。</strong></p>
+<hr>
+<h2 id="資料セット">資料セット<a class="hash" href="#資料セット" aria-label="このセクションへのリンク">#</a></h2>
+<div class="table-wrap"><table class="md"><thead><tr><th>#</th><th>ファイル</th><th>内容</th><th>読む順序</th></tr></thead><tbody><tr><td>1</td><td><strong><code>../plan.md</code></strong></td><td><strong>決定した内容と18週の実行計画。現在の正典</strong></td><td><strong>1番目</strong></td></tr><tr><td>2</td><td><strong><code>../decisions.md</code></strong></td><td><strong>各決定の「なぜ」（D-01〜D-39）。根拠・代替案・却下理由。</strong> 計画書が肥大しないよう分離。計画書の <code>→ 根拠: D-xx</code> から引く</td><td>2番目</td></tr><tr><td>3</td><td><code>../progress.md</code></td><td><strong>ジャンル別の週次実働記録。</strong> 見積もり（§3-3）との乖離を見る。<strong>記入内容が薄いのは仕様</strong>（判定基準は #7 に外してある）</td><td>着工後</td></tr><tr><td>4</td><td><code>project-handoff.md</code></td><td>テーマ選定の経緯・数理的な芯（2026-08-14 時点）</td><td>背景が必要なとき</td></tr><tr><td>5</td><td><code>partner-questions-v1.md</code></td><td>確認シート第1版。回答記録と用語集</td><td>参照のみ</td></tr><tr><td>6</td><td><code>../README.md</code></td><td>人間向けの入口。<strong>現在地のみ</strong>（日付ごとの経過は #3 に移した。2026-08-24）</td><td>状況把握</td></tr><tr><td>7</td><td><code>progress-log-review.md</code></td><td><strong>進捗ログを見せられたときの手順。</strong> 歯止めの判定基準・週ごとの観測ポイント・指摘の出し方</td><td><strong>#3 を渡されたら必ず</strong></td></tr><tr><td>8</td><td><strong><code>../next.md</code></strong></td><td><strong>残タスクの一覧と状態。</strong> 「次に何をするか」の唯一の集約先（2026-08-24 新設）</td><td><strong>作業の話をするなら必ず</strong></td></tr><tr><td>9</td><td><strong><code>../tasks/T01</code>〜<code>T10</code></strong></td><td><strong>実行手順書。</strong> 打つコマンド・埋める項目・完了判定。<strong>下の「越えてはいけない線」を必ず読むこと</strong></td><td><strong>同上</strong></td></tr><tr><td>10</td><td><code>../glossary.md</code></td><td>用語集。<code>partner-questions-v1.md</code> の末尾から昇格・拡充（2026-08-24）</td><td>参照のみ</td></tr><tr><td>11</td><td><code>../learning.md</code></td><td><strong>学習資料へのリンク集</strong>（ジャンル別3本まで）。<strong>D-33 の代替手段</strong>（2026-08-24 新設）</td><td>参照のみ</td></tr><tr><td>12</td><td><code>../notes/</code></td><td>詰まった記録・調べたことの置き場。テンプレは <code>notes/README.md</code></td><td>参照のみ</td></tr></tbody></table></div>
+<blockquote><p><strong>確認シート第2版（松田への質問票）は 2026-08-16 に回答を受領し、内容を計画書・決定記録に全て反映したうえで 2026-08-17 に削除した。</strong> 松田の回答そのものを参照する必要はない。<strong>回答から来た決定は計画書 §7-6・§7-7・§14 と決定記録 D-30〜D-37 に入っている。</strong></p></blockquote>
+<p><strong>リポジトリ内の一次資料</strong>（docs/ 以外）</p>
+<div class="table-wrap"><table class="md"><thead><tr><th>パス</th><th>内容</th></tr></thead><tbody><tr><td><code>../../Discuss.md</code></td><td><strong>非同期の連絡場所。</strong> メンバー間の連絡と、<strong>AIが完了報告の不備を書き込む先</strong>（手順は <code>progress-log-review.md</code>）。<strong>セッション開始時に必ず読むこと</strong></td></tr><tr><td><code>../../HowToPush.md</code></td><td>メンバー向けの Git 操作手順（旧 ルート <code>README.md</code>。2026-08-17 に改名）</td></tr><tr><td><code>blender_system/system-info.txt</code></td><td><strong>松田が 2026-08-15 に提出した Blender システム情報の原本。</strong> 確認シート Q9 の回答であり、Q10・Q13・Q16 の部分回答でもある。計画書 §7-6 はこれを要約したもの。<strong>環境まわりで矛盾が出たら原本を見ること</strong></td></tr></tbody></table></div>
+<p><strong>計画書と <code>project-handoff.md</code> が矛盾する場合、計画書が優先される。</strong> handoff は 2026-08-14 時点の検討結果であり、その後の決定で複数箇所が修正されている（handoff 冒頭の警告ボックスに対照表がある）。</p>
+<hr>
+<h2 id="新しいセッションの開始時の前提">新しいセッションの開始時の前提<a class="hash" href="#新しいセッションの開始時の前提" aria-label="このセクションへのリンク">#</a></h2>
+<p><strong>以下は決定済み。再検討・再提案は不要。</strong></p>
+<ul><li><strong>開発テーマは確定済み。</strong>（handoff §2）<strong>2026-08-16 に松田の了承と志望分野の判明により、テーマ再検討の分岐は完全に閉じた</strong>（D-30）。第二候補「物理シミュレーション × Unity」は破棄済み</li><li><strong>使用言語は Python 単一で確定。</strong>（handoff §8、計画書 §7）<strong>2026-08-16 に松田から「遅ければ C++ でも」との提案があったが不採用</strong>（D-32）。速度は Numba・行列化・チャンク分割で対処し、E7 の題材にする</li><li><strong>Python のバージョンは 3.11 で確定済み。</strong> 仮決めではない（2026-08-15、松田の実機確認。計画書 §7-2 / D-15）。<strong>Blender内蔵 numpy は 1.26.4 で確認済み</strong>（D-17）</li><li><strong>ボクセル解像度は 256³ 維持</strong>（松田のPCは 16GB。D-32）。<strong>チャンク分割は解像度に依らず採用</strong>（D-21）</li><li><strong>計画書 §0 の決定事項は全て確定済み。</strong> 覆す提案をする場合は、<strong>決定記録の該当項目に書かれた根拠に反論すること。</strong></li><li><strong>リポジトリは <code>4bitcom_HandM</code> を使用</strong>（D-27）。<strong>3D復元専用にしてよいと松田が回答済み（2026-08-16）</strong></li></ul>
+<h3 id="分担の扱い2026-08-16-改訂重要">分担の扱い（2026-08-16 改訂・重要）<a class="hash" href="#分担の扱い2026-08-16-改訂重要" aria-label="このセクションへのリンク">#</a></h3>
+<ul><li><strong>担当は「人」ではなく「作業ジャンル G1〜G9」で管理する</strong>（D-36、計画書 §3-3）。<strong>人ごとの担当表は廃止済み。復活させる提案をしないこと</strong></li><li><strong>誰がやるかは着手時に決める。</strong> 計画書に個人名で担当を書き込まないこと</li><li><strong>個人の研究志望に紐づく記述は計画書から削除済み</strong>（D-37）。<strong>技術核3つ・研究助走・志望研究室・研究室訪問向けの語り口は復活させない。</strong> 技術的な中身（バンドル調整・離散ラプラシアン・E6 など）は<strong>そのまま維持</strong></li><li><strong>メンバー追加を検討中。</strong> 文書は「新しく入る人が読む」前提で書くこと</li></ul>
+<h3 id="-手順書-tasks-で越えてはいけない線2026-08-24-追加最重要">⚠️ 手順書（<code>../tasks/</code>）で越えてはいけない線【2026-08-24 追加・最重要】<a class="hash" href="#-手順書-tasks-で越えてはいけない線2026-08-24-追加最重要" aria-label="このセクションへのリンク">#</a></h3>
+<p><strong><code>tasks/</code> の手順書には、意図的に書かれていない部分がある。</strong> 空欄・未記入に見えても<strong>穴ではない。埋めてはならない。</strong></p>
+<div class="table-wrap"><table class="md"><thead><tr><th>手順書に書いてある（＝補完してよい）</th><th><strong>意図的に空けてある（＝絶対に埋めない）</strong></th></tr></thead><tbody><tr><td>環境構築・ツール操作（<code>uv</code>・Git・GitHub 画面）</td><td><strong>アルゴリズムの導出・数式の変形</strong></td></tr><tr><td>設定ファイルの中身（<code>ci.yml</code>・ラベル定義）</td><td><strong>実装コード</strong>（関数シグネチャと通すべきテストまでが上限）</td></tr><tr><td>打つコマンドと期待出力</td><td><strong>テストの期待値</strong>（本人に導かせる）</td></tr><tr><td>完了したと分かる観測方法</td><td><strong>比較の結論・設計の選択</strong>（どちらが良いか）</td></tr><tr><td>既知の罠への対処</td><td><strong>調べれば分かることの要約</strong></td></tr></tbody></table></div>
+<p><strong>判断基準</strong>: <strong>「そこで詰まって時間を使うことに、学びがあるか」</strong>。
+<code>uv sync</code> が通らず2時間溶かす → 学びなし → <strong>全部書く</strong>。座標変換の符号を自分で導いて間違える → <strong>その間違いが理解になる</strong> → <strong>書かない</strong>。</p>
+<p><strong>具体例</strong>: <code>../tasks/T01-pairpro1-io.md</code> は <code>io/coords.py</code>・<code>io/cameras.py</code> の<strong>シグネチャと docstring だけ</strong>を置き、本体を空けてある。
+<strong>「親切のつもりで実装を書き足す」ことは、<a href="../decisions.html#d-33">D-33</a>（生成AIを使わずに書きたい）と <a href="../plan.html#s3-8">計画書 §3-8</a>（数理は自作するのが本プロジェクトの芯）の両方に反する。</strong>
+<strong>知識が足りないと判断した場合の正しい対応は、実装を書くことではなく <code>../learning.md</code> に資料を1本足すこと。</strong></p>
+<p>この線引きは <code>../tasks/README.md</code> にも人間向けに明記してある。</p>
+<h3 id="参加者についてaiが踏まえるべき前提2026-08-16-時点">参加者について、AIが踏まえるべき前提（2026-08-16 時点）<a class="hash" href="#参加者についてaiが踏まえるべき前提2026-08-16-時点" aria-label="このセクションへのリンク">#</a></h3>
+<ul><li><strong>Python 歴が数か月のメンバーがいる</strong>（主言語は C）。numpy / OpenCV / bpy / pytest はいずれも未経験。<strong>Git は clone / commit / push まで</strong>。<strong>必要な資料は <code>../learning.md</code> に集約済み。説明を書き下ろす前にそこを見ること</strong></li><li><strong>「生成AIを用いたコーディングを控えたい」という申告がある</strong>（D-33）。<strong>この方針を尊重する。「AIに書かせれば速い」という提案をしないこと</strong></li><li><strong>担当を減らす方向の提案もしないこと。</strong> 入口の段差を均す形で対応済み（計画書 §7-7）</li></ul>
+<hr>
+<h2 id="検討したが却下された提案再提案不要">検討したが却下された提案（再提案不要）<a class="hash" href="#検討したが却下された提案再提案不要" aria-label="このセクションへのリンク">#</a></h2>
+<p><strong>却下理由つきの一覧は <a href="../decisions.html#d-26">決定記録 D-26</a> にある。</strong> 見出しのみ再掲。</p>
+<ul><li>スコープ削減3件（Marching Cubes / UV展開を自作しない、前処理を2種に限定。計 −45h）</li><li>実写データのみで進める／実写と合成を最初から並行</li><li>完全な役割分担（松田＝作業の受け皿）</li><li><strong>副担当はレビューのみ・実装しない</strong>（2026-08-15 改訂 → D-04。<strong>さらに 2026-08-16 に「主担当／副担当」の枠組みごと撤回 → D-36</strong>）</li><li>リポジトリを2つに分ける</li><li>大学のPBL・演習科目向けの提出文書を整備する</li><li>関口の開発環境を Ubuntu 単独に絞る</li><li>Unity / C++ / Rust の採用</li><li>「①を完成させてから④」の順次開発</li></ul>
+<p><strong>2026-08-16 の松田の回答のうち採用しなかったもの</strong>は <a href="../decisions.html#d-34">決定記録 D-34</a> に一覧がある（C++ 導入／レンダラ自作・品質作り込み／被写体としての風景・ぬいぐるみ）。</p>
+<p><strong>再提案する場合は、D-26・D-34 に書かれた却下理由に反論すること。</strong></p>
+<hr>
+<h2 id="文書運用のルール">文書運用のルール<a class="hash" href="#文書運用のルール" aria-label="このセクションへのリンク">#</a></h2>
+<p>このプロジェクトの文書は役割で分かれている。<strong>書き足すときは置き場所を間違えないこと。</strong></p>
+<div class="table-wrap"><table class="md"><thead><tr><th>内容</th><th>置き場所</th></tr></thead><tbody><tr><td>決まったこと（仕様・手順・日程）</td><td>計画書</td></tr><tr><td><strong>なぜそう決めたか</strong>（根拠・代替案・却下理由）</td><td><strong>決定記録</strong>。計画書には書かない（肥大するため）</td></tr><tr><td>週ごとの実績・<strong>日付ごとの経過</strong></td><td><code>../progress.md</code></td></tr><tr><td><strong>次に何をするか</strong>（残タスクと状態）</td><td><strong><code>../next.md</code></strong>。README には書かない</td></tr><tr><td><strong>どうやるか</strong>（手順・完了判定）</td><td><strong><code>../tasks/T&lt;番号&gt;-*.md</code></strong>。<strong>仕様は書かず計画書へリンクする</strong>（二重管理を避ける）</td></tr><tr><td>用語の定義（1行）</td><td><code>../glossary.md</code></td></tr><tr><td>学習資料へのリンク</td><td><code>../learning.md</code>（<strong>ジャンルごと3本まで。要約は書かない</strong>）</td></tr><tr><td>詰まった記録・調べたメモ</td><td><code>../notes/</code></td></tr><tr><td>松田への確認事項</td><td><strong>文書を作らない。</strong> 口頭で聞き、決まったことを Issue / PR に1〜2行残す（計画書 §8-3）</td></tr><tr><td>人間が最初に見るもの</td><td>README</td></tr></tbody></table></div>
+<p><strong>決定を変えたときは、決定記録の項目を消さずに改訂履歴として追記する</strong>（「かつてこう決めていて、こういう理由で変えた」が残っていること自体が共同開発の説明材料になるため）。</p>
+<hr>
+<h2 id="注意文書が長くなりすぎた経緯">注意：文書が長くなりすぎた経緯<a class="hash" href="#注意文書が長くなりすぎた経緯" aria-label="このセクションへのリンク">#</a></h2>
+<p>2026-08-15 時点で docs 配下が4000行を超え、<strong>関口から「どれを読めばいいか分からない」という指摘があった。</strong> そのため：</p>
+<ol><li><code>README.md</code> を人間向けの唯一の入口として新設</li><li>手続き用・履歴用の文書を <code>internal/</code> に分離（本ファイルを含む）</li><li>計画書から「セッション引き継ぎ用」の記述を本ファイルへ移動</li></ol>
+<p><strong>今後、文書を追加・拡張するときは「人間が読む必要があるか」を先に判断し、無ければ <code>internal/</code> に置くこと。</strong> README は短く保つ。</p>
+<p><strong>2026-08-16 追記：松田からも同種の指摘があった。</strong></p>
+<blockquote><p>「質問多すぎ。ファイル数少ないのに似たファイル名で名前長い」（コミットメッセージ）</p></blockquote>
+<p><strong>対応済み</strong>：① <strong>確認シートは第2版で打ち止め。回答を反映したうえで第2版のファイルごと削除した（2026-08-17）。</strong> 以降の確認は口頭で行い、決まったことだけを Issue / PR に1〜2行残す運用に切り替えた（計画書 §8-3）。② <strong><code>doc/</code> → <code>docs/</code> 改名と、ファイル名からの <code>3d-reconstruction-</code> 接頭辞の除去を実施（2026-08-17）</strong>（計画書 §16）。</p>
+<p><strong>AIへの指示</strong>: <strong>このプロジェクトで新しい質問票・大型の文書を提案しないこと。</strong> 2人とも文書量に対して既に不満を表明している。<strong>追記は既存ファイルの該当節に行う。</strong></p>
+<h3 id="2026-08-24-の増加について記録">2026-08-24 の増加について（記録）<a class="hash" href="#2026-08-24-の増加について記録" aria-label="このセクションへのリンク">#</a></h3>
+<p><strong>docs 配下の行数が 5割ほど増えた</strong>（改訂前 4,302行）。上の「短く保つ」方針に反して見えるので、経緯を残す。
+<strong>現在の行数はここに書かない</strong>（書くと必ず古くなる）。数えるなら <code>find docs -name '*.md' | xargs cat | wc -l</code>。</p>
+<p><strong>きっかけ</strong>: 「進捗ログから次の作業を辿っても、ファイル名と関数名しか書いておらず、何をすればよいか分からない」「初心者が学びながら進める構成になっていない」という2件の指摘。</p>
+<div class="table-wrap"><table class="md"><thead><tr><th>増えたもの</th><th>性質</th></tr></thead><tbody><tr><td><code>../tasks/</code> 11件</td><td><strong>1件150〜400行。1回に1件しか開かない</strong></td></tr><tr><td><code>../next.md</code></td><td>通読対象</td></tr><tr><td><code>../glossary.md</code> / <code>../learning.md</code></td><td><strong>引くもの。通読しない</strong></td></tr><tr><td><code>../notes/README.md</code></td><td>テンプレート</td></tr></tbody></table></div>
+<p><strong>通読が必要な量はむしろ減っている</strong>（<code>../README.md</code> から §1 の日付付き経過76行を <code>../progress.md</code> へ移設した）。
+<strong>それでも総量は増えた。</strong> 次に文書を足すときは、<strong>この増加分を先に見直す</strong>こと。特に <code>../tasks/</code> は<strong>完了したタスクの手順書を消してよい</strong>（履歴は <code>../progress.md</code> と PR に残る）。</p>
+  </main>
+</div>
+<footer class="foot">
+  <p>このページは <code>docs/internal/ai-session-context.md</code> から自動生成しています。編集は md 側で。</p>
+</footer>
+</body>
+</html>

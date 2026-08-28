@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>3D復元プロジェクト — ここから読む</title>
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+<header class="topbar">
+  <div class="topbar-inner">
+    <nav class="crumbs"><a href="../index.html">ドキュメント</a></nav>
+    <span class="src">docs/README.md</span>
+  </div>
+</header>
+<div class="layout">
+  <details class="toc"><summary class="toc-title">目次</summary><ul><li class="lv2"><a href="#それぞれのmdファイル役割">それぞれのmdファイル役割</a></li><li class="lv2"><a href="#route">0. 道順（30分）</a></li><li class="lv2"><a href="#here">1. いま、どこにいるか</a></li><li class="lv2"><a href="#2-次にやること">2. 次にやること</a></li><li class="lv3"><a href="#-次にやること一覧nextmdnextmd">👉 次にやること一覧（next.md）</a></li><li class="lv3"><a href="#いま優先度が高い3つ">いま優先度が高い3つ</a></li><li class="lv2"><a href="#3-どの文書をいつ開くか">3. どの文書を、いつ開くか</a></li><li class="lv3"><a href="#ファイルの一覧">ファイルの一覧</a></li><li class="lv2"><a href="#4-各ステップで迷子にならないための地図">4. 各ステップで迷子にならないための地図</a></li><li class="lv2"><a href="#5-困ったときのメモ">5. 困ったときのメモ</a></li><li class="lv2"><a href="#6-まだ決まっていないこと">6. まだ決まっていないこと</a></li></ul></details>
+  <main class="page">
+<h1 id="3d復元プロジェクト--ここから読む">3D復元プロジェクト — ここから読む<a class="hash" href="#3d復元プロジェクト--ここから読む" aria-label="このセクションへのリンク">#</a></h1>
+<p><strong>迷ったらこのファイルに戻ってくれば大丈夫です。</strong>
+他の文書は全部「必要になったときに引くもの」なので、頭から読む必要はありません。</p>
+<p><strong>最終更新</strong>: 2026-08-24 — <strong>現在地は <a href="#here">§1</a>、次にやることは <a href="next.html">next.md</a>。</strong></p>
+<blockquote><h2 id="それぞれのmdファイル役割">それぞれのmdファイル役割<a class="hash" href="#それぞれのmdファイル役割" aria-label="このセクションへのリンク">#</a></h2>
+<div class="table-wrap"><table class="md table--headless"><thead><tr><th></th><th></th></tr></thead><tbody><tr><td><strong>何からやればいいか分からない</strong></td><td><strong>→ <a href="#route">下の §0 道順（30分）</a></strong></td></tr><tr><td><strong>とりあえず何かやりたい</strong></td><td><strong>→ <a href="next.html">次にやること（next.md）</a></strong> — タスク表と、1件ずつの手順書</td></tr><tr><td><strong>言葉が分からない</strong></td><td><strong>→ <a href="glossary.html">用語集（glossary.md）</a></strong> — 点群・ボクセル・再投影誤差… 1行ずつ</td></tr><tr><td><strong>知識が足りなくて書けない</strong></td><td><strong>→ <a href="learning.html">学びの入口（learning.md）</a></strong> — ジャンル別に資料3本まで</td></tr><tr><td><strong>詰まった／調べたことを残す</strong></td><td><strong>→ <a href="notes/README.html"><code>notes/</code></a></strong> — テンプレ付き</td></tr></tbody></table></div>
+<p><strong>手順書は、環境構築とツール操作は全部書いてありますが、導出・実装・設計判断はわざと空けてあります</strong>（<a href="decisions.html#d-33">D-33</a>）。
+<strong>足りないのが知識なら <a href="learning.html">学びの入口</a> へ</strong>。答えではなく資料が置いてあります。</p></blockquote>
+<hr>
+<h2 id="route">0. 道順（30分）<a class="hash" href="#route" aria-label="このセクションへのリンク">#</a></h2>
+<p><strong>新しく入った人・久しぶりに戻ってきた人は、この順に開いてください。</strong> それ以外は読まなくて大丈夫です。</p>
+<div class="table-wrap"><table class="md"><thead><tr><th>#</th><th>やること</th><th>何のため</th><th>目安</th></tr></thead><tbody><tr><td>1</td><td><strong>このページの <a href="#here">§1 いま、どこにいるか</a></strong> を眺める</td><td>全体のどのへんにいるか</td><td>5分</td></tr><tr><td>2</td><td><strong><a href="plan.html#s3-8">計画書 §3-8 スコープの明示</a></strong> を読む</td><td><strong>やること／やらないことの線引き。</strong>「思っていたのと違う」を先に潰す</td><td>5分</td></tr><tr><td>3</td><td><strong><a href="plan.html#s12">計画書 §12 撤退ライン</a></strong> を読む</td><td><strong>どこまでいけば完成扱いか。</strong> 終わりが見えていないと不安になります</td><td>5分</td></tr><tr><td>4</td><td><strong><a href="glossary.html">用語集</a></strong> をざっと流す</td><td><strong>覚えなくていいです。</strong>「分からない言葉はここにある」と知るだけ</td><td>10分</td></tr><tr><td>5</td><td><strong><a href="next.html">次にやること</a></strong> を開き、取れそうなタスクを1つ選ぶ</td><td>ここから先は手を動かす</td><td>5分</td></tr></tbody></table></div>
+<p><strong>最初の1週間で、あわせてこの3つを。</strong></p>
+<div class="table-wrap"><table class="md"><thead><tr><th>やること</th><th>リンク</th></tr></thead><tbody><tr><td><strong>Git の練習を1周</strong>（branch → PR → merge）</td><td><a href="tasks/T05-git-practice.html">T05</a>（1h）</td></tr><tr><td><strong>スコープと撤退ラインの3問に答える</strong></td><td><a href="tasks/T10-read-scope.html">T10</a>（15分）</td></tr><tr><td><strong>Python の足場を作る</strong>（型ヒント・<code>pathlib</code>）</td><td><a href="learning.html">学びの入口 §0</a>（3h）</td></tr></tbody></table></div>
+<blockquote><p><strong><a href="plan.html">計画書</a> と <a href="decisions.html">決定記録</a> は、通読する文書ではありません。</strong> 合わせて2,600行を超えます。
+<strong>必要になったときに、<a href="plan.html#index">計画書の索引</a> か <a href="decisions.html">決定記録の一覧</a> から引いてください。</strong></p></blockquote>
+<hr>
+<h2 id="here">1. いま、どこにいるか<a class="hash" href="#here" aria-label="このセクションへのリンク">#</a></h2>
+<pre><code>着工  ●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━  完成
+       ↑
+   W02（2026-08-24 時点）／全18週</code></pre>
+<div class="table-wrap"><table class="md"><thead><tr><th></th><th>状態</th></tr></thead><tbody><tr><td><strong>計画・確認事項</strong></td><td>✅ <strong>決着済み。</strong> 着工をブロックするものは残っていない（回答は <a href="plan.html#s14">計画書 §14</a>、判断は <a href="decisions.html">D-30〜D-37</a>）</td></tr><tr><td><strong>G6 基盤の「器」</strong></td><td>✅ <strong>完了（8/20 push・8/24 に3台で確認）。</strong> 環境・骨格・<code>import recon3d</code> まで。→ <a href="plan.html#s6-2">計画書 §6-2 の完了判定</a>を満たした</td></tr><tr><td><strong>G6 の「中身」</strong></td><td>⬜ <strong>これから。</strong> 座標変換と <code>cameras.json</code> の実装（→ <a href="tasks/T01-pairpro1-io.html">T01</a>）</td></tr><tr><td><strong>G7・G9 運用の器</strong></td><td>⬜ <strong>未着手。</strong> CI・ブランチ保護・ラベル（→ <a href="tasks/T03-ci-workflow.html">T03</a>・<a href="tasks/T04-branch-protection.html">T04</a>・<a href="tasks/T06-labels-and-board.html">T06</a>）</td></tr><tr><td><strong>G2・G3 の下ごしらえ</strong></td><td>⬜ <strong>未着手。</strong> マスク方式の候補（→ <a href="tasks/T07-mask-options.html">T07</a>。<strong>W02 中に決める</strong>）・Blender の入口メモ（→ <a href="tasks/T08-blender-entry-note.html">T08</a>）・3Dモデル探し（→ <a href="tasks/T09-find-3d-model.html">T09</a>）</td></tr><tr><td><strong>G1〜G5・G8 の本体</strong></td><td>⬜ <strong>W02 から。</strong> <a href="plan.html#s10">計画書 §10</a> の Phase 0（OpenCV で一直線に通す／Blender で合成データ）。<strong>手順書はありません</strong> → <a href="next.html#w02">next.md §1-b</a></td></tr></tbody></table></div>
+<blockquote><p>⚠️ <strong>他の端末は <code>git pull</code> のあと <code>uv sync</code> を1回流してください。</strong> <code>pyproject.toml</code> に <code>[build-system]</code> が入ったので、プロジェクト自身が editable install されます（→ <a href="plan.html#s6-3">計画書 §6-3</a>）。</p></blockquote>
+<p><strong>日付ごとに何があったかは <a href="progress.html">進捗ログ</a> にあります。</strong>
+<strong>なぜそう決めたかは <a href="decisions.html">決定記録</a></strong> に D 番号で入っています。ここには<strong>現在地だけ</strong>を置きます。</p>
+<hr>
+<h2 id="2-次にやること">2. 次にやること<a class="hash" href="#2-次にやること" aria-label="このセクションへのリンク">#</a></h2>
+<blockquote><h3 id="-次にやること一覧nextmdnextmd">👉 <strong><a href="next.html">次にやること一覧（next.md）</a></strong><a class="hash" href="#-次にやること一覧nextmdnextmd" aria-label="このセクションへのリンク">#</a></h3>
+<p><strong>次の一手はここに集約しました。</strong> タスクの表があり、<strong>1つ1つに手順書が付いています</strong>（<code>docs/tasks/</code>）。
+手順書には「何を打ち込むか」「何ができたら終わりか」まで書いてあるので、<strong>開いたらそのまま作業に入れます。</strong></p></blockquote>
+<p><strong>担当者は書きません。</strong> 取れる人が取ってください（<a href="plan.html#s3-2">計画書 §3-2</a>）。</p>
+<h3 id="いま優先度が高い3つ">いま優先度が高い3つ<a class="hash" href="#いま優先度が高い3つ" aria-label="このセクションへのリンク">#</a></h3>
+<div class="table-wrap"><table class="md"><thead><tr><th>#</th><th>やること</th><th>ジャンル</th><th>目安</th></tr></thead><tbody><tr><td>🔴 <a href="tasks/T01-pairpro1-io.html">T01</a></td><td><strong>ペアプロ#1：座標系と <code>cameras.json</code> を決めて実装する</strong></td><td>G6 基盤・I/O</td><td>2h（2人）</td></tr><tr><td>🔴 <a href="tasks/T02-oral-decisions.html">T02</a></td><td>保留になっている5件を口頭で決める</td><td>全員</td><td>15分</td></tr><tr><td>🟠 <a href="tasks/T03-ci-workflow.html">T03</a></td><td>CI（GitHub Actions）の雛形を置く</td><td>G7 テスト・CI</td><td>1h</td></tr></tbody></table></div>
+<p><strong>T01 が終わらないと他のジャンルが1行も書けません</strong>（座標系とデータ形式が決まらないため）。<strong>そこから取ってください。</strong></p>
+<p><strong>残り7件（Git練習・ブランチ保護・ラベル登録・マスク方式・Blender入口メモ・3Dモデル探し・スコープ確認）は <a href="next.html">next.md</a> の表</strong>にあります。</p>
+<p><strong>終わったタスクの一覧は <a href="next.html">next.md の末尾</a></strong> にあります。</p>
+<hr>
+<h2 id="3-どの文書をいつ開くか">3. どの文書を、いつ開くか<a class="hash" href="#3-どの文書をいつ開くか" aria-label="このセクションへのリンク">#</a></h2>
+<p><strong>普段は開かなくていいです。</strong> 下の「こういうとき」に当てはまったときだけ開いてください。</p>
+<div class="table-wrap"><table class="md"><thead><tr><th>こういうとき</th><th>開くもの</th></tr></thead><tbody><tr><td><strong>何をすればいいか分からない</strong></td><td><strong><a href="next.html">次にやること（next.md）</a></strong> ← まずここ</td></tr><tr><td><strong>タスクは決まったが、やり方が分からない</strong></td><td><strong><code>docs/tasks/</code> のそのタスクの手順書</strong>（<a href="next.html">next.md</a> の表からリンク）</td></tr><tr><td><strong>言葉の意味が分からない</strong></td><td><a href="glossary.html">用語集</a></td></tr><tr><td><strong>知識が足りなくて手が止まった</strong></td><td><a href="learning.html">学びの入口</a></td></tr><tr><td><strong>詰まった／調べたことを残す</strong></td><td><a href="notes/README.html"><code>notes/</code></a></td></tr><tr><td>いま全体のどこにいるか知りたい</td><td><strong>このファイル（README）</strong></td></tr><tr><td><strong>どのジャンルの作業があるか一覧で見たい</strong></td><td><a href="plan.html#s3-3">計画書 §3-3</a> の<strong>作業ジャンル一覧（G1〜G9）</strong></td></tr><tr><td><strong>新しく入った人に渡す</strong></td><td>このファイル → <a href="next.html">next.md</a> → <a href="plan.html#s3-3">計画書 §3-3</a>・<a href="plan.html#s3-8">§3-8</a> の順</td></tr><tr><td>「あの確認、何て答えが出てたっけ？」</td><td><a href="plan.html#s14">計画書 §14</a>（8/16 の回答と、その反映先の一覧）</td></tr><tr><td>「この仕様どうなってた？」</td><td><a href="plan.html#index">計画書の索引</a> から引く</td></tr><tr><td><strong>まだ決まっていないことを確認する</strong></td><td><a href="plan.html#s16">計画書 §16</a></td></tr><tr><td><strong>「なんでこう決めたんだっけ？」</strong></td><td><a href="decisions.html">決定記録</a></td></tr><tr><td>「この決定、変えたい」</td><td><a href="decisions.html">決定記録</a> で理由を読んでから相談</td></tr><tr><td>今週の作業が終わった</td><td><a href="progress.html">進捗ログ</a> に記録 → <strong>書けたらAIに見せる</strong>（抜けを指摘してもらう）</td></tr><tr><td>新しくAIに相談する</td><td><a href="internal/ai-session-context.html"><code>internal/ai-session-context.md</code></a> を渡す</td></tr></tbody></table></div>
+<h3 id="ファイルの一覧">ファイルの一覧<a class="hash" href="#ファイルの一覧" aria-label="このセクションへのリンク">#</a></h3>
+<p><strong>読むもの</strong></p>
+<div class="table-wrap"><table class="md"><thead><tr><th>ファイル</th><th>何が書いてあるか</th><th>いつ</th></tr></thead><tbody><tr><td><strong>README.md</strong>（これ）</td><td><strong>現在地</strong>（いま全体のどこにいるか）</td><td>迷ったとき</td></tr><tr><td><strong><a href="next.html">next.md</a></strong></td><td><strong>次にやることの一覧。</strong> タスクごとに手順書へのリンク</td><td><strong>作業を始めるとき毎回</strong></td></tr><tr><td><strong><code>tasks/T01</code>〜<code>T10</code></strong></td><td><strong>やり方。</strong> 打つコマンド・埋める項目・完了判定</td><td><strong>タスクを取ったとき</strong></td></tr><tr><td><strong><a href="glossary.html">glossary.md</a></strong></td><td><strong>用語集。</strong> 定義1行ずつ</td><td><strong>知らない言葉が出たとき</strong></td></tr><tr><td><strong><a href="learning.html">learning.md</a></strong></td><td><strong>学びの入口。</strong> ジャンル別の資料3本まで</td><td><strong>書けそうにないとき</strong></td></tr><tr><td><strong><a href="notes/README.html"><code>notes/</code></a></strong></td><td><strong>詰まったこと・調べたことの置き場</strong>（テンプレ付き）</td><td><strong>詰まったとき・抜けたとき</strong></td></tr><tr><td><a href="plan.html">計画書</a></td><td><strong>仕様と日程</strong>（何を作るか。18週の予定）</td><td>引くとき</td></tr><tr><td><a href="decisions.html">決定記録</a></td><td><strong>なぜそう決めたか</strong>（D-01〜D-39）</td><td>引くとき</td></tr><tr><td><a href="progress.html">進捗ログ</a></td><td><strong>実際どう進んだか</strong>（テンプレをコピーして5分）</td><td>毎週</td></tr></tbody></table></div>
+<blockquote><p><strong>役割分担</strong>：<strong>README = どこにいるか</strong> ／ <strong>next.md + tasks/ = 次に何をどうやるか</strong> ／ <strong>glossary + learning = 分からないときの逃げ場</strong> ／ <strong>notes/ = 詰まった記録</strong> ／ <strong>plan.md = 何を作るか</strong> ／ <strong>decisions.md = なぜそうするか</strong> ／ <strong>progress.md = 何をやったか</strong></p></blockquote>
+<p><strong>リポジトリのルート直下（<code>docs/</code> の外）</strong></p>
+<div class="table-wrap"><table class="md"><thead><tr><th>ファイル</th><th>何が書いてあるか</th><th>いつ</th></tr></thead><tbody><tr><td><a href="../Discuss.html">Discuss.md</a></td><td><strong>非同期の連絡場所。</strong> 対面でないときの連絡と、完了報告への指摘</td><td><strong>定期的に確認</strong></td></tr><tr><td><a href="../HowToPush.html">HowToPush.md</a></td><td>Git の操作手順（旧 ルート <code>README.md</code>）</td><td>Git で詰まったとき</td></tr></tbody></table></div>
+<p><strong>読まなくていいもの（<code>internal/</code>）</strong></p>
+<p>手続き用・履歴用です。中身が要るときだけ開けば十分です。</p>
+<div class="table-wrap"><table class="md"><thead><tr><th>ファイル</th><th>中身</th></tr></thead><tbody><tr><td><code>internal/ai-session-context.md</code></td><td>AIに文脈を渡すための資料</td></tr><tr><td><code>internal/progress-log-review.md</code></td><td><strong>進捗ログをAIにレビューさせる手順</strong>（判定基準・週ごとの観測ポイント）</td></tr><tr><td><code>internal/project-handoff.md</code></td><td>テーマを選んだときの検討経緯（8/14時点）</td></tr><tr><td><code>internal/partner-questions-v1.md</code></td><td>確認シート第1版。回答済みの記録（<strong>用語集は <a href="glossary.html">glossary.md</a> に移しました</strong>）</td></tr></tbody></table></div>
+<hr>
+<h2 id="4-各ステップで迷子にならないための地図">4. 各ステップで迷子にならないための地図<a class="hash" href="#4-各ステップで迷子にならないための地図" aria-label="このセクションへのリンク">#</a></h2>
+<p><strong>先の話なので、いまは読まなくて大丈夫です。</strong> そのフェーズに入ったときに戻ってきてください。</p>
+<div class="table-wrap"><table class="md"><thead><tr><th>時期</th><th>やること</th><th>開く文書</th></tr></thead><tbody><tr><td><strong>W02</strong>（いまここ）<br>8/24〜</td><td>ペアプロ#1（座標系と <code>cameras.json</code>）、CI・運用の器、Git練習、保留分の口頭確認</td><td><strong><a href="next.html">next.md</a> の T01〜T10</strong> ／ 計画書 <a href="plan.html#s4">§4</a>・<a href="plan.html#s5">§5</a>・<a href="plan.html#s13">§13</a></td></tr><tr><td><strong>W02–W03</strong></td><td>G2：Blenderで合成データ作成<br>G1・G3：OpenCVで一直線に通してみる</td><td><a href="plan.html#s10">計画書 §10 Phase 0</a></td></tr><tr><td><strong>W04–W05</strong></td><td>実測値を根拠に「何ができたら合格か」を決める</td><td><a href="plan.html#s10">計画書 §10 Phase 1</a></td></tr><tr><td><strong>W06–W11</strong></td><td>数理コアの自作（一番重い6週間）</td><td><a href="plan.html#s10">計画書 §10 Phase 2</a> ／ <strong>資料は <a href="learning.html">学びの入口 G1</a></strong></td></tr><tr><td><strong>★11/1</strong></td><td><strong>1回目の判定。</strong>うまくいってなければ規模を縮小</td><td><a href="plan.html#s12">計画書 §12</a></td></tr><tr><td><strong>W12–W15</strong></td><td>ボクセル彫刻・メッシュ化。ペアプロ#2・#3</td><td><a href="plan.html#s10">計画書 §10 Phase 3</a></td></tr><tr><td><strong>★11/29</strong></td><td><strong>2回目の判定</strong></td><td><a href="plan.html#s12">計画書 §12</a></td></tr><tr><td><strong>W16–W18</strong></td><td>評価実験、README整備</td><td><a href="plan.html#s11">計画書 §11</a></td></tr></tbody></table></div>
+<p><strong>★の判定を先に決めてあるのは、諦めどきで揉めないためです。</strong> どちらに転んでも成果物にはなるように組んであります。</p>
+<hr>
+<h2 id="5-困ったときのメモ">5. 困ったときのメモ<a class="hash" href="#5-困ったときのメモ" aria-label="このセクションへのリンク">#</a></h2>
+<p><strong>「これ何だっけ」という用語</strong> → <strong><a href="glossary.html">用語集（glossary.md）</a>。</strong> 点群・メッシュ・ボクセル・バンドル調整・editable install など、<strong>定義1行ずつ</strong>で並べてあります。<strong>載っていなかったら、その場で足してください。</strong></p>
+<p><strong>「知識が足りなくて書けない」</strong> → <strong><a href="learning.html">学びの入口（learning.md）</a>。</strong> ジャンルごとに資料を3本まで絞ってあります。<strong><a href="decisions.html#d-33">D-33</a> で生成AIを使わない方針にしているぶん、ここが唯一の代わり</strong>です。</p>
+<p><strong>「詰まった／調べたことを残したい」</strong> → <strong><a href="notes/README.html"><code>docs/notes/</code></a>。</strong> テンプレートを置いてあります（症状 / 試したこと / 原因 / 解決 / 分かったこと）。<strong>冗長でかまいません</strong>（<a href="../Discuss.html">Discuss.md 8/17</a>）。</p>
+<p><strong>「勝手に決めていいのか分からない」</strong> → 決めていいです。ただし<strong>決めたことは必ずIssueかPRのコメントに1〜2行残してください。</strong> 毎日会えるぶん口頭で済みがちですが、それだとGitHubに何も残らず、就活で見せる材料が減ります。</p>
+<p><strong>「これ誰がやるんだっけ」</strong> → <strong>決まっていないのが正常です。</strong> <a href="plan.html#s3-3">計画書 §3-3</a> に<strong>作業ジャンル（G1〜G9）</strong>の一覧があるので、<strong>着手するときに取って、Issueに自分を入れてください。</strong> 人ごとの担当表は 8/16 に廃止しました（→ <a href="decisions.html#d-36">D-36</a>）。</p>
+<hr>
+<h2 id="6-まだ決まっていないこと">6. まだ決まっていないこと<a class="hash" href="#6-まだ決まっていないこと" aria-label="このセクションへのリンク">#</a></h2>
+<p><strong>一覧は <a href="plan.html#s16">計画書 §16</a> にあります</strong>（項目・決定時期・手順書へのリンク）。ここには置きません。<strong>2か所に書くと必ず食い違うためです。</strong></p>
+<p><strong>そのうち、いま動かせるものはこの3つです。</strong></p>
+<div class="table-wrap"><table class="md"><thead><tr><th>決めること</th><th>いつ</th><th>手順</th></tr></thead><tbody><tr><td>成果物の形・撤退ライン・週の進め方・メッシュ自作範囲</td><td><strong>W02 の対面</strong></td><td><a href="tasks/T02-oral-decisions.html">T02</a></td></tr><tr><td>マスクの作り方</td><td>W02</td><td><a href="tasks/T07-mask-options.html">T07</a></td></tr><tr><td>合成データに使う3Dモデル（<strong>凹みのある形が必須</strong>）</td><td>W02</td><td><a href="tasks/T09-find-3d-model.html">T09</a></td></tr></tbody></table></div>
+  </main>
+</div>
+<footer class="foot">
+  <p>このページは <code>docs/README.md</code> から自動生成しています。編集は md 側で。</p>
+</footer>
+</body>
+</html>
