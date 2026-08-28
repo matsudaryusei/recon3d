@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>3D復元プロジェクト — 着工前の確認シート（第1版・記入済み）</title>
+<link rel="stylesheet" href="../../assets/style.css">
+</head>
+<body>
+<header class="topbar">
+  <div class="topbar-inner">
+    <nav class="crumbs"><a href="../../index.html">ドキュメント</a><span class="sep">/</span><span>internal/</span></nav>
+    <span class="src">docs/internal/partner-questions-v1.md</span>
+  </div>
+</header>
+<div class="layout">
+  <details class="toc"><summary class="toc-title">目次</summary><ul><li class="lv2"><a href="#回答受領状況2026-08-15-時点">回答受領状況（2026-08-15 時点）</a></li><li class="lv2"><a href="#-上記の未回答分は第2版で解消済み2026-08-16">📄 上記の未回答分は第2版で解消済み（2026-08-16）</a></li><li class="lv2"><a href="#このシートについて">このシートについて</a></li><li class="lv2"><a href="#q1-君の技術核3つこれで納得できるか-最重要">Q1. 君の「技術核」3つ、これで納得できるか？ 【最重要】</a></li><li class="lv2"><a href="#q2-このプロジェクトにリアルタイム描画は登場しない了承できるか-最重要">Q2. このプロジェクトにリアルタイム描画は登場しない。了承できるか？ 【最重要】</a></li><li class="lv2"><a href="#q3-主担当副担当という進め方でいいか">Q3. 「主担当＋副担当」という進め方でいいか？</a></li><li class="lv2"><a href="#-この設問は-2026-08-15-に修正された">⚠ この設問は 2026-08-15 に修正された</a></li><li class="lv2"><a href="#q4-対面ペアプロを3か所計12時間確保できるか">Q4. 対面ペアプロを3か所・計12時間、確保できるか？</a></li><li class="lv2"><a href="#q5-合成データから始める方針でいいか">Q5. 「合成データから始める」方針でいいか？</a></li><li class="lv2"><a href="#q6-週89時間--18週コミットできるか">Q6. 週8〜9時間 × 18週、コミットできるか？</a></li><li class="lv2"><a href="#q7-git運用のルールこれでいいか">Q7. Git運用のルール、これでいいか？</a></li><li class="lv2"><a href="#q8-リポジトリを-public-にするのは完成後でいいか">Q8. リポジトリを public にするのは完成後でいいか？</a></li><li class="lv2"><a href="#q9-blenderのバージョンと内蔵pythonのバージョン-w01最優先">Q9. Blenderのバージョンと、内蔵Pythonのバージョン 【W01最優先】</a></li><li class="lv2"><a href="#q10-windows-のバージョンと開発環境">Q10. Windows のバージョンと、開発環境</a></li><li class="lv2"><a href="#q11-git-github-の経験レベル">Q11. Git / GitHub の経験レベル</a></li><li class="lv2"><a href="#q12-python-の経験レベル">Q12. Python の経験レベル</a></li><li class="lv2"><a href="#q13-開発に使うpcのスペック">Q13. 開発に使うPCのスペック</a></li><li class="lv2"><a href="#q14-撮影機材の所持状況">Q14. 撮影機材の所持状況</a></li><li class="lv2"><a href="#q15-志望している3dcg研究室はどの分野-重要">Q15. 志望している3DCG研究室は、どの分野？ 【重要】</a></li><li class="lv2"><a href="#q16-3dcgですでに得意なことやったことがあること">Q16. 3DCGで、すでに得意なこと・やったことがあること</a></li><li class="lv2"><a href="#q17-リポジトリ名">Q17. リポジトリ名</a></li><li class="lv2"><a href="#q18-合成データの元にする3dモデル-w01">Q18. 合成データの元にする3Dモデル 【W01】</a></li><li class="lv2"><a href="#q19-実物撮影の被写体">Q19. 実物撮影の被写体</a></li><li class="lv2"><a href="#q20-メッシュ処理をどこまで自作するか">Q20. メッシュ処理をどこまで自作するか</a></li><li class="lv2"><a href="#q21-最終的な出力の形">Q21. 最終的な出力の形</a></li><li class="lv2"><a href="#q22-撤退ラインの認識合わせ">Q22. 撤退ラインの認識合わせ</a></li><li class="lv2"><a href="#q23-週の進め方曜日と時間帯">Q23. 週の進め方（曜日と時間帯）</a></li><li class="lv2"><a href="#q24-逆に関口に聞きたいこと言っておきたいこと">Q24. 逆に、関口に聞きたいこと・言っておきたいこと</a></li><li class="lv2"><a href="#いま返事がほしいものだけもう一度まとめる">いま返事がほしいものだけ、もう一度まとめる</a></li><li class="lv2"><a href="#補足出てきた用語">補足：出てきた用語</a></li></ul></details>
+  <main class="page">
+<h1 id="3d復元プロジェクト--着工前の確認シート第1版記入済み">3D復元プロジェクト — 着工前の確認シート（第1版・記入済み）<a class="hash" href="#3d復元プロジェクト--着工前の確認シート第1版記入済み" aria-label="このセクションへのリンク">#</a></h1>
+<blockquote><p><strong>🗄 このシートには書き込まないでください。役目は終わっています。</strong>
+<strong>未回答分は第2版（2026-08-16 に回答受領）で解消済み</strong>で、回答の中身は <a href="../plan.html">計画書</a> と <a href="../decisions.html">決定記録</a> に反映してあります（第2版のファイルは反映完了後の 2026-08-17 に削除しました）。<strong>以降の確認は文書を作らず口頭で行い、決まったことを Issue / PR に1〜2行残します</strong>（計画書 §8-3）。
+<strong>用語集は <a href="../glossary.html">docs/glossary.md</a> に移しました（2026-08-24）。</strong> 分からない言葉はそちらを引いてください。本書末尾のものは移行前の原本です。</p></blockquote>
+<p><strong>宛先</strong>: 松田
+<strong>作成</strong>: 関口 / 2026-08-14
+<strong>最終更新</strong>: 2026-08-15（松田から <code>blender_system/system-info.txt</code> を受領し、Q9 / Q10 / Q13 / Q16 に反映）
+<strong>所要時間</strong>: 20〜30分</p>
+<hr>
+<h2 id="回答受領状況2026-08-15-時点">回答受領状況（2026-08-15 時点）<a class="hash" href="#回答受領状況2026-08-15-時点" aria-label="このセクションへのリンク">#</a></h2>
+<p>松田から <strong>Blender のシステム情報</strong>（<code>blender_system/system-info.txt</code>、コミット <code>aa97607</code>）を受領した。これにより以下が埋まった。</p>
+<div class="table-wrap"><table class="md"><thead><tr><th>設問</th><th>状態</th><th>出典</th></tr></thead><tbody><tr><td><strong>Q9</strong> Blender / Python のバージョン</td><td><strong>✅ 回答完了</strong></td><td><code>blender_system/system-info.txt</code></td></tr><tr><td><strong>Q10</strong> Windows のバージョン・開発環境</td><td>🔶 部分回答（OS のみ判明。エディタ・WSL・ターミナルは未回答）</td><td>同上</td></tr><tr><td><strong>Q13</strong> PCスペック</td><td>🔶 部分回答（GPU・CPU命令セットのみ判明。<strong>メモリ・ストレージが未回答</strong>）</td><td>同上</td></tr><tr><td><strong>Q16</strong> 3DCGの経験</td><td>🔶 間接的な手がかりのみ（有効アドオンから推測。<strong>本人の回答が必要</strong>）</td><td>同上</td></tr><tr><td>Q1–Q8, Q11, Q12, Q14, Q15, Q17–Q24</td><td>⬜ 未回答</td><td>—</td></tr></tbody></table></div>
+<p><strong>まだ回答が必要なもののうち、優先度が高い3つ</strong></p>
+<ol><li><strong>Q1・Q2・Q3</strong>（Noなら計画そのものを組み直す設問）</li><li><strong>Q13 のメモリ容量</strong> — ボクセル解像度 256³ を確定できない</li><li><strong>Q15 志望研究室の分野</strong> — 受領した情報からは<strong>キャラクター/アニメーション寄り</strong>の可能性が読み取れるため（Q16 の項を参照）、確認の重要度が上がった</li></ol>
+<blockquote><h2 id="-上記の未回答分は第2版で解消済み2026-08-16">📄 上記の未回答分は第2版で解消済み（2026-08-16）<a class="hash" href="#-上記の未回答分は第2版で解消済み2026-08-16" aria-label="このセクションへのリンク">#</a></h2>
+<p>上記の未回答分と、受領情報から新たに生じた質問（N1–N10）をまとめた<strong>確認シート第2版</strong>に、松田から 2026-08-16 に回答を受領した。<strong>回答の中身は計画書 §7-6（環境）・§7-7（前提スキル）・§14（確認事項）と決定記録 D-30〜D-37 に反映済み</strong>で、第2版のファイルは反映完了後の 2026-08-17 に削除した。</p>
+<p><strong>答えを保留した分（成果物の形・撤退ライン・週の進め方・メッシュ自作範囲）は W01 の対面で口頭確認する</strong>（計画書 §14 の 10〜13）。</p>
+<p><strong>本書（第1版）は、受領済み回答の記録と用語集として残す。</strong></p></blockquote>
+<p><strong>資料セット</strong>（この3つで文脈が完結する）</p>
+<div class="table-wrap"><table class="md"><thead><tr><th>#</th><th>ファイル</th><th>内容</th></tr></thead><tbody><tr><td>1</td><td><code>project-handoff.md</code></td><td>テーマ選定の経緯・数理的な芯（背景資料）</td></tr><tr><td>2</td><td><code>../plan.md</code></td><td><strong>開発計画書・全16節。現在の正典</strong></td></tr><tr><td>3</td><td><strong>本書</strong></td><td>松田への確認シート（Q1–Q24）</td></tr></tbody></table></div>
+<p><strong>回答方法</strong>: このファイルをコピーして各設問の <code>回答:</code> 欄に直接書き込み、返してもらう形が一番早い。全部埋まらなくてもよい。<strong>Part 1 の Q1・Q2・Q3 だけは必ず答えてほしい</strong>（Noなら計画を組み直すため）。</p>
+<hr>
+<h2 id="このシートについて">このシートについて<a class="hash" href="#このシートについて" aria-label="このセクションへのリンク">#</a></h2>
+<p>計画書を一通り書いたので、<strong>着工前に君の合意と情報が必要な項目</strong>をまとめた。計画書を全部読まなくても答えられるように、必要な前提は各設問に書いてある。</p>
+<p>3部構成。</p>
+<div class="table-wrap"><table class="md"><thead><tr><th>Part</th><th>内容</th><th>答え方</th></tr></thead><tbody><tr><td><strong>Part 1</strong></td><td>合意してほしいこと（8問）</td><td>Yes / No / 条件付き</td></tr><tr><td><strong>Part 2</strong></td><td>君しか知らない事実（8問）</td><td>事実を記入</td></tr><tr><td><strong>Part 3</strong></td><td>一緒に決めたいこと（9問）</td><td>意見・希望を記入</td></tr></tbody></table></div>
+<p><strong>「No」や「気が進まない」も歓迎する。</strong> 着工後に判明するより、今この段階で分かったほうが圧倒的に安い。特に Part 1 の Q1–Q3 は、Noなら計画を組み直す。</p>
+<p>各設問に <strong>【これが変わる】</strong> として、答えによって何が動くかを書いてある。</p>
+<hr>
+<h1 id="part-0-プロジェクトの30秒要約">Part 0. プロジェクトの30秒要約<a class="hash" href="#part-0-プロジェクトの30秒要約" aria-label="このセクションへのリンク">#</a></h1>
+<p><strong>作るもの</strong>: 物を一周撮った写真から3Dモデルを作るシステム。</p>
+<p><strong>2つの手法を統合する。</strong> それぞれの弱点が正反対だから。</p>
+<div class="table-wrap"><table class="md"><thead><tr><th>手法</th><th>得意</th><th>不得意</th></tr></thead><tbody><tr><td>① 多視点復元（特徴点→カメラ姿勢→点群）</td><td>模様のある面、凹み</td><td>無地の面（点群に穴が空く）</td></tr><tr><td>④ シルエット復元（輪郭→ボクセル彫刻→メッシュ）</td><td>外形が確実、必ず閉じた形になる</td><td><strong>凹みが原理的に削れない</strong>（お椀の内側が埋まる）</td></tr></tbody></table></div>
+<p><strong>合流点は2つ。</strong></p>
+<ol><li>④が「削る」にはカメラの角度が要る → ①が供給する</li><li>④は凹みを削れない → ①の点群が「ここは物体の外だ」と教えて補正する</li></ol>
+<p><strong>期間</strong>: 2026-08-17 着工 〜 12-20（18週）。1人あたり週8〜9時間。
+<strong>言語</strong>: Python単一。Blender が Python API しか受け付けないため。
+<strong>役割</strong>: 関口＝数値計算（カメラ姿勢推定・最適化・反復解法）、松田＝CG・画像処理・メッシュ・データ生成。</p>
+<hr>
+<h1 id="part-1-合意してほしいこと">Part 1. 合意してほしいこと<a class="hash" href="#part-1-合意してほしいこと" aria-label="このセクションへのリンク">#</a></h1>
+<h2 id="q1-君の技術核3つこれで納得できるか-最重要">Q1. 君の「技術核」3つ、これで納得できるか？ 【最重要】<a class="hash" href="#q1-君の技術核3つこれで納得できるか-最重要" aria-label="このセクションへのリンク">#</a></h2>
+<p>正直に書く。<strong>最初の計画では、君の担当が「作業の受け皿」になっていて、3DCG研究への助走になっていなかった。</strong> 関口側は「悪条件最小二乗＝志望研究室のテーマ」に直結する部分を4つ確保していたのに対して、君側にそれに相当するものが無かった。片方だけが得をする構造で、これは共同開発として良くない。</p>
+<p>そこで、君側にも研究につながる技術核を3つ確保した。</p>
+<p><strong>核1：合成データセット生成器（Blender）</strong></p>
+<p>Blenderに既知の3Dモデルを置き、カメラを円周上に20方向並べてレンダリング。画像・シルエット・カメラ行列・正解の3D形状を一括出力する。<strong>着工1週目から君が主役になる部分。</strong></p>
+<p><strong>核2：メッシュ処理（Marching Cubes 以降）</strong></p>
+<p>ボクセル（3Dのピクセル）の塊からメッシュを起こし、簡略化・UV展開・テクスチャ投影まで。</p>
+<p><strong>核3：離散ラプラシアン作用素の構成（関口と共同）</strong></p>
+<p>メッシュを滑らかにする処理で <code>(I + λL) x' = x</code> という方程式を解く。この <code>L</code> という行列の作り方を君が担当する。</p>
+<div class="table-wrap"><table class="md"><thead><tr><th>担当</th><th>内容</th><th>分野</th></tr></thead><tbody><tr><td><strong>君</strong></td><td>行列 <code>L</code> の構成。<strong>一様重み vs cotan重み</strong>（三角形の角度から決まる重み）を両方実装し、形の歪み方の違いを測る</td><td>離散微分幾何</td></tr><tr><td>関口</td><td>できた疎行列を共役勾配法で解く。反復回数・収束を測る</td><td>数値線形代数</td></tr></tbody></table></div>
+<p><strong>核3が一番大事だと思っている。</strong> ここが2人の専門が実際に交わる唯一の点で、「分担して2つ作った」ではなく「<strong>同じ数式を、幾何側と解析側から2人で作った</strong>」と言える。就活でも研究室訪問でも、この1点があるかないかで話の強さが変わる。</p>
+<p><strong>【これが変わる】</strong> Noなら役割分担を組み直す。何が足りないかを具体的に教えてほしい。</p>
+<pre><code>回答:</code></pre>
+<hr>
+<h2 id="q2-このプロジェクトにリアルタイム描画は登場しない了承できるか-最重要">Q2. このプロジェクトにリアルタイム描画は登場しない。了承できるか？ 【最重要】<a class="hash" href="#q2-このプロジェクトにリアルタイム描画は登場しない了承できるか-最重要" aria-label="このセクションへのリンク">#</a></h2>
+<p>君の興味は「リアルタイム・Unity・GUI寄り」と聞いた。<strong>正直に言うと、このプロジェクトは静止画の一括処理で、リアルタイム描画は本質的に出てこない。</strong> Unityも、数値計算部分との言語をまたぐ接続コストが高いため不採用にしてある。</p>
+<p>だから君の旨味は、<strong>リアルタイム描画ではなくジオメトリ処理とレンダリングに置くことになる。</strong> 3DCG研究の評価軸としてはジオメトリ処理のほうがむしろ王道ではあるが、君がやりたいことと違うなら意味がない。</p>
+<p><strong>受け皿として用意してあるもの</strong>: ボクセルが削られていく過程をリアルタイム表示するビューア。デモ動画として一番見栄えがする部分でもある。ただし優先度は最後（余力があれば）。</p>
+<p><strong>【これが変わる】</strong> 「どうしてもリアルタイム描画を主軸にしたい」なら、このテーマ自体を再検討したほうがいい。第二候補として「物理シミュレーション × Unity」という案が残してある。着工前なら乗り換えのコストはゼロだが、着工後だと全部が無駄になる。<strong>今言ってほしい。</strong></p>
+<pre><code>回答:
+□ 了承する。ジオメトリ処理で問題ない
+□ 了承するが、ビューアは優先度を上げたい
+□ リアルタイム描画を主軸にしたい（テーマ再検討）
+
+コメント:</code></pre>
+<hr>
+<h2 id="q3-主担当副担当という進め方でいいか">Q3. 「主担当＋副担当」という進め方でいいか？<a class="hash" href="#q3-主担当副担当という進め方でいいか" aria-label="このセクションへのリンク">#</a></h2>
+<p>「二人で協力して作りたい」という話があったので、その形を設計した。ただし<strong>全部を2人で書くと開発速度が半分になり、確実に間に合わない</strong>（工数計算済み・後述）。そこで折衷案。</p>
+<div class="table-wrap"><table class="md"><thead><tr><th>役割</th><th>やること</th></tr></thead><tbody><tr><td><strong>主担当</strong></td><td>実装する。設計判断をする</td></tr><tr><td><strong>副担当</strong></td><td>PRをレビューする。<strong>「何をやっているか説明できる」ところまで理解する。</strong> <del>実装はしない</del></td></tr></tbody></table></div>
+<p>つまり<strong>全てのコードに、書く人と読む人がいる。</strong> 書く1人＋読む1人なら消費は1.3倍程度で済むが、書く2人だと2倍になる。工数からしてこれが上限。</p>
+<blockquote><h2 id="-この設問は-2026-08-15-に修正された">⚠ この設問は 2026-08-15 に修正された<a class="hash" href="#-この設問は-2026-08-15-に修正された" aria-label="このセクションへのリンク">#</a></h2>
+<p><strong>「副担当は実装しない」は書き方の誤りだった。</strong> 実際に想定しているのは「<strong>詳しいほうが主軸になって、一緒に作る</strong>」形であり、<strong>副担当も実装に参加する。</strong></p>
+<p><strong>修正版（第2版 Q-e）に松田は「了承」と回答済み（2026-08-16）。</strong> ただし<strong>この「主担当＋副担当」という枠組み自体が同日にジャンル制へ改訂された</strong>（→ <a href="../decisions.html#d-36">D-36</a>）。上の表は経緯の記録として残してある。</p>
+<p>修正後の定義（計画書 §3-2・§3-6 が正典）:</p>
+<div class="table-wrap"><table class="md"><thead><tr><th>役割</th><th>やること</th></tr></thead><tbody><tr><td><strong>主担当</strong></td><td><strong>設計を決める。</strong> モジュールの中核を実装する。副担当がやる部分を切り出す</td></tr><tr><td><strong>副担当</strong></td><td><strong>切り出された部分を実装する。</strong> そのうえでPR全体をレビューして理解する</td></tr></tbody></table></div>
+<p>切り出しの原則は「<strong>副担当自身の専門が顔を出す部分を選ぶ</strong>」。具体的な割り当ては計画書 §3-6 の担当表を参照。</p></blockquote>
+<p><strong>あわせて1つルールを入れたい。</strong></p>
+<blockquote><p>PRを承認するとき、コメントに「<strong>このPRが何をしているか、自分の言葉で1〜3行</strong>」を必ず書く。</p></blockquote>
+<p>「LGTM」だけの形式的な承認を構造的に禁止するため。書けないなら、書けるまで聞く。よく会えるので、その場で聞けばいい。</p>
+<p><strong>これは就活でも効く。</strong>「相互レビューで互いの専門を理解した」を、GitHubのPR履歴という証拠付きで語れる。</p>
+<p><strong>【これが変わる】</strong> Noなら、共有をもっと増やす代わりに作るものを減らす（＝スコープ削減）というトレードオフになる。</p>
+<pre><code>回答:</code></pre>
+<hr>
+<h2 id="q4-対面ペアプロを3か所計12時間確保できるか">Q4. 対面ペアプロを3か所・計12時間、確保できるか？<a class="hash" href="#q4-対面ペアプロを3か所計12時間確保できるか" aria-label="このセクションへのリンク">#</a></h2>
+<p>速度を犠牲にしてでも2人で書く価値がある箇所を、<strong>3つだけ</strong>選んだ。</p>
+<div class="table-wrap"><table class="md"><thead><tr><th>箇所</th><th>2人でやる理由</th><th>時間</th><th>時期</th></tr></thead><tbody><tr><td><code>cameras.json</code> の入出力と座標系変換</td><td>ここを間違えると全工程が汚染される。3D復元で一番事故が多い箇所</td><td>2h×1</td><td>W01（8/17の週）</td></tr><tr><td>ボクセル彫刻の行列化</td><td>カメラの幾何（関口）とボクセル/画像の座標（君）が噛み合う箇所</td><td>2h×2</td><td>W12（11/2の週）</td></tr><tr><td>離散ラプラシアン <code>L</code> の構成と求解</td><td>Q1の核3。2人の専門が交わる点</td><td>2h×3</td><td>W14（11/16の週）</td></tr></tbody></table></div>
+<p>計12時間。総予算の約4%。<strong>これ以上は増やせない。</strong></p>
+<p><strong>【これが変わる】</strong> 時期の都合が悪ければずらす。ただしW01のペアプロだけは動かせない（ここが決まらないと2人とも着工できない）。</p>
+<pre><code>回答:</code></pre>
+<hr>
+<h2 id="q5-合成データから始める方針でいいか">Q5. 「合成データから始める」方針でいいか？<a class="hash" href="#q5-合成データから始める方針でいいか" aria-label="このセクションへのリンク">#</a></h2>
+<p><strong>最初は実物を撮影せず、Blenderの中でレンダリングした画像から始めたい。</strong></p>
+<p>理由は3つ。</p>
+<p><strong>① 正解が全部手に入る。</strong> 実物を撮影しても、そのマグカップの「正しい3D形状」は誰も知らない。だから復元結果が正しいかを数値で言えない。Blenderなら、元の3Dモデルがそのまま正解になる。カメラの位置も、シルエットも、全部正解が分かる。</p>
+<p><strong>② デバッグが劇的に楽になる。</strong> 誤差ゼロの完璧な入力を入れて答えが合わなければ、原因は100%プログラムのバグ。実物だと「バグなのか撮影が悪いのか」が切り分けられず、ここで数週間溶ける。</p>
+<p><strong>③ 今日から始められる。</strong> 回転台も背景布も照明も要らない。そして<strong>君の最初の仕事が1週目に発生する</strong>（関口の実装完了を待たなくていい）。</p>
+<p>実物撮影は Phase 0 の最終週（W03、8/31の週）に<strong>1セットだけ</strong>試して感触を掴み、本格導入は Phase 3（11月）から。</p>
+<p><strong>【これが変わる】</strong> 「最初から実物でやりたい」なら、機材調達を最優先タスクにして日程を組み直す。</p>
+<pre><code>回答:</code></pre>
+<hr>
+<h2 id="q6-週89時間--18週コミットできるか">Q6. 週8〜9時間 × 18週、コミットできるか？<a class="hash" href="#q6-週89時間--18週コミットできるか" aria-label="このセクションへのリンク">#</a></h2>
+<p>全部作った場合の工数を積み上げると <strong>315時間</strong>。2人で割って18週で割ると、<strong>1人あたり週8.75時間</strong>（1日1〜2時間 × 週4日程度）。</p>
+<div class="table-wrap"><table class="md"><thead><tr><th>項目</th><th>概算</th></tr></thead><tbody><tr><td>バンドル調整（最適化の中核）</td><td>60h</td></tr><tr><td>評価実験</td><td>40h</td></tr><tr><td>I/O・テスト・CI</td><td>30h</td></tr><tr><td>DLT・三角測量</td><td>30h</td></tr><tr><td>ボクセル彫刻</td><td>25h</td></tr><tr><td>セグメンテーション・特徴点</td><td>25h</td></tr><tr><td>テクスチャ・UV展開</td><td>25h</td></tr><tr><td>Marching Cubes</td><td>20h</td></tr><tr><td>ラプラシアン平滑化</td><td>20h</td></tr><tr><td>合成データ生成器</td><td>20h</td></tr><tr><td>ドキュメント</td><td>20h</td></tr><tr><td><strong>合計</strong></td><td><strong>315h</strong></td></tr></tbody></table></div>
+<p><strong>注意点を正直に書く。</strong> この見積もりに<strong>デバッグ時間が入っていない。</strong> 数値計算のデバッグは実装の1〜2倍かかるのが普通なので、実質450〜500時間になる可能性がある。その場合は5〜6か月（〜2027年2月）に延ばすか、後述の撤退ライン（Q22）で規模を落とす。</p>
+<p><strong>大事なのはペース。</strong>「休日に10時間、その後2週間放置」より「毎週コンスタントに」を優先したい。GitHubのコミット履歴が継続性の証拠になるため。</p>
+<p><strong>【これが変わる】</strong> 週の稼働時間が違うなら、スコープか期間を今のうちに調整する。</p>
+<pre><code>回答:
+週に確保できそうな時間:
+繁忙で動けない時期（バイト・授業・他プロジェクト）:</code></pre>
+<hr>
+<h2 id="q7-git運用のルールこれでいいか">Q7. Git運用のルール、これでいいか？<a class="hash" href="#q7-git運用のルールこれでいいか" aria-label="このセクションへのリンク">#</a></h2>
+<p>Git経験が浅いと聞いたので、できるだけシンプルにした。</p>
+<div class="table-wrap"><table class="md"><thead><tr><th>項目</th><th>決定</th></tr></thead><tbody><tr><td>ブランチ</td><td><code>main</code> 一本。作業は <code>feat/mesh-marching-cubes</code> のような枝を切る</td></tr><tr><td><code>main</code> への直push</td><td><strong>禁止</strong>（設定で弾く）。必ずPR経由</td></tr><tr><td>マージ</td><td>squash merge（履歴が読みやすい）</td></tr><tr><td>レビュー</td><td>相手の承認が必須。<strong>ただし最初の2週間（W01–W02）は承認不要</strong>にする。慣れてからW03で必須化</td></tr><tr><td>Issue</td><td>1 Issue = 1 PR = 1〜2週で終わる単位</td></tr><tr><td>ボード</td><td>GitHub Projects を1枚（Todo / In Progress / In Review / Done）</td></tr></tbody></table></div>
+<p><strong>週1回、対面15分で次週のIssueを2人で切る。</strong></p>
+<p><strong>1つお願い。</strong> 対面で決めたことは、その場でIssueかPRにコメントで残してほしい。<strong>GitHub上に議論が残らないと、就活で見せられる材料が減る。</strong> 口頭で全部済ませると、リポジトリには結果のコードしか残らない。</p>
+<p><strong>【これが変わる】</strong> Gitに不安があれば、W01で一緒に練習する時間を取る（1時間程度）。遠慮なく言ってほしい。</p>
+<pre><code>回答:
+□ 問題ない
+□ W01でGitの練習時間がほしい
+
+不安な操作があれば具体的に:</code></pre>
+<hr>
+<h2 id="q8-リポジトリを-public-にするのは完成後でいいか">Q8. リポジトリを public にするのは完成後でいいか？<a class="hash" href="#q8-リポジトリを-public-にするのは完成後でいいか" aria-label="このセクションへのリンク">#</a></h2>
+<p>現在 private。<strong>完成後（2026年12月以降）に public 化</strong>する想定。</p>
+<p>トレードオフを書いておく。</p>
+<div class="table-wrap"><table class="md"><thead><tr><th></th><th>private → 後で public</th><th>最初から public</th></tr></thead><tbody><tr><td>利点</td><td>試行錯誤の汚い履歴を整理してから見せられる</td><td>GitHubの草（contribution graph）が最初から公開で積み上がる</td></tr><tr><td>欠点</td><td>「継続的に開発した」証拠が後出しになる</td><td>最初からREADMEとコミットメッセージを見られる前提で書く必要がある</td></tr></tbody></table></div>
+<p>関口としては現状の「完成後public」で問題ないと思っているが、就活の時期によっては早めに公開したほうがいい可能性もある。</p>
+<p><strong>【これが変わる】</strong> 早期公開にするなら、README とコミットメッセージの書き方の基準を最初から上げる。</p>
+<pre><code>回答:</code></pre>
+<hr>
+<h1 id="part-2-君しか知らない事実教えてほしい">Part 2. 君しか知らない事実（教えてほしい）<a class="hash" href="#part-2-君しか知らない事実教えてほしい" aria-label="このセクションへのリンク">#</a></h1>
+<h2 id="q9-blenderのバージョンと内蔵pythonのバージョン-w01最優先">Q9. Blenderのバージョンと、内蔵Pythonのバージョン 【W01最優先】<a class="hash" href="#q9-blenderのバージョンと内蔵pythonのバージョン-w01最優先" aria-label="このセクションへのリンク">#</a></h2>
+<p><strong>これが分からないとプロジェクトのPythonバージョンを確定できない。</strong> ずれるとBlenderの中で自作モジュールを import できない。</p>
+<p><strong>調べ方</strong>: Blenderを起動 → 上部タブの「Scripting」→ 下部のコンソールに以下を貼って Enter。</p>
+<pre><code class="lang-python">import sys, bpy
+print("Blender:", bpy.app.version_string)
+print("Python :", sys.version)</code></pre>
+<p><strong>【これが変わる】</strong> プロジェクト全体のPythonバージョン。現状 3.11 で仮決めしている（Blender 4.2 LTS が 3.11 のため）。</p>
+<pre><code>回答: ✅ 2026-08-15 受領（blender_system/system-info.txt）
+Blender: 5.0.1  (branch: blender-v5.0-release / hash: a3db93c5b259 / 2025-12-15 Release)
+Python : 3.11.13  (MSC v.1929 64bit AMD64)</code></pre>
+<h3 id="関口側の処理結果">関口側の処理結果<a class="hash" href="#関口側の処理結果" aria-label="このセクションへのリンク">#</a></h3>
+<p><strong>仮決めしていた Python 3.11 で正しかった。バージョン確定。</strong></p>
+<div class="table-wrap"><table class="md"><thead><tr><th>項目</th><th>確定値</th></tr></thead><tbody><tr><td>Blender</td><td><strong>5.0.1</strong>（Windows 版・公式インストーラ）</td></tr><tr><td>内蔵 Python</td><td><strong>3.11.13</strong></td></tr><tr><td>プロジェクトの Python</td><td><strong>3.11 系に固定</strong>。<code>uv</code> で <code>3.11.13</code> を明示指定して 3台の環境を揃える</td></tr></tbody></table></div>
+<p><strong>当初の想定との差分</strong>: 計画書は「Blender <strong>4.2 LTS</strong> が 3.11 だから」を根拠に 3.11 を仮決めしていたが、実機は <strong>5.0.1</strong> だった。<strong>結果として Python は同じ 3.11 系なので、計画への影響はない</strong>（根拠の記述だけ計画書 §7-2 で差し替えた）。</p>
+<p><strong>ただし1点だけ注意が要る。</strong> 5.0.x は LTS ではないため、松田側が Blender を自動更新すると内蔵 Python が動く可能性がある。</p>
+<blockquote><p><strong>お願い</strong>: 開発期間中（〜2026-12）は <strong>Blender を 5.0.x から上げないでほしい。</strong> 上げる必要が出たら、上げる前に一報がほしい（プロジェクトの Python を追随させる必要があるため）。</p></blockquote>
+<p><strong>受領した情報から追加で分かったこと</strong>（Q10・Q13・Q16 に反映済み）は各設問を参照。</p>
+<hr>
+<h2 id="q10-windows-のバージョンと開発環境">Q10. Windows のバージョンと、開発環境<a class="hash" href="#q10-windows-のバージョンと開発環境" aria-label="このセクションへのリンク">#</a></h2>
+<p><strong>【これが変わる】</strong> 環境構築手順の書き方。WSLを使うなら話が変わる（Blenderとの連携が面倒になるので、素のWindowsを推奨したい）。</p>
+<pre><code>回答: 🔶 2026-08-15 一部判明（blender_system/system-info.txt より）
+Windows のバージョン（10 / 11）: ビルド 10.0.26200 → 実体は Windows 11（25H2 相当）と思われる ※要確認
+エディタ（VSCode / PyCharm / その他）: ← 未回答
+WSL は使っている？: Blender は素の Windows 側に導入済み（C:\Program Files\...）。開発全体で WSL を使うかは ← 未回答
+ターミナルは何を使っている？（PowerShell / Git Bash / cmd）: ← 未回答</code></pre>
+<h3 id="補足読み取りの根拠">補足（読み取りの根拠）<a class="hash" href="#補足読み取りの根拠" aria-label="このセクションへのリンク">#</a></h3>
+<p>システム情報の <code>platform:</code> 行は <code>'Windows-10-10.0.26200-SP0'</code> となっているが、<strong>これを「Windows 10」と読んではいけない。</strong> Python の <code>platform</code> モジュールは Windows 11 でも先頭を <code>Windows-10</code> と表記するため、判定に使うのは末尾のビルド番号のほう。<strong>26200 は Windows 11 系のビルド</strong>（26100 = 24H2、26200 = 25H2）。</p>
+<p><strong>確定したこと</strong>: Blender は <code>C:\Program Files\Blender Foundation\Blender 5.0\</code> に入っており、<strong>WSL 内ではなく素の Windows 上で動いている</strong>。これは §7 で推奨していた形と一致するので、環境構築手順はそのまま使える。</p>
+<p><strong>まだ聞きたいこと</strong>: エディタ / ターミナル / WSL の使用有無。CI が Windows でも回る構成（§9）なので致命的ではないが、環境構築手順書（W01）を松田の実環境に合わせて書きたい。</p>
+<hr>
+<h2 id="q11-git-github-の経験レベル">Q11. Git / GitHub の経験レベル<a class="hash" href="#q11-git-github-の経験レベル" aria-label="このセクションへのリンク">#</a></h2>
+<p>正確に把握したい。<strong>できないことがあるのは全く問題ではない。</strong> 把握できていないまま進めるのが問題。</p>
+<pre><code>回答（できるものにチェック）:
+□ clone
+□ commit / push
+□ branch を切る
+□ Pull Request を出す
+□ Pull Request をレビューする
+□ merge conflict を解決する
+□ rebase
+□ .gitignore を書く
+
+GitHub でチーム開発をした経験:</code></pre>
+<hr>
+<h2 id="q12-python-の経験レベル">Q12. Python の経験レベル<a class="hash" href="#q12-python-の経験レベル" aria-label="このセクションへのリンク">#</a></h2>
+<pre><code>回答:
+Python 歴:
+□ numpy を使ったことがある
+□ OpenCV を使ったことがある
+□ Open3D を使ったことがある
+□ Blender の Python API（bpy）でスクリプトを書いたことがある
+□ pytest を書いたことがある
+□ クラス / dataclass を書ける
+□ 型ヒントを書いたことがある
+
+一番慣れている言語:</code></pre>
+<hr>
+<h2 id="q13-開発に使うpcのスペック">Q13. 開発に使うPCのスペック<a class="hash" href="#q13-開発に使うpcのスペック" aria-label="このセクションへのリンク">#</a></h2>
+<p><strong>【これが変わる】</strong> ボクセルの解像度（256³ = 1670万個 を想定中）と、レンダリングの枚数・解像度。メモリが足りないなら128³に落とす。</p>
+<pre><code>回答: 🔶 2026-08-15 一部判明（blender_system/system-info.txt より）
+CPU: 型番不明。AVX2 対応（Cycles が AVX2 カーネルを選択している）
+メモリ: ← 未回答【最重要】
+GPU（あれば型番）: Intel(R) Iris(R) Xe Graphics（内蔵GPU）
+                   ドライバ 32.0.101.7085 / OpenGL 4.6 / Blender のバックエンドは OpenGL
+ストレージの空き: ← 未回答</code></pre>
+<h3 id="ここから判明した重要な制約cycles-は-cpu-レンダリングになる">ここから判明した重要な制約：<strong>Cycles は CPU レンダリングになる</strong><a class="hash" href="#ここから判明した重要な制約cycles-は-cpu-レンダリングになる" aria-label="このセクションへのリンク">#</a></h3>
+<p>システム情報の Cycles の欄に出ているのは <code>CPU device capabilities: AVX2</code> の1行だけで、<strong>GPU 計算デバイス（OneAPI 等）が挙がっていない。</strong> つまり現状の設定では <strong>Cycles を選ぶとレンダリングが CPU で回る。</strong></p>
+<p>内蔵GPU（Iris Xe）である点と合わせると、含意は3つ。</p>
+<div class="table-wrap"><table class="md"><thead><tr><th>影響</th><th>対応（計画書 §7-6 に反映済み）</th></tr></thead><tbody><tr><td>Cycles で20方向×複数データセットを回すと、レンダリングだけで数時間〜溶ける</td><td><strong>合成データ生成は EEVEE を既定にする。</strong> 復元の入力に必要なのは「一貫した見え方」であって物理的に正確な光ではないため、EEVEE で十分</td></tr><tr><td>内蔵GPU はシステムメモリを共有する</td><td>ボクセル 256³ の可否がメモリ次第。<strong>下の試算を参照</strong></td></tr><tr><td>ビューポート表示も内蔵GPU</td><td>L4 のリアルタイムビューア（Q2）の実現性は控えめに見積もる</td></tr></tbody></table></div>
+<h3 id="ボクセル解像度の試算メモリ回答待ちの理由">ボクセル解像度の試算（メモリ回答待ちの理由）<a class="hash" href="#ボクセル解像度の試算メモリ回答待ちの理由" aria-label="このセクションへのリンク">#</a></h3>
+<p>256³ = <strong>1677万ボクセル</strong>。占有グリッド自体は小さい（uint8 なら 17 MB）が、<strong>問題は §7-5 の「行列で一括投影する」実装のほうで、中間バッファが大きくなる。</strong></p>
+<div class="table-wrap"><table class="md"><thead><tr><th>配列</th><th>256³</th><th>128³</th></tr></thead><tbody><tr><td>占有グリッド（uint8）</td><td>17 MB</td><td>2 MB</td></tr><tr><td>全ボクセル中心の同次座標 <code>4×N</code>（float64）</td><td><strong>537 MB</strong></td><td>67 MB</td></tr><tr><td>投影結果 <code>3×N</code>（float64・カメラ1台分）</td><td><strong>403 MB</strong></td><td>50 MB</td></tr></tbody></table></div>
+<p>素直に書くと 256³ で<strong>一時的に 1 GB 前後</strong>を使う。<strong>メモリ 8 GB だと厳しく、16 GB なら（チャンク分割すれば）通る</strong>、という線。</p>
+<p><strong>対応方針</strong>: どちらに転んでも動くよう、<strong>ボクセルをチャンク（塊）に分割して投影する実装を最初から採る。</strong> これは関口側（<code>geometry/carving.py</code>、ペアプロ#2）の設計に落とす。そのうえで解像度の最終決定は W12 に実測で行う。</p>
+<p><strong>なのでメモリ容量だけは早めに教えてほしい</strong>（<code>Win + Pause</code> キー、またはタスクマネージャー → パフォーマンス → メモリ）。</p>
+<hr>
+<h2 id="q14-撮影機材の所持状況">Q14. 撮影機材の所持状況<a class="hash" href="#q14-撮影機材の所持状況" aria-label="このセクションへのリンク">#</a></h2>
+<p>実物撮影は Phase 3（11月）からだが、調達に時間がかかるものは早めに動きたい。</p>
+<pre><code>回答（持っているものにチェック）:
+□ カメラ（スマホでも可）— 機種:
+□ 三脚
+□ 回転台（ターンテーブル）
+□ 単色の背景布（緑・黒など）
+□ 照明（デスクライトでも可）
+□ チェッカーボード（カメラ較正用の白黒格子。印刷でも可）
+
+調達できそうなもの / 予算感:</code></pre>
+<hr>
+<h2 id="q15-志望している3dcg研究室はどの分野-重要">Q15. 志望している3DCG研究室は、どの分野？ 【重要】<a class="hash" href="#q15-志望している3dcg研究室はどの分野-重要" aria-label="このセクションへのリンク">#</a></h2>
+<p>一口に3DCGと言っても方向がかなり違うので、<strong>どこに力を入れるかの配分を変えたい。</strong></p>
+<div class="table-wrap"><table class="md"><thead><tr><th>分野</th><th>このプロジェクトで強化できる部分</th></tr></thead><tbody><tr><td><strong>ジオメトリ処理・形状解析</strong></td><td>核2・核3を厚くする。cotan重み、メッシュ簡略化、形状の誤差評価を深掘り</td></tr><tr><td><strong>レンダリング・シェーディング</strong></td><td>核1を厚くする。物理ベースレンダリング、多様な照明条件でのデータセット生成</td></tr><tr><td><strong>アニメーション・物理</strong></td><td>正直、このプロジェクトでは直接つながらない。第二候補テーマのほうが合う</td></tr><tr><td><strong>画像生成・ニューラルレンダリング</strong></td><td>復元結果を NeRF / 3D Gaussian Splatting と比較する実験を追加できる</td></tr></tbody></table></div>
+<p><strong>【これが変わる】</strong> 技術核の配分と、評価実験に追加する項目。</p>
+<pre><code>回答:
+志望研究室 / 分野:
+そこで扱われているテーマ（分かる範囲で）:</code></pre>
+<hr>
+<h2 id="q16-3dcgですでに得意なことやったことがあること">Q16. 3DCGで、すでに得意なこと・やったことがあること<a class="hash" href="#q16-3dcgですでに得意なことやったことがあること" aria-label="このセクションへのリンク">#</a></h2>
+<p><strong>【これが変わる】</strong> 既にできることは工数見積もりから引ける。逆に未経験の部分は学習時間を積む。</p>
+<pre><code>回答: ⬜ 本人の回答が必要（以下は受領ファイルからの推測にすぎない）
+Blender歴:
+モデリング経験:
+テクスチャ・UV展開の経験:
+レンダリング設定（ライティング、カメラ設定）の経験:
+Unity歴 / 作ったもの:
+その他（シェーダ、アニメーション等）:</code></pre>
+<h3 id="受領ファイルからの推測要本人確認">受領ファイルからの推測（<strong>要・本人確認</strong>）<a class="hash" href="#受領ファイルからの推測要本人確認" aria-label="このセクションへのリンク">#</a></h3>
+<p><code>system-info.txt</code> の「有効なアドオン」欄に、標準では入っていないものが3つ入っていた。</p>
+<div class="table-wrap"><table class="md"><thead><tr><th>アドオン</th><th>バージョン</th><th>用途</th></tr></thead><tbody><tr><td><code>vrm</code></td><td>3.21.0</td><td>VRM（VTuber向け3Dアバター形式）の入出力</td></tr><tr><td><code>mmd_tools</code></td><td>4.5.8</td><td>MMD（MikuMikuDance）モデル・モーションの取り込み</td></tr><tr><td><code>rokoko-studio-live-blender</code></td><td>1.4.3</td><td>Rokoko のモーションキャプチャを Blender にライブ接続する</td></tr></tbody></table></div>
+<p><strong>ここから読めること</strong>: 松田の Blender 経験は <strong>キャラクター／アバター／モーション寄り</strong>である可能性が高い。特に Rokoko のライブ連携は、静止画のレンダリングではなくリアルタイムのモーション流し込みのためのもの。</p>
+<p><strong>これが効いてくる設問が2つある。</strong></p>
+<ul><li><strong>Q2（リアルタイム描画は登場しない）</strong>: 「リアルタイム・Unity寄り」という事前の把握と、この構成は整合する。<strong>Q2 の回答の重要度がさらに上がった。</strong></li><li><strong>Q15（志望研究室の分野）</strong>: Q15 の表で「<strong>アニメーション・物理</strong> → 正直、このプロジェクトでは直接つながらない」と書いた欄に当たる可能性がある。もしそうなら、テーマ選定そのものを見直す判断があり得る。<strong>着工前に必ず答えてほしい。</strong></li></ul>
+<p><strong>なお、あくまで「入っているアドオンから推測しただけ」であって、決めつけではない。</strong> 実際にどれをどれくらい使ってきたかは本人しか知らないので、Q15・Q16 は自分の言葉で書いてほしい。</p>
+<p><strong>確定した好材料も1つある。</strong> glTF エクスポータ（<code>io_scene_gltf2</code> 5.0.21）と FBX（<code>io_scene_fbx</code> 5.14.0）が有効なので、<strong>Q21 の「glTF で出力」は追加の準備なしに実現できる。</strong></p>
+<hr>
+<h1 id="part-3-一緒に決めたいこと">Part 3. 一緒に決めたいこと<a class="hash" href="#part-3-一緒に決めたいこと" aria-label="このセクションへのリンク">#</a></h1>
+<h2 id="q17-リポジトリ名">Q17. リポジトリ名<a class="hash" href="#q17-リポジトリ名" aria-label="このセクションへのリンク">#</a></h2>
+<p>現在未定。public化する前提なので、後から見て内容が分かる名前にしたい。</p>
+<p>案:</p>
+<ul><li><code>multiview-visualhull-recon</code></li><li><code>recon3d</code>（シンプル。Pythonパッケージ名もこれにする想定）</li><li><code>silhouette-sfm-fusion</code></li></ul>
+<p><strong>【これが変わる】</strong> パッケージ名（<code>src/recon3d/</code> の部分）も揃えるので、早めに決めたい。</p>
+<pre><code>回答:</code></pre>
+<hr>
+<h2 id="q18-合成データの元にする3dモデル-w01">Q18. 合成データの元にする3Dモデル 【W01】<a class="hash" href="#q18-合成データの元にする3dモデル-w01" aria-label="このセクションへのリンク">#</a></h2>
+<p>君が Blender で用意する最初のデータ。<strong>条件が1つある。</strong></p>
+<blockquote><p><strong>必ず「凹んだ形状」を含むモデルにすること。</strong></p></blockquote>
+<p>理由: このプロジェクトの最重要実験は「①のみ / ④のみ / 統合」の3条件比較で、<strong>統合が優れていることを数字で証明する</strong>もの。ところが凸形状（球、Suzanne など）だけだと、シルエット法が苦手とする凹みが存在しないので、統合の意味が数字に出ない。</p>
+<p><strong>理想は「無地の面 + 凹み」の両方を持つもの。</strong></p>
+<div class="table-wrap"><table class="md"><thead><tr><th>条件</th><th>失敗する手法</th></tr></thead><tbody><tr><td>無地・模様がない面</td><td>① 多視点復元（特徴点が取れず点群に穴が空く）</td></tr><tr><td>凹んだ形状</td><td>④ シルエット復元（原理的に削れない）</td></tr></tbody></table></div>
+<p><strong>マグカップがこの両方を満たす</strong>（陶器の無地の面＋内側の凹み）。だから主データはマグカップ相当を推したい。</p>
+<p>副データとして Stanford Bunny のような凸・高テクスチャのモデルも1つ欲しい（①単独の上限性能を見るため）。</p>
+<p><strong>【これが変わる】</strong> 実験結果の説得力そのもの。</p>
+<pre><code>回答:
+主データに使いたいモデル:
+副データに使いたいモデル:
+入手先（自作 / 既存アセット / 配布モデル）:
+ライセンスは大丈夫そう？:</code></pre>
+<hr>
+<h2 id="q19-実物撮影の被写体">Q19. 実物撮影の被写体<a class="hash" href="#q19-実物撮影の被写体" aria-label="このセクションへのリンク">#</a></h2>
+<p>Phase 3（11月）から。Q18と同じ理由で、<strong>凹みと無地面の両方</strong>が欲しい。除外するのは鏡面（金属・光沢）と透明物（両手法とも原理的に無理）。</p>
+<pre><code>回答:
+候補:</code></pre>
+<hr>
+<h2 id="q20-メッシュ処理をどこまで自作するか">Q20. メッシュ処理をどこまで自作するか<a class="hash" href="#q20-メッシュ処理をどこまで自作するか" aria-label="このセクションへのリンク">#</a></h2>
+<p>Q1の核2に関わる。君の判断を聞きたい。</p>
+<div class="table-wrap"><table class="md"><thead><tr><th>処理</th><th>選択肢</th></tr></thead><tbody><tr><td><strong>Marching Cubes</strong>（ボクセル→メッシュ）</td><td>自作する / <code>skimage.measure.marching_cubes</code> を使う</td></tr><tr><td><strong>メッシュ簡略化</strong></td><td>自作する / Open3D の機能を使う</td></tr><tr><td><strong>UV展開</strong></td><td>自作する / Blender の Smart UV Project を使う</td></tr><tr><td><strong>テクスチャ投影</strong></td><td>自作する（推奨。ここは君の見せ場）</td></tr></tbody></table></div>
+<p>現在の計画では<strong>Marching Cubes と メッシュ簡略化は自作、UV展開は Blender の機能を使う</strong>想定にしている（UV展開は独立した研究テーマになるほど深く、片手間で作るものではないため）。</p>
+<p><strong>トレードオフ</strong>: 自作を増やすと「中身を理解している」と言えるが、工数を食う。Q6 の315時間には Marching Cubes 20h・UV/テクスチャ 25h が計上済み。</p>
+<p><strong>【これが変わる】</strong> 工数配分と、君が「これは自分が作った」と言える範囲。</p>
+<pre><code>回答:</code></pre>
+<hr>
+<h2 id="q21-最終的な出力の形">Q21. 最終的な出力の形<a class="hash" href="#q21-最終的な出力の形" aria-label="このセクションへのリンク">#</a></h2>
+<p>何をもって「完成」とするか。</p>
+<pre><code>回答（欲しいものにチェック）:
+□ テクスチャ付きメッシュ（.obj + .png）
+□ Blender シーンファイル（.blend）
+□ glTF（Web で見られる形式）
+□ デモ動画（回転しながら表示）
+□ 復元過程の可視化動画（ボクセルが削られていく様子）
+□ その他:
+
+一番見栄えがすると思うもの:</code></pre>
+<hr>
+<h2 id="q22-撤退ラインの認識合わせ">Q22. 撤退ラインの認識合わせ<a class="hash" href="#q22-撤退ラインの認識合わせ" aria-label="このセクションへのリンク">#</a></h2>
+<p>野心的な構成なので、<strong>先に「どこまで諦めるか」を決めてある。</strong> 上から順に諦める。</p>
+<div class="table-wrap"><table class="md"><thead><tr><th>段階</th><th>到達内容</th><th>位置づけ</th></tr></thead><tbody><tr><td><strong>L4</strong></td><td>統合＋実験＋ビューア＋ドキュメント一式</td><td>理想</td></tr><tr><td><strong>L3</strong></td><td>統合パイプライン完成、Blender出力、比較実験</td><td><strong>目標</strong></td></tr><tr><td><strong>L2</strong></td><td>④のみ（カメラ位置を回転台の角度から直接計算）でメッシュ生成</td><td>合格ライン</td></tr><tr><td><strong>L1</strong></td><td>①のみ、点群生成＋収束実験</td><td>最低保証</td></tr></tbody></table></div>
+<p><strong>判定は2回。</strong></p>
+<div class="table-wrap"><table class="md"><thead><tr><th>時期</th><th>判定内容</th><th>落ちた場合</th></tr></thead><tbody><tr><td><strong>W11 終了時（11/1）</strong></td><td>最適化（バンドル調整）が収束しているか</td><td>→ L2へ。カメラ姿勢推定を回避してメッシュに全振り</td></tr><tr><td><strong>W15 終了時（11/29）</strong></td><td>メッシュが出ているか</td><td>→ L1へ。点群と数値実験に集中</td></tr></tbody></table></div>
+<p><strong>L2 に落ちた場合、君の担当（メッシュ側）が主軸になる。</strong> L1 に落ちた場合は逆に関口側が主軸。どちらに倒れても成果物にはなる。</p>
+<p><strong>【これが変わる】</strong> ここを事前に共有しておかないと、判定のタイミングで「諦めるのか」という話になって揉める。<strong>先に合意しておきたい。</strong></p>
+<pre><code>回答:
+□ 了承。この判定基準とタイミングでいい
+□ 気になる点がある:</code></pre>
+<hr>
+<h2 id="q23-週の進め方曜日と時間帯">Q23. 週の進め方（曜日と時間帯）<a class="hash" href="#q23-週の進め方曜日と時間帯" aria-label="このセクションへのリンク">#</a></h2>
+<pre><code>回答:
+作業しやすい曜日・時間帯:
+週1回の対面ミーティングを固定するなら、いつがいい？:
+連絡手段（Discord / LINE / Slack など）:
+返信の速さの期待値（即レス / 1日以内 / 数日）:</code></pre>
+<hr>
+<h2 id="q24-逆に関口に聞きたいこと言っておきたいこと">Q24. 逆に、関口に聞きたいこと・言っておきたいこと<a class="hash" href="#q24-逆に関口に聞きたいこと言っておきたいこと" aria-label="このセクションへのリンク">#</a></h2>
+<p><strong>遠慮なく書いてほしい。</strong> 特に以下は歓迎する。</p>
+<ul><li>計画の中で納得できない部分</li><li>「これは無理そう」と感じる部分</li><li>「これもやりたい」という追加提案</li><li>数理側の説明で分からなかった用語</li></ul>
+<pre><code>回答:</code></pre>
+<hr>
+<h1 id="回答後の流れ">回答後の流れ<a class="hash" href="#回答後の流れ" aria-label="このセクションへのリンク">#</a></h1>
+<ol><li>このシートの回答をもとに、計画書を修正する ← Q9 の分は 2026-08-15 に反映済み</li><li><del>Q9（Blenderバージョン）が分かり次第、Pythonバージョンを確定</del> → <strong>✅ 完了。Blender 5.0.1 / Python 3.11.13 を確認し、プロジェクトの Python を 3.11 に確定した</strong></li><li><strong>W01（8/17の週）にペアプロ#1（2時間）</strong> — 座標系の規約と <code>cameras.json</code> の仕様を2人で決めて実装する</li><li>それが終われば、以降は互いの完成を待たずに並行して進められる</li></ol>
+<h2 id="いま返事がほしいものだけもう一度まとめる">いま返事がほしいものだけ、もう一度まとめる<a class="hash" href="#いま返事がほしいものだけもう一度まとめる" aria-label="このセクションへのリンク">#</a></h2>
+<p>Blenderの情報、ありがとう。<strong>これで Python のバージョンが確定して、関口側は W01 の環境構築に着手できる。</strong></p>
+<p>残りで急ぐのはこの4つだけ。他は後でいい。</p>
+<div class="table-wrap"><table class="md"><thead><tr><th>優先</th><th>設問</th><th>なぜ急ぐか</th></tr></thead><tbody><tr><td>1</td><td><strong>Q1・Q2・Q3</strong></td><td>Noなら計画を組み直すため。特に <strong>Q2</strong>（リアルタイム描画が出てこないこと）は、受領したアドオン構成を見て確認の必要性が上がった</td></tr><tr><td>2</td><td><strong>Q15</strong>（志望研究室の分野）</td><td>同上。アニメーション系ならテーマ選定から見直す判断があり得る</td></tr><tr><td>3</td><td><strong>Q13 のメモリ容量</strong></td><td>ボクセル解像度（256³ か 128³ か）を決められない</td></tr><tr><td>4</td><td><strong>Q17</strong>（リポジトリ名）・<strong>Q18</strong>（合成データの元モデル）</td><td>W01 で必要</td></tr></tbody></table></div>
+<p><strong>あわせて1つお願い</strong>: 開発期間中（〜2026-12）は <strong>Blender を 5.0.x のままにしてほしい。</strong> 5.0.x は LTS ではないので、上げると内蔵 Python が動いて、プロジェクト全体の Python を追随させる必要が出る。上げたい事情ができたら先に一報がほしい。</p>
+<hr>
+<h2 id="補足出てきた用語">補足：出てきた用語<a class="hash" href="#補足出てきた用語" aria-label="このセクションへのリンク">#</a></h2>
+<blockquote><p><strong>この節にあった用語表は <a href="../glossary.html">docs/glossary.md</a> に移し、そちらで大幅に拡充しました（2026-08-24）。</strong>
+<strong>定義が2か所にあると必ず食い違うため、こちらの写しは削除しています。</strong> 分からない言葉は <a href="../glossary.html">用語集</a> を引いてください。</p></blockquote>
+  </main>
+</div>
+<footer class="foot">
+  <p>このページは <code>docs/internal/partner-questions-v1.md</code> から自動生成しています。編集は md 側で。</p>
+</footer>
+</body>
+</html>

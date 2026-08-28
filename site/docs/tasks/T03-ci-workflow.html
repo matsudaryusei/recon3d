@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>T03 — CI（GitHub Actions）の雛形を置く</title>
+<link rel="stylesheet" href="../../assets/style.css">
+</head>
+<body>
+<header class="topbar">
+  <div class="topbar-inner">
+    <nav class="crumbs"><a href="../../index.html">ドキュメント</a><span class="sep">/</span><a href="README.html">tasks/</a></nav>
+    <span class="src">docs/tasks/T03-ci-workflow.md</span>
+  </div>
+</header>
+<div class="layout">
+  <details class="toc"><summary class="toc-title">目次</summary><ul><li class="lv2"><a href="#なぜやるのか">なぜやるのか</a></li><li class="lv2"><a href="#ステップ1ブランチを切る">ステップ1：ブランチを切る</a></li><li class="lv2"><a href="#ステップ2ファイルを作る">ステップ2：ファイルを作る</a></li><li class="lv3"><a href="#各行が何をしているか">各行が何をしているか</a></li><li class="lv2"><a href="#ステップ3push-して動くか見る">ステップ3：push して動くか見る</a></li><li class="lv2"><a href="#完了判定">完了判定</a></li><li class="lv2"><a href="#つまずいたら">つまずいたら</a></li><li class="lv2"><a href="#終わったら">終わったら</a></li></ul></details>
+  <main class="page">
+<h1 id="t03--cigithub-actionsの雛形を置く">T03 — CI（GitHub Actions）の雛形を置く<a class="hash" href="#t03--cigithub-actionsの雛形を置く" aria-label="このセクションへのリンク">#</a></h1>
+<p><a href="../next.html">← 次にやること一覧に戻る</a></p>
+<div class="table-wrap"><table class="md table--headless"><thead><tr><th></th><th></th></tr></thead><tbody><tr><td>ジャンル</td><td><strong>G7 テスト・CI</strong>（<a href="../plan.html#s3-3">計画書 §3-3</a>）</td></tr><tr><td>目安時間</td><td>1時間</td></tr><tr><td>前提</td><td>なし（G6 の骨格が push 済みであること。→ 済）</td></tr><tr><td>作るもの</td><td><code>.github/workflows/ci.yml</code></td></tr><tr><td>仕様の出どころ</td><td><a href="../plan.html#s9-2">計画書 §9-2</a> ／ <a href="../decisions.html#d-24">D-24</a></td></tr></tbody></table></div>
+<hr>
+<blockquote><p><strong>先に読むもの</strong>：特にありません。<strong>下の手順をそのまま打てば通ります。</strong>
+設定ファイルの文法まで知りたくなったら → <a href="../learning.html">学びの入口 G9</a> の GitHub Actions。<strong>用語は <a href="../glossary.html">用語集</a>。</strong></p></blockquote>
+<h2 id="なぜやるのか">なぜやるのか<a class="hash" href="#なぜやるのか" aria-label="このセクションへのリンク">#</a></h2>
+<p><strong>「自分の PC では動くのに、相手の PC では落ちる」を自動で見つけるためです。</strong></p>
+<p>いまは3台（mac / Windows / Ubuntu）で手で <code>uv run pytest</code> を流して確認しました（8/24）。<strong>これを毎回手でやるのは続きません。</strong> GitHub Actions に肩代わりさせます。</p>
+<p><strong>Windows と Ubuntu の2つで回します</strong>（<a href="../decisions.html#d-24">D-24</a>）。mac を入れないのは、<strong>改行コードとパス区切りの事故は Windows で出る</strong>からで、mac 固有の事故は今のところ想定していないためです。</p>
+<blockquote><p><strong>Blender を使うテスト（<code>tools/blender_*.py</code>）は CI から外します。</strong> GitHub の実行環境に Blender が無いためで、これは手元での確認とします。</p></blockquote>
+<hr>
+<h2 id="ステップ1ブランチを切る">ステップ1：ブランチを切る<a class="hash" href="#ステップ1ブランチを切る" aria-label="このセクションへのリンク">#</a></h2>
+<pre><code class="lang-bash">git switch main
+git pull origin main
+git switch -c feat/ci-workflow</code></pre>
+<hr>
+<h2 id="ステップ2ファイルを作る">ステップ2：ファイルを作る<a class="hash" href="#ステップ2ファイルを作る" aria-label="このセクションへのリンク">#</a></h2>
+<pre><code class="lang-bash">mkdir -p .github/workflows</code></pre>
+<p><code>.github/workflows/ci.yml</code> を作り、<strong>下をそのまま貼ってください。</strong></p>
+<pre><code class="lang-yaml">name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    name: pytest (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: uv をインストール
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+
+      - name: 依存をインストール
+        run: uv sync
+
+      - name: Python のバージョンを表示（3.11.13 のはず）
+        run: uv run python -V
+
+      - name: テストを実行
+        run: uv run pytest -v</code></pre>
+<h3 id="各行が何をしているか">各行が何をしているか<a class="hash" href="#各行が何をしているか" aria-label="このセクションへのリンク">#</a></h3>
+<div class="table-wrap"><table class="md"><thead><tr><th>行</th><th>意味</th></tr></thead><tbody><tr><td><code>on: push: branches: [main]</code></td><td><code>main</code> に入ったときに回す</td></tr><tr><td><code>on: pull_request</code></td><td><strong>PR を出したときに回す。</strong> これが本命（マージ前に落ちてくれる）</td></tr><tr><td><code>fail-fast: false</code></td><td><strong>片方が落ちても、もう片方を最後まで回す。</strong> どっちのOSで落ちたかを知りたいので必須</td></tr><tr><td><code>matrix: os: [...]</code></td><td>Ubuntu と Windows で同じことを2回やる</td></tr><tr><td><code>astral-sh/setup-uv@v5</code></td><td><strong><code>uv</code> を入れるだけ</strong>の公式アクション。<strong>Python はここでは入りません</strong>（次の <code>uv sync</code> が <code>.python-version</code> を見て 3.11.13 を自動で用意します）</td></tr><tr><td><code>enable-cache: true</code></td><td>依存のダウンロードをキャッシュする。2回目以降が速くなる</td></tr><tr><td><code>uv sync</code></td><td><code>uv.lock</code> のとおりに環境を作る。<strong>プロジェクト自身も editable install される</strong>（<a href="../plan.html#s6-3">計画書 §6-3</a>）</td></tr><tr><td><code>uv run pytest -v</code></td><td>テストを実行。<code>-v</code> はどのテストが通ったか一覧で出す</td></tr></tbody></table></div>
+<blockquote><p>⚠️ <strong><code>astral-sh/setup-uv@v5</code> が「見つからない」と言われたら、<code>@v3</code> に下げてください。</strong> <a href="../plan.html#s9-2">計画書 §9-2</a> の骨子は <code>@v3</code> で書かれています。新しい方から試して、駄目なら下げるだけです。<strong>下げた場合は理由を PR に1行書いてください。</strong></p></blockquote>
+<hr>
+<h2 id="ステップ3push-して動くか見る">ステップ3：push して動くか見る<a class="hash" href="#ステップ3push-して動くか見る" aria-label="このセクションへのリンク">#</a></h2>
+<pre><code class="lang-bash">git add .github/workflows/ci.yml
+git commit -m "ci: GitHub Actions で Ubuntu と Windows の pytest を回す"
+git push -u origin feat/ci-workflow</code></pre>
+<p>GitHub 上で <strong>PR を作成</strong>します。作った直後に <strong>PR の下の方に CI の実行状況が出ます。</strong></p>
+<ul><li><strong><code>Details</code> を押すとログが読めます。</strong> どのステップで落ちたかが行単位で分かります</li><li>2〜3分で終わります</li></ul>
+<hr>
+<h2 id="完了判定">完了判定<a class="hash" href="#完了判定" aria-label="このセクションへのリンク">#</a></h2>
+<ul><li class="task"><input type="checkbox" disabled> PR のページに <strong><code>pytest (ubuntu-latest)</code> と <code>pytest (windows-latest)</code> の2つ</strong>が出ている</li><li class="task"><input type="checkbox" disabled> <strong>両方が緑（✅）になっている</strong></li><li class="task"><input type="checkbox" disabled> ログの <code>uv run python -V</code> が <strong><code>Python 3.11.13</code></strong> と出ている</li><li class="task"><input type="checkbox" disabled> ログの最後が <strong><code>1 passed</code></strong>（<a href="T01-pairpro1-io.html">T01</a> が先に入っていればもっと多い）</li></ul>
+<p><strong>緑になったらマージしてください。</strong></p>
+<blockquote><p>⚠️ <strong>マージボタンの右のプルダウンから <code>Squash and merge</code> を選んでください。</strong>
+squash 以外を無効にするのは <a href="T04-branch-protection.html">T04 のステップ3</a> で、<strong>まだ済んでいません。</strong>
+いまボタンをそのまま押すと、既定の <code>Create a merge commit</code> になります（<a href="../plan.html#s8-1">計画書 §8-1</a> は squash に統一と決めています）。</p></blockquote>
+<hr>
+<h2 id="つまずいたら">つまずいたら<a class="hash" href="#つまずいたら" aria-label="このセクションへのリンク">#</a></h2>
+<div class="table-wrap"><table class="md"><thead><tr><th>症状</th><th>原因と対処</th></tr></thead><tbody><tr><td>Windows だけ落ちる／改行に関する差分が出る</td><td><code>.gitattributes</code> が効いていない可能性。<code>git add --renormalize .</code> を1回流して差分を見る（<a href="../plan.html#s7-3">計画書 §7-3</a>）</td></tr><tr><td><code>error: Failed to build ...</code> / <code>Failed to prepare distributions</code></td><td><code>pyproject.toml</code> の <code>packages = ["src/recon3d"]</code> が消えていないか確認（<a href="../plan.html#s6-3">計画書 §6-3</a>）</td></tr><tr><td><code>no tests ran</code> / exit code 5</td><td><code>tests/</code> が push されていない。<code>git ls-files tests</code> で確認</td></tr><tr><td>Actions のタブに何も出ない</td><td>リポジトリの <strong>Settings → Actions → General</strong> で Actions が無効になっていないか確認</td></tr><tr><td>課金が心配</td><td><strong>public リポジトリは無料。</strong> private でも Free プランに月2000分の枠があります。⚠️ <strong>Windows ランナーは消費が2倍で数えられる</strong>ので、1回あたり「Ubuntu 3分 + Windows 3分×2 = 約9分」の計算になります。それでも週に何十回も回さない限り枠内です</td></tr></tbody></table></div>
+<hr>
+<h2 id="終わったら">終わったら<a class="hash" href="#終わったら" aria-label="このセクションへのリンク">#</a></h2>
+<ol><li><a href="../progress.html">進捗ログ</a> の今週の表に <strong>G7 の行</strong>を1行足す（PR番号を忘れずに）</li><li><a href="../next.html">次にやること</a> の T03 の状態を <code>✅ 完了</code> に書き換える</li><li><strong>次は <a href="T04-branch-protection.html">T04 <code>main</code> ブランチの保護</a> ですが、その前に <a href="T05-git-practice.html">T05 Git の練習</a> を全員が済ませてください。</strong> T04 で <code>main</code> を保護すると <code>git push origin main</code> が使えなくなります。<strong>PR の手順を知らないまま保護すると、全員が何もできなくなります</strong></li></ol>
+  </main>
+</div>
+<footer class="foot">
+  <p>このページは <code>docs/tasks/T03-ci-workflow.md</code> から自動生成しています。編集は md 側で。</p>
+</footer>
+</body>
+</html>

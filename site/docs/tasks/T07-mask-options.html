@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>T07 — マスク生成方式の候補を1枚にまとめる</title>
+<link rel="stylesheet" href="../../assets/style.css">
+</head>
+<body>
+<header class="topbar">
+  <div class="topbar-inner">
+    <nav class="crumbs"><a href="../../index.html">ドキュメント</a><span class="sep">/</span><a href="README.html">tasks/</a></nav>
+    <span class="src">docs/tasks/T07-mask-options.md</span>
+  </div>
+</header>
+<div class="layout">
+  <details class="toc"><summary class="toc-title">目次</summary><ul><li class="lv2"><a href="#着手前に読むもの">着手前に読むもの</a></li><li class="lv2"><a href="#なぜやるのか">なぜやるのか</a></li><li class="lv2"><a href="#何を比較するのか4方式">何を比較するのか（4方式）</a></li><li class="lv2"><a href="#ステップ1ファイルを作る">ステップ1：ファイルを作る</a></li><li class="lv2"><a href="#ステップ2この骨組みを埋める">ステップ2：この骨組みを埋める</a></li><li class="lv2"><a href="#ステップ3埋め方のコツ">ステップ3：埋め方のコツ</a></li><li class="lv2"><a href="#完了判定">完了判定</a></li><li class="lv2"><a href="#つまずいたら">つまずいたら</a></li><li class="lv2"><a href="#終わったら">終わったら</a></li></ul></details>
+  <main class="page">
+<h1 id="t07--マスク生成方式の候補を1枚にまとめる">T07 — マスク生成方式の候補を1枚にまとめる<a class="hash" href="#t07--マスク生成方式の候補を1枚にまとめる" aria-label="このセクションへのリンク">#</a></h1>
+<p><a href="../next.html">← 次にやること一覧に戻る</a></p>
+<div class="table-wrap"><table class="md table--headless"><thead><tr><th></th><th></th></tr></thead><tbody><tr><td>ジャンル</td><td><strong>G3 画像処理</strong>（判断材料づくり）</td></tr><tr><td>目安時間</td><td>2時間</td></tr><tr><td>前提</td><td><strong>Blender は不要。</strong>（<a href="../decisions.html#d-35">D-35</a> で「手を動かす検証はしない、材料の提示まで」と決めてある）</td></tr><tr><td>作るもの</td><td><strong><code>docs/notes/mask-options.md</code>（A4 1枚相当）</strong></td></tr><tr><td>仕様の出どころ</td><td><a href="../decisions.html#d-35">D-35</a> ／ <a href="../decisions.html#d-20">D-20</a> ／ <a href="../plan.html">計画書 §7-6</a></td></tr></tbody></table></div>
+<hr>
+<h2 id="着手前に読むもの">着手前に読むもの<a class="hash" href="#着手前に読むもの" aria-label="このセクションへのリンク">#</a></h2>
+<div class="table-wrap"><table class="md"><thead><tr><th>初めて出てくること</th><th>資料</th></tr></thead><tbody><tr><td><strong>Blender のレンダリング設定・コンポジタ</strong></td><td><a href="../learning.html">学びの入口 G2</a> の Blender マニュアル</td></tr><tr><td><code>アルファチャンネル</code> / <code>二値化</code> / <code>Cryptomatte</code> などの言葉</td><td><a href="../glossary.html">用語集 §5</a></td></tr></tbody></table></div>
+<blockquote><p><strong>調べた結果をどう並べ、どれを推すかは、この作業の中身そのものです。</strong> ここには手順しか書いていません。</p></blockquote>
+<h2 id="なぜやるのか">なぜやるのか<a class="hash" href="#なぜやるのか" aria-label="このセクションへのリンク">#</a></h2>
+<p><strong>マスク（被写体の形だけを白、背景を黒にした画像）は、シルエット復元＝ボクセル彫刻の入力そのものです。</strong>
+ここが濁ると、<strong>このプロジェクトの最重要実験 E5 の数字が意味をなさなくなります。</strong></p>
+<p><strong>そして、いま2人ともマスク生成をやったことがありません。</strong> 8/16 の確認では「判断できない」という回答でした。
+だから <strong>「経験がある人に委ねる」ではなく「材料を作ってから2人で決める」</strong> に切り替えました（<a href="../decisions.html#d-35">D-35</a>）。</p>
+<p><strong>この作業は「決める」ことではありません。「決められる状態にする」ことです。</strong></p>
+<hr>
+<h2 id="何を比較するのか4方式">何を比較するのか（4方式）<a class="hash" href="#何を比較するのか4方式" aria-label="このセクションへのリンク">#</a></h2>
+<p><strong>Blender で被写体だけを切り出す代表的なやり方が4つあります。</strong> この4つを調べて表にします。</p>
+<div class="table-wrap"><table class="md"><thead><tr><th>#</th><th>方式</th><th>ざっくり何をするか</th></tr></thead><tbody><tr><td>1</td><td><strong>アルファチャンネル（Film &gt; Transparent）</strong></td><td>背景を透明にしてレンダリングし、PNG の α を取り出して二値化する</td></tr><tr><td>2</td><td><strong>Holdout（オブジェクトのマスク設定）</strong></td><td>特定オブジェクトを「穴」として扱わせ、そこだけ抜く</td></tr><tr><td>3</td><td><strong>Cryptomatte</strong></td><td>オブジェクト単位の ID を持ったパスを出力し、目的のオブジェクトの ID だけ抜く</td></tr><tr><td>4</td><td><strong>Compositor の ID Mask / Object Index</strong></td><td>オブジェクトに番号を振り、コンポジタで番号一致の画素だけ取り出す</td></tr></tbody></table></div>
+<hr>
+<h2 id="ステップ1ファイルを作る">ステップ1：ファイルを作る<a class="hash" href="#ステップ1ファイルを作る" aria-label="このセクションへのリンク">#</a></h2>
+<pre><code class="lang-bash">git switch main &amp;&amp; git pull origin main
+git switch -c docs/mask-options
+mkdir -p docs/notes
+touch docs/notes/mask-options.md</code></pre>
+<hr>
+<h2 id="ステップ2この骨組みを埋める">ステップ2：この骨組みを埋める<a class="hash" href="#ステップ2この骨組みを埋める" aria-label="このセクションへのリンク">#</a></h2>
+<p><strong>下をコピーして、<code>docs/notes/mask-options.md</code> に貼ってから埋めてください。</strong></p>
+<pre><code class="lang-markdown"># マスク生成方式の候補（決定用の判断材料）
+
+**目的**: Blender の合成データから、被写体だけを白・背景を黒にした二値マスクを得る方式を決める。
+**決めるとき**: **W02 中**に2人で（→ docs/decisions.md#d-35）。**W03 以降の G3 がここで止まる**
+**この文書の位置づけ**: 決定ではなく判断材料。決めた結果は別に1本残す。
+
+## 前提（この環境で動くことが条件）
+
+- Blender 5.0.1 / 内蔵 Python 3.11.13 / numpy 1.26.4（`pip install` はしない。`bpy` と `numpy` のみに依存させる → 計画書 §7-4）
+- `blender --background --python &lt;script&gt;` で **CLI から自動実行できること**（20枚を手作業で書き出すのは論外）
+- 出力は **PNG。0 と 255 の二値**（グレーの中間値が残ると彫刻が濁る）
+
+## 比較表
+
+| | 1 アルファ | 2 Holdout | 3 Cryptomatte | 4 ID Mask |
+|---|---|---|---|---|
+| 仕組み（1〜2行） | | | | |
+| **スクリプトから自動化できるか** | | | | |
+| **出力が二値になるか**（中間値が出ないか） | | | | |
+| 半透明・毛・髪への強さ | | | | |
+| **実装量**（行数の肌感／設定箇所の数） | | | | |
+| レンダリングエンジン依存（EEVEE / Cycles） | | | | |
+| 落とし穴・既知の罠 | | | | |
+| 参考にした URL | | | | |
+
+## 推す案と、その理由
+
+（1〜3段落。「なぜこれが本プロジェクトに合うか」を書く）
+
+## 決めるときの質問（この3つに答えられれば決まる）
+
+1. 20枚を CLI で自動生成できるか
+2. しきい値を触らずに 0/255 の二値が出るか
+3. 被写体が増えたとき（回転台＋被写体の2物体）に破綻しないか
+
+## 松田側で確認してほしいこと（Blender がある端末）
+
+- [ ] 推した方式で 1 枚だけ出力してみる
+- [ ] 出力を開いて、**中間値の画素が無いか**を確認する（例：ヒストグラムが 0 と 255 の2本だけか）
+- [ ] 確認した結果を、この文書の下に追記する</code></pre>
+<hr>
+<h2 id="ステップ3埋め方のコツ">ステップ3：埋め方のコツ<a class="hash" href="#ステップ3埋め方のコツ" aria-label="このセクションへのリンク">#</a></h2>
+<div class="table-wrap"><table class="md"><thead><tr><th>行</th><th>どう調べるか</th></tr></thead><tbody><tr><td><strong>仕組み</strong></td><td>Blender 公式マニュアルの該当ページを見る。<strong>バージョンを 5.0 に合わせて読むこと</strong>（古い版と UI が違う）</td></tr><tr><td><strong>自動化できるか</strong></td><td><strong>これが一番大事な行です。</strong> <code>bpy</code> から設定できるプロパティ名まで書けるとベスト（例：<code>scene.render.film_transparent = True</code>）</td></tr><tr><td><strong>二値になるか</strong></td><td>アンチエイリアスが効くと<strong>輪郭に中間値が出ます。</strong> 中間値が出る方式なら「しきい値でどう潰すか」まで書く</td></tr><tr><td><strong>実装量</strong></td><td>「3行」「ノードを4つつなぐ」など<strong>肌感で十分</strong>。正確な数字は要りません</td></tr><tr><td><strong>参考 URL</strong></td><td><strong>必ず入れてください。</strong> 後で松田が同じページを開けることが目的です</td></tr></tbody></table></div>
+<blockquote><p><strong>分からない行は「不明」と書いて構いません。</strong> 空欄より「調べたが分からなかった」の方が情報量があります。</p></blockquote>
+<hr>
+<h2 id="完了判定">完了判定<a class="hash" href="#完了判定" aria-label="このセクションへのリンク">#</a></h2>
+<ul><li class="task"><input type="checkbox" disabled> <code>docs/notes/mask-options.md</code> があり、<strong>比較表の4列すべてに何か書いてある</strong>（「不明」も可）</li><li class="task"><input type="checkbox" disabled> <strong>「自動化できるか」と「二値になるか」の2行は、4方式すべて埋まっている</strong>（ここが空だと決められません）</li><li class="task"><input type="checkbox" disabled> <strong>推す案が1つ選ばれ、理由が書いてある</strong></li><li class="task"><input type="checkbox" disabled> 参考 URL が方式ごとに1本以上ある</li><li class="task"><input type="checkbox" disabled> 松田側で確認するチェックリストが末尾にある</li></ul>
+<p>PR を出してマージ：</p>
+<pre><code class="lang-bash">git add docs/notes/mask-options.md
+git commit -m "docs(G3): マスク生成方式の候補を比較表にまとめた（D-35）"
+git push -u origin docs/mask-options</code></pre>
+<hr>
+<h2 id="つまずいたら">つまずいたら<a class="hash" href="#つまずいたら" aria-label="このセクションへのリンク">#</a></h2>
+<div class="table-wrap"><table class="md"><thead><tr><th>症状</th><th>対処</th></tr></thead><tbody><tr><td><strong>4方式の違いがそもそも分からない</strong></td><td>まず <a href="../glossary.html">用語集 §5</a> で <code>アルファチャンネル</code>・<code>Cryptomatte</code>・<code>二値化</code> を引く。→ 次に <a href="https://docs.blender.org/manual/en/latest/" class="ext" target="_blank" rel="noopener">Blender マニュアル</a> を版 5.0 で読む</td></tr><tr><td><strong>記事が見つかる版が古い</strong>（4.x の UI と違う）</td><td><strong>「自動化できるか」の行だけは版に依存しにくい</strong>ので、そこを優先して埋める。UI の位置は松田が実機で確認します</td></tr><tr><td><strong>Blender が無いので確かめられない</strong></td><td><strong>確かめなくてよい作業です</strong>（<a href="../decisions.html#d-35">D-35</a>：関口は判断材料の提示まで）。「未確認」と明記して渡す</td></tr><tr><td><strong>どれが良いか決められない</strong></td><td><strong>決めなくてよいです。</strong> この作業の成果物は比較表で、決定は W02 に2人でやります。「推す案」は仮でよい</td></tr><tr><td><strong>調べたが分からない行がある</strong></td><td><strong>「不明」と書く。</strong> 空欄より情報量があります。<strong>分からなかったこと自体が、松田が実機で確かめる項目になります</strong></td></tr><tr><td>表が埋まらないまま2時間経った</td><td><strong>そこで止めて出す。</strong> 埋まっている行だけでも W02 の議論は始められます</td></tr></tbody></table></div>
+<h2 id="終わったら">終わったら<a class="hash" href="#終わったら" aria-label="このセクションへのリンク">#</a></h2>
+<ol><li><strong><a href="../../Discuss.html">Discuss.md</a> に「読んでほしい」と1行書く。</strong> 相手が気づかないと決められません</li><li><a href="../progress.html">進捗ログ</a> の今週の表に <strong>G3 の行</strong>を1行足す</li><li><a href="../next.html">次にやること</a> の T07 の状態を <code>✅ 完了</code> に書き換える</li><li><strong>W02 中に、2人で15分取って決めてください。</strong> 決めた方式と理由は <code>docs/notes/</code> にもう1本残します（<a href="../decisions.html#d-20">D-20</a>。書き手は実際に動かした側）</li></ol>
+  </main>
+</div>
+<footer class="foot">
+  <p>このページは <code>docs/tasks/T07-mask-options.md</code> から自動生成しています。編集は md 側で。</p>
+</footer>
+</body>
+</html>

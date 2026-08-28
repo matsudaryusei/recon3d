@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>3D復元プロジェクト — 決定記録</title>
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+<header class="topbar">
+  <div class="topbar-inner">
+    <nav class="crumbs"><a href="../index.html">ドキュメント</a></nav>
+    <span class="src">docs/decisions.md</span>
+  </div>
+</header>
+<div class="layout">
+  <details class="toc"><summary class="toc-title">目次</summary><ul><li class="lv2"><a href="#この文書の使い方">この文書の使い方</a></li><li class="lv2"><a href="#一覧">一覧</a></li><li class="lv2"><a href="#d-01">D-01. Blender合成データで着工する</a></li><li class="lv2"><a href="#d-02">D-02. 被写体に凹み形状を必須とする</a></li><li class="lv2"><a href="#d-03">D-03. 協働の型を「主担当＋副担当」にする（⚠ 2026-08-16 撤回）</a></li><li class="lv2"><a href="#d-04">D-04. 副担当も一部を実装する【2026-08-15 改訂 / ⚠ 2026-08-16 撤回】</a></li><li class="lv2"><a href="#d-05">D-05. 副担当の実装範囲は「自分の専門が顔を出す部分」から切り出す（⚠ 2026-08-16 撤回）</a></li><li class="lv2"><a href="#d-06">D-06. ペアプロは3か所・計12時間に限定する</a></li><li class="lv2"><a href="#d-07">D-07. 松田側に技術核を3つ確保する（⚠ 2026-08-16 撤回）</a></li><li class="lv2"><a href="#d-08">D-08. リアルタイム描画は扱わない</a></li><li class="lv2"><a href="#d-09">D-09. Approveコメントに要約を必須化する</a></li><li class="lv2"><a href="#d-10">D-10. 座標系をOpenCV規約に統一する</a></li><li class="lv2"><a href="#d-11">D-11. 座標変換を1ファイルに閉じ込め、機械的に検査する</a></li><li class="lv2"><a href="#d-12">D-12. cameras.json のスキーマ設計（4つの判断）</a></li><li class="lv2"><a href="#d-13">D-13. 単一リポジトリにする</a></li><li class="lv2"><a href="#d-14">D-14. uv を採用する</a></li><li class="lv2"><a href="#d-15">D-15. Python を 3.11 に固定する</a></li><li class="lv2"><a href="#d-16">D-16. .gitattributes を関口が初日に置く</a></li><li class="lv2"><a href="#d-17">D-17. Blender用スクリプトは bpy と numpy のみに依存させる</a></li><li class="lv2"><a href="#d-18">D-18. 自作とライブラリの線引き</a></li><li class="lv2"><a href="#d-19">D-19. 合成データのレンダラを EEVEE にする</a></li><li class="lv2"><a href="#d-20">D-20. マスク出力時は View Transform を Standard にする</a></li><li class="lv2"><a href="#d-21">D-21. ボクセル投影をチャンク分割で実装する</a></li><li class="lv2"><a href="#d-22">D-22. main 一本・squash merge にする</a></li><li class="lv2"><a href="#d-23">D-23. テストを3層に分ける</a></li><li class="lv2"><a href="#d-24">D-24. CI を Ubuntu + Windows で回す</a></li><li class="lv2"><a href="#d-25">D-25. 撤退ラインを先に決め、判定時期を固定する</a></li><li class="lv2"><a href="#d-26">D-26. 却下した提案の一覧（再提案不要）</a></li><li class="lv2"><a href="#d-27">D-27. 既存リポジトリ 4bitcom_HandM をそのまま使う</a></li><li class="lv2"><a href="#d-28">D-28. 分担の比重は固定せず、実績を記録して更新する（2026-08-16 発展的に解消）</a></li><li class="lv2"><a href="#d-29">D-29. 同席作業を既定とし、ペアプロと区別する</a></li><li class="lv2"><a href="#d-30">D-30. テーマを確定する（再検討の分岐を閉じる）</a></li><li class="lv2"><a href="#d-31">D-31. レンダリング設計を追加実験（E8）の候補として受ける</a></li><li class="lv2"><a href="#d-32">D-32. ボクセル 256³ を維持し、実装言語は Python 単一のままとする</a></li><li class="lv2"><a href="#d-33">D-33. 松田の「生成AIを使わない」方針を前提に工程を組む</a></li><li class="lv2"><a href="#d-34">D-34. 松田の回答のうち採用しなかったもの（2026-08-16）</a></li><li class="lv2"><a href="#d-35">D-35. マスク生成方式は関口が候補を提示し、W02 に2人で決める</a></li><li class="lv2"><a href="#d-36">D-36. 担当を「人」ではなく「作業ジャンル」で管理する</a></li><li class="lv2"><a href="#d-37">D-37. 個人の研究志望に紐づく記述を計画書から外す</a></li><li class="lv2"><a href="#d-38">D-38. プロジェクトをパッケージとして扱い、editable install で import recon3d を通す</a></li><li class="lv2"><a href="#d-39">D-39. リポジトリを同期フォルダ（iCloud Drive 等）の下に置かない</a></li><li class="lv2"><a href="#改訂履歴">改訂履歴</a></li></ul></details>
+  <main class="page">
+<h1 id="3d復元プロジェクト--決定記録">3D復元プロジェクト — 決定記録<a class="hash" href="#3d復元プロジェクト--決定記録" aria-label="このセクションへのリンク">#</a></h1>
+<blockquote><p><strong>📖 これは辞書です。頭から読まないでください。</strong>
+<strong>「なんでこう決めたんだっけ？」と思ったときだけ</strong>、その番号（D-xx）を引いてください。
+入口は <strong><a href="README.html">README.md</a></strong> です。</p></blockquote>
+<p><strong>作成</strong>: 2026-08-15
+<strong>位置づけ</strong>: <strong>計画書（<code>plan.md</code>）から「なぜそう決めたか」を分離したもの。</strong></p>
+<hr>
+<h2 id="この文書の使い方">この文書の使い方<a class="hash" href="#この文書の使い方" aria-label="このセクションへのリンク">#</a></h2>
+<p>計画書には<strong>決定した内容だけ</strong>を書く。<strong>その根拠・検討した代替案・却下理由は全てこちらに置く。</strong></p>
+<div class="table-wrap"><table class="md"><thead><tr><th>知りたいこと</th><th>見る場所</th></tr></thead><tbody><tr><td><strong>何が決まっているか</strong>（仕様・手順・日程）</td><td>計画書</td></tr><tr><td><strong>なぜそう決まったか</strong>（根拠・代替案・却下理由）</td><td><strong>本書</strong></td></tr><tr><td>どういう経緯でテーマが選ばれたか</td><td><code>internal/project-handoff.md</code>（引き継ぎ資料）</td></tr></tbody></table></div>
+<p>計画書の各節には <code>→ 根拠: D-07</code> の形で参照が入っている。<strong>その番号を本書で引く。</strong></p>
+<h3 id="決定を覆したいとき">決定を覆したいとき<a class="hash" href="#決定を覆したいとき" aria-label="このセクションへのリンク">#</a></h3>
+<p><strong>本書の該当項目の「根拠」と「却下した代替案」に反論すること。</strong> 根拠を読まずに再提案しない。既に検討して却下した案を蒸し返すのが、この種のプロジェクトで最も時間を浪費する行動なので、それを防ぐために本書がある。</p>
+<h3 id="決定を変えたとき">決定を変えたとき<a class="hash" href="#決定を変えたとき" aria-label="このセクションへのリンク">#</a></h3>
+<p><strong>項目を消さずに、改訂履歴として追記する。</strong> 「かつてこう決めていて、こういう理由で変えた」が残っていること自体が、共同開発の説明材料になる。</p>
+<hr>
+<h2 id="一覧">一覧<a class="hash" href="#一覧" aria-label="このセクションへのリンク">#</a></h2>
+<div class="table-wrap"><table class="md"><thead><tr><th>#</th><th>決定</th><th>計画書</th></tr></thead><tbody><tr><td><strong>データ</strong></td><td></td><td></td></tr><tr><td><a href="#d-01">D-01</a></td><td>Blender合成データで着工する</td><td>§2</td></tr><tr><td><a href="#d-02">D-02</a></td><td>被写体に凹み形状を必須とする</td><td>§2</td></tr><tr><td><strong>協働</strong></td><td></td><td></td></tr><tr><td><a href="#d-03">D-03</a></td><td><del>協働の型を「主担当＋副担当」にする</del> <strong>⚠ 2026-08-16 撤回</strong>（→ <a href="#d-36">D-36</a>）</td><td>§3-2</td></tr><tr><td><a href="#d-04">D-04</a></td><td><del>副担当も一部を実装する</del>（2026-08-15 改訂）<strong>⚠ 2026-08-16 撤回</strong>（→ <a href="#d-36">D-36</a>）</td><td>§3-2</td></tr><tr><td><a href="#d-05">D-05</a></td><td><del>副担当の実装範囲は「自分の専門が顔を出す部分」から切り出す</del> <strong>⚠ 2026-08-16 撤回</strong>（→ <a href="#d-36">D-36</a>）</td><td>§6-1</td></tr><tr><td><a href="#d-06">D-06</a></td><td>ペアプロは3か所・計12時間に限定する</td><td>§3-4</td></tr><tr><td><a href="#d-07">D-07</a></td><td><del>松田側に技術核を3つ確保する</del> <strong>⚠ 2026-08-16 撤回</strong>（→ <a href="#d-36">D-36</a>・<a href="#d-37">D-37</a>）</td><td>§3-4</td></tr><tr><td><a href="#d-08">D-08</a></td><td>リアルタイム描画は扱わない</td><td>§3-8・§7-6</td></tr><tr><td><a href="#d-09">D-09</a></td><td>Approveコメントに要約を必須化する</td><td>§3-2</td></tr><tr><td><strong>設計</strong></td><td></td><td></td></tr><tr><td><a href="#d-10">D-10</a></td><td>座標系をOpenCV規約に統一する</td><td>§4-1</td></tr><tr><td><a href="#d-11">D-11</a></td><td>座標変換を1ファイルに閉じ込め、機械的に検査する</td><td>§4-3</td></tr><tr><td><a href="#d-12">D-12</a></td><td><code>cameras.json</code> のスキーマ設計（4つの判断）</td><td>§5-2</td></tr><tr><td><a href="#d-13">D-13</a></td><td>単一リポジトリにする</td><td>§6</td></tr><tr><td><strong>環境</strong></td><td></td><td></td></tr><tr><td><a href="#d-14">D-14</a></td><td><code>uv</code> を採用する</td><td>§7-1</td></tr><tr><td><a href="#d-15">D-15</a></td><td>Python を 3.11 に固定する</td><td>§7-2</td></tr><tr><td><a href="#d-16">D-16</a></td><td><code>.gitattributes</code> を関口が初日に置く</td><td>§7-3</td></tr><tr><td><a href="#d-17">D-17</a></td><td>Blender用スクリプトは <code>bpy</code> と <code>numpy</code> のみに依存させる</td><td>§7-4</td></tr><tr><td><a href="#d-18">D-18</a></td><td>自作とライブラリの線引き</td><td>§7-5</td></tr><tr><td><a href="#d-19">D-19</a></td><td>合成データのレンダラを EEVEE にする</td><td>§7-6</td></tr><tr><td><a href="#d-20">D-20</a></td><td>マスク出力時は View Transform を Standard にする</td><td>§7-6</td></tr><tr><td><a href="#d-21">D-21</a></td><td>ボクセル投影をチャンク分割で実装する</td><td>§7-6</td></tr><tr><td><strong>運用</strong></td><td></td><td></td></tr><tr><td><a href="#d-22">D-22</a></td><td><code>main</code> 一本・squash merge にする</td><td>§8-1</td></tr><tr><td><a href="#d-23">D-23</a></td><td>テストを3層に分ける</td><td>§9-1</td></tr><tr><td><a href="#d-24">D-24</a></td><td>CI を Ubuntu + Windows で回す</td><td>§9-2</td></tr><tr><td><a href="#d-25">D-25</a></td><td>撤退ラインを先に決め、判定時期を固定する</td><td>§12</td></tr><tr><td><a href="#d-27">D-27</a></td><td>既存リポジトリ <code>4bitcom_HandM</code> をそのまま使う</td><td>§6</td></tr><tr><td><a href="#d-28">D-28</a></td><td>分担の比重は固定せず、実績を記録して更新する</td><td>§3-6</td></tr><tr><td><a href="#d-29">D-29</a></td><td><strong>同席作業を既定とし、ペアプロと区別する</strong></td><td>§3-4</td></tr><tr><td><strong>松田の回答を受けた決定（2026-08-16）</strong></td><td></td><td></td></tr><tr><td><a href="#d-30">D-30</a></td><td><strong>テーマを確定する（再検討の分岐を閉じる）</strong></td><td>§3-5・§7-6</td></tr><tr><td><a href="#d-31">D-31</a></td><td><strong>レンダリング設計を追加実験（E8）の候補として受ける</strong>（採否は W04）</td><td>§11・§16</td></tr><tr><td><a href="#d-32">D-32</a></td><td>ボクセル 256³ を維持し、実装言語は Python 単一のままとする</td><td>§7-6</td></tr><tr><td><a href="#d-33">D-33</a></td><td>松田の「生成AIを使わない」方針を前提に工程を組む</td><td>§7-7</td></tr><tr><td><a href="#d-35">D-35</a></td><td>マスク生成方式は関口が候補を提示し、W02 に2人で決める</td><td>§7-6</td></tr><tr><td><strong>分担の組み替え（2026-08-16）</strong></td><td></td><td></td></tr><tr><td><a href="#d-36">D-36</a></td><td><strong>担当を「人」ではなく「作業ジャンル」で管理する</strong></td><td>§3-2・§3-3</td></tr><tr><td><a href="#d-37">D-37</a></td><td><strong>個人の研究志望に紐づく記述を計画書から外す</strong></td><td>§1・§15</td></tr><tr><td><strong>着工（2026-08-20）</strong></td><td></td><td></td></tr><tr><td><a href="#d-38">D-38</a></td><td><strong>プロジェクトをパッケージとして扱い、editable install で <code>import recon3d</code> を通す</strong></td><td>§6-2・§6-3</td></tr><tr><td><a href="#d-39">D-39</a></td><td><strong>リポジトリを同期フォルダ（iCloud Drive 等）の下に置かない</strong></td><td>§7-8</td></tr><tr><td><strong>却下</strong></td><td></td><td></td></tr><tr><td><a href="#d-26">D-26</a></td><td>却下した提案の一覧（再提案不要）</td><td>§0</td></tr><tr><td><a href="#d-34">D-34</a></td><td>松田の回答のうち採用しなかったもの（2026-08-16）</td><td>§3-8</td></tr></tbody></table></div>
+<hr>
+<h2 id="d-01">D-01. Blender合成データで着工する<a class="hash" href="#d-01" aria-label="このセクションへのリンク">#</a></h2>
+<p><strong>決定</strong>: 実物撮影ではなく、Blenderでレンダリングした画像から着工する。実物は Phase 0 最終週（W03）に1セットだけ通し、本格導入は Phase 3（11月）から。</p>
+<p><strong>日付</strong>: 2026-08-14 ／ <strong>計画書</strong>: §2</p>
+<h3 id="根拠">根拠<a class="hash" href="#根拠" aria-label="このセクションへのリンク">#</a></h3>
+<p><strong>① 正解が全部手に入る。</strong>
+実物を撮影しても、そのマグカップの「正しい3D形状」は誰も知らない。だから復元結果が正しいかを数値で言えない。Blenderなら元の3Dモデルがそのまま真値になり、カメラ位置もシルエットも全て正解が分かる。</p>
+<p>これは評価実験の成立条件そのもの。<strong>真値メッシュが無いと Hausdorff 距離が測れず、Phase 1 の数値目標「Hausdorff距離 ○mm以下」が立てられない。</strong></p>
+<p><strong>② デバッグが劇的に楽になる。</strong>
+誤差ゼロの完璧な入力を入れて答えが合わなければ、原因は100%プログラムのバグ。実物だと「バグなのか撮影が悪いのか」が切り分けられず、Phase 2 が泥沼化する。</p>
+<p><strong>③ 今日から始められる。</strong>
+回転台・背景布・照明の調達を待たない。「8月中着工」と直接噛み合う。さらに<strong>松田の初仕事が1週目に発生する</strong>（引き継ぎ資料 §5 が心配していた「松田が6週間何もできない」問題が解決する）。モック <code>cameras.json</code> を手書きするより自然な形で、しかもBlenderからカメラ行列を書き出せばモックが自動生成される。</p>
+<h3 id="却下した代替案">却下した代替案<a class="hash" href="#却下した代替案" aria-label="このセクションへのリンク">#</a></h3>
+<div class="table-wrap"><table class="md"><thead><tr><th>案</th><th>却下理由</th></tr></thead><tbody><tr><td>実写データのみで進める</td><td>形状の真値が存在せず、Hausdorff距離での評価が不可能になる</td></tr><tr><td>実写と合成を最初から並行</td><td>二系統のデータローダとテストの維持コストが工数を圧迫する</td></tr></tbody></table></div>
+<h3 id="既知のリスクと対策">既知のリスクと対策<a class="hash" href="#既知のリスクと対策" aria-label="このセクションへのリンク">#</a></h3>
+<p><strong>合成画像は綺麗すぎる。</strong> ノイズも影のムラもなく特徴点が理想的に取れるため、実写に移った瞬間に精度が落ちる。</p>
+<p>→ <strong>W03 に実写を1セットだけ通す。</strong> 精度は問わず、「自分たちの被写体で特徴点が何点取れるか」という実測値だけを取る。</p>
+<h3 id="補足引き継ぎ資料の誤りを1つ訂正している">補足：引き継ぎ資料の誤りを1つ訂正している<a class="hash" href="#補足引き継ぎ資料の誤りを1つ訂正している" aria-label="このセクションへのリンク">#</a></h3>
+<p>引き継ぎ資料 §6 の「ターンテーブルの回転角が真値になる」は、<strong>カメラ姿勢の真値であって形状の真値ではない。</strong> この取り違えが、実写のみで評価実験が組めると誤認した原因だった。</p>
+<hr>
+<h2 id="d-02">D-02. 被写体に凹み形状を必須とする<a class="hash" href="#d-02" aria-label="このセクションへのリンク">#</a></h2>
+<p><strong>決定</strong>: 合成データ・実写データとも、<strong>必ず凹んだ形状を含む被写体</strong>を使う。主データはマグカップ相当。</p>
+<p><strong>日付</strong>: 2026-08-14 ／ <strong>計画書</strong>: §2</p>
+<h3 id="根拠-2">根拠<a class="hash" href="#根拠-2" aria-label="このセクションへのリンク">#</a></h3>
+<p>本プロジェクトの最重要実験は「①のみ / ④のみ / 統合」の3条件比較（E5）で、<strong>統合が優れていることを数字で証明する</strong>もの。この実験が成立するには、<strong>①が失敗する条件と④が失敗する条件の両方を含む被写体</strong>が要る。</p>
+<div class="table-wrap"><table class="md"><thead><tr><th>条件</th><th>失敗する手法</th></tr></thead><tbody><tr><td>無地でテクスチャのない面</td><td>① 多視点復元（特徴点が取れず点群に穴が空く）</td></tr><tr><td>凹んだ形状</td><td>④ シルエット復元（<strong>原理的に</strong>削れない）</td></tr></tbody></table></div>
+<p><strong>凸形状だけ（球、Suzanne など）で実験すると、シルエット法が苦手とする凹みが存在しないので、統合の意味が数字に出ない。</strong> つまりプロジェクトの結論そのものが出せなくなる。</p>
+<p><strong>マグカップはこの両方を満たす</strong>（陶器の無地の面＋内側の凹み）。副データとして Stanford Bunny のような凸・高テクスチャのモデルも1つ用意し、①単独の上限性能を見る。</p>
+<h3 id="この決定が崩れる条件">この決定が崩れる条件<a class="hash" href="#この決定が崩れる条件" aria-label="このセクションへのリンク">#</a></h3>
+<p>松田が用意する3Dモデルが凸形状だけだった場合。<strong>W01 の時点で確認する</strong>（確認シート Q18）。</p>
+<hr>
+<h2 id="d-03">D-03. 協働の型を「主担当＋副担当」にする（⚠ 2026-08-16 撤回）<a class="hash" href="#d-03" aria-label="このセクションへのリンク">#</a></h2>
+<blockquote><p><strong>⚠ この決定は <a href="#d-36">D-36</a> で撤回された。</strong> 現在は担当を人に固定せず、<strong>作業ジャンル G1〜G9</strong> で管理する。
+<strong>以下は撤回前の記録。</strong> 工数の考え方（315h・デバッグ時間の扱い）は現在も有効。</p></blockquote>
+<p><strong>決定</strong>: 全てのコードに主担当と副担当を置く。詳しいほうが主担当として設計を握る。</p>
+<p><strong>日付</strong>: 2026-08-14 ／ <strong>計画書</strong>: §3-2</p>
+<h3 id="根拠-3">根拠<a class="hash" href="#根拠-3" aria-label="このセクションへのリンク">#</a></h3>
+<p><strong>前提として、工数は既に飽和している。</strong> 実装の積み上げが315時間、1人あたり週8.75時間 × 18週。これは資料1 §1 の想定（週6〜10時間）のほぼ上限。</p>
+<p>この制約から、<strong>「全てのコードを2人で書く」という運用は採れない。</strong> 同じコードを2人が書けば throughput は半分（630h・週17.5h）になり、確実に破綻する。</p>
+<p>だから「共有するかしないか」ではなく「<strong>どこを、どの濃さで共有するか</strong>」を設計する。</p>
+<p><strong>副次的な利点</strong>: 「相互レビューで互いの専門を理解した」を、PR履歴という<strong>証拠付き</strong>で就活で語れる。</p>
+<h3 id="補足デバッグ時間が見積もりに入っていない">補足：デバッグ時間が見積もりに入っていない<a class="hash" href="#補足デバッグ時間が見積もりに入っていない" aria-label="このセクションへのリンク">#</a></h3>
+<p>315時間の内訳にデバッグ時間は含まれていない。<strong>数値計算のデバッグは実装の1〜2倍かかるのが普通</strong>であり、実質は450〜500h規模になりうる。超過分は資料1 §1 が許容する「余裕があれば5〜6か月」（〜2027年2月）で吸収し、それでも足りなければ D-25 の撤退ラインで判定する。</p>
+<hr>
+<h2 id="d-04">D-04. 副担当も一部を実装する【2026-08-15 改訂 / ⚠ 2026-08-16 撤回】<a class="hash" href="#d-04" aria-label="このセクションへのリンク">#</a></h2>
+<blockquote><p><strong>⚠ <a href="#d-36">D-36</a> で撤回。</strong> 「副担当の実装比率は全体平均3割まで」という計器も<strong>廃止した</strong>（担当を人に固定しないため、測る対象が無くなった）。
+<strong>代わりに <code>progress.md</code> はジャンル別の実働時間を記録する。</strong>
+<strong>以下は撤回前の記録。</strong> 「事前の制約ではなく事後の計器にする」という考え方自体は、ジャンル制でも踏襲している。</p></blockquote>
+<p><strong>決定</strong>: 副担当は「レビューのみ」ではなく、<strong>主担当が切り出した部分を実装する。</strong> 主担当と副担当の違いは「書くか読むか」ではなく「<strong>設計を決めるか、決まった設計の中で書くか</strong>」。</p>
+<p><strong>日付</strong>: 2026-08-15（D-03 の改訂） ／ <strong>計画書</strong>: §3-2・§3-6</p>
+<h3 id="改訂の経緯">改訂の経緯<a class="hash" href="#改訂の経緯" aria-label="このセクションへのリンク">#</a></h3>
+<p><strong>初版では副担当を「PRをレビューする。実装はしない」と定義していた。これは実態と合わないため改めた。</strong></p>
+<p>実際に想定している協働の形は「<strong>詳しい人が主軸となって一緒に作る</strong>」であって、片方が完全に手を動かさない形ではない。初版の書き方は、工数の制約（D-03）を優先するあまり、実際にやりたいことを取り違えていた。</p>
+<h3 id="根拠工数との両立">根拠：工数との両立<a class="hash" href="#根拠工数との両立" aria-label="このセクションへのリンク">#</a></h3>
+<div class="table-wrap"><table class="md"><thead><tr><th>運用</th><th>総工数</th><th>1人あたり週</th><th>可否</th></tr></thead><tbody><tr><td>全部を2人で共同実装</td><td>630h</td><td>17.5h</td><td>✕ 破綻する</td></tr><tr><td>全部を1人で書き、相手はレビューのみ（初版）</td><td>約350h</td><td>9.7h</td><td>○ だが知識が実装に定着しない</td></tr><tr><td><strong>主担当が中核＋副担当が一部を実装</strong>（改訂後）</td><td><strong>約350h</strong></td><td><strong>約9.7h</strong></td><td><strong>◎ 採用</strong></td></tr></tbody></table></div>
+<p><strong>見積もりの根拠</strong>: 各モジュールの <strong>1〜2割</strong>を副担当が実装し、専門外ゆえに主担当の 1.5〜2倍の時間が掛かると置くと、</p>
+<pre><code>0.85 + 0.15 × 1.7 ≒ 1.1  →  総工数は約1割増
+315h → 約350h、週8.75h → 週9.7h</code></pre>
+<p>資料1 §1 の想定（週6〜10時間）には収まるが、<strong>余裕は削られている。</strong></p>
+<h3 id="歯止め2026-08-15-修正モジュール単位--全体平均">歯止め【2026-08-15 修正：モジュール単位 → 全体平均】<a class="hash" href="#歯止め2026-08-15-修正モジュール単位--全体平均" aria-label="このセクションへのリンク">#</a></h3>
+<p><strong>副担当の実装比率が3割を超えると週10時間を突破して破綻する。</strong> この数字は上の計算から出ている。</p>
+<p><strong>ただし「各モジュールで3割まで」という当初の書き方は誤りだった。</strong> 比重は内容によって大きく変わるため。</p>
+<div class="table-wrap"><table class="md"><thead><tr><th>状況</th><th>実際の比重</th></tr></thead><tbody><tr><td>可視化が主体の週（バンドル調整のヤコビアン可視化など）</td><td>副担当が半分近く書くことがある</td></tr><tr><td>専門的すぎて手が出せない週（Schur補元の導出と実装）</td><td>副担当はレビューのみ＝0割</td></tr></tbody></table></div>
+<p><strong>モジュールごとに3割で縛ると、この自然な変動を潰してしまう。</strong> 歯止めとして必要なのは総量の管理だけなので、次のように改める。</p>
+<blockquote><p><strong>制約は「全体平均で3割まで」。週ごと・モジュールごとの変動は許容する。</strong></p></blockquote>
+<p>判定は累積で行う。実績は <code>progress.md</code> に週次で記録し、<strong>累積の平均</strong>が3割を超えそうなら次週で調整する。それでも戻らない場合はスコープを削る（D-25 の撤退ライン）。</p>
+<p><strong>この修正で工数の結論は変わらない。</strong> 平均が3割に収まっていれば、上の <code>0.85 + 0.15×1.7 ≒ 1.1</code> の試算はそのまま成立する（試算は元々「各モジュールの1〜2割」という平均値で置いていたため）。</p>
+<h3 id="2026-08-15-再修正3割は事前の制約ではなく事後の計器">【2026-08-15 再修正】3割は「事前の制約」ではなく「事後の計器」<a class="hash" href="#2026-08-15-再修正3割は事前の制約ではなく事後の計器" aria-label="このセクションへのリンク">#</a></h3>
+<p><strong>関口の認識</strong>: 分担は実際にやってみないと分からない。平日はほぼ毎日会えるため、その場の会話で分担が決まることが多くなる。</p>
+<p>これを受けて、3割の位置づけを変える。</p>
+<div class="table-wrap"><table class="md"><thead><tr><th></th><th>誤った運用</th><th>正しい運用</th></tr></thead><tbody><tr><td>何のための数字か</td><td><strong>事前に守る上限。</strong> 超えないように作業を割り振る</td><td><strong>事後に気づくための計器。</strong> 記録して振り返り、大きく超えていたら手を打つ</td></tr><tr><td>超えたときにすること</td><td>副担当の作業を減らす</td><td><strong>スコープか期間を見直す</strong>（D-25）</td></tr></tbody></table></div>
+<p><strong>なぜ事前の制約にしてはいけないか。</strong></p>
+<p>3割という数字は、<strong>工数が破綻しないための条件</strong>であって、<strong>良い分担の条件ではない。</strong> これを事前の制約として運用すると、「本当はここを一緒にやったほうがいいのに、比率が超えるから止める」という判断が起きる。それは目的と手段が逆転している。</p>
+<p><strong>そもそも着工前に正しい比率は分からない。</strong> 互いの得意・不得意の実像も、各モジュールの実際の難しさも、やってみるまで確定しない。<strong>事前に決めた数字を守ること自体には価値がない。</strong></p>
+<p>したがって：</p>
+<blockquote><p><strong>上限は設けない。記録して、累積平均が3割を大きく超えていたら、そのとき初めてスコープか期間を見直す。</strong></p></blockquote>
+<p>工数の試算（<code>≒1.1</code>）は<strong>予測</strong>であって<strong>目標</strong>ではない。予測が外れたら、予測のほうを更新する。</p>
+<h3 id="副次的な利点">副次的な利点<a class="hash" href="#副次的な利点" aria-label="このセクションへのリンク">#</a></h3>
+<p><strong>Approveコメント規約（D-09）が書きやすくなる。</strong> 自分が触った部分が必ずPRの中にあるため、「このPRが何をしているか」を自分の言葉で書く際の足がかりになる。</p>
+<hr>
+<h2 id="d-05">D-05. 副担当の実装範囲は「自分の専門が顔を出す部分」から切り出す（⚠ 2026-08-16 撤回）<a class="hash" href="#d-05" aria-label="このセクションへのリンク">#</a></h2>
+<blockquote><p><strong>⚠ <a href="#d-36">D-36</a> で撤回。</strong> ただし<strong>「自分の得意が顔を出すところから取る」という発想は、ジャンルの選び方としてそのまま生きている</strong>（§3-2 の「やりたい人が取る」）。
+<strong>以下は撤回前の記録。</strong></p></blockquote>
+<p><strong>決定</strong>: 副担当が実装する部分は、<strong>副担当自身の専門が活きる箇所</strong>を選ぶ。具体的な割り当ては計画書 §3-6 の担当表に持つ。</p>
+<p><strong>日付</strong>: 2026-08-15 ／ <strong>計画書</strong>: §3-6</p>
+<h3 id="根拠-4">根拠<a class="hash" href="#根拠-4" aria-label="このセクションへのリンク">#</a></h3>
+<p>適当に切り出すと<strong>雑用の押し付け</strong>になる。原則を置くことで3つ同時に満たせる。</p>
+<ol><li>副担当が短時間で戦力になる（学習コストが低い）</li><li>そのモジュールの理解が、実装を通じて入る</li><li><strong>成果物として「自分がやった」と言える</strong>（D-07 の趣旨と一致する）</li></ol>
+<h3 id="なぜ可視化系が松田に寄っているのか">なぜ可視化系が松田に寄っているのか<a class="hash" href="#なぜ可視化系が松田に寄っているのか" aria-label="このセクションへのリンク">#</a></h3>
+<p><strong>意図的にそうしている。</strong> 関口のモジュール（DLT・三角測量・バンドル調整・CG法）は「<strong>数字は出るが目に見えない</strong>」ものばかりで、絵が付かないとデバッグも成果発表も成立しない。</p>
+<p>つまり可視化は雑用ではなく、<strong>デバッグと成果発表の生命線</strong>。そこに松田の専門が最短で効く。</p>
+<p>具体例：</p>
+<ul><li>再投影の可視化 → <strong>再投影誤差が「見える」ようになるのでデバッグの主力になる</strong></li><li>ヤコビアンの疎パターンの可視化 → 「疎とはどういう形か」が図で分かる。説明素材としても効く</li><li>残差の収束グラフ → E4実験の図がそのまま作れる</li></ul>
+<p>逆に関口は松田のモジュールで、<strong>メッシュ簡略化の二次誤差行列</strong>（まさに線形代数）や<strong>テクスチャの可視性判定</strong>（射影幾何）のような、自分の専門が素で出る部分を実装する。</p>
+<h3 id="運用上の注意衝突の回避">運用上の注意（衝突の回避）<a class="hash" href="#運用上の注意衝突の回避" aria-label="このセクションへのリンク">#</a></h3>
+<p>モジュール境界＝担当境界にしてある（D-13）ので日常的な衝突は起きないが、副担当が相手のモジュール内を触る以上、規律が要る。</p>
+<blockquote><p><strong>副担当が実装する部分は、主担当が「どのファイルの、どの関数か」を先に切り出してから着手する。</strong></p></blockquote>
+<p>§3-6 の割り当ての多くは<strong>独立したファイルに切り出せる</strong>（可視化関数、テスト、評価指標の計算）。切り出せない場合は主担当のブランチに副担当がコミットを積み、<code>main</code> 宛のPRは主担当が1本にまとめる（レビューの責任を明確にするため）。</p>
+<h3 id="固定ではない">固定ではない<a class="hash" href="#固定ではない" aria-label="このセクションへのリンク">#</a></h3>
+<p>「これは自分がやりたい」があれば入れ替える。週1回の対面Issue切り（計画書 §8-3）の場で調整する。</p>
+<hr>
+<h2 id="d-06">D-06. ペアプロは3か所・計12時間に限定する<a class="hash" href="#d-06" aria-label="このセクションへのリンク">#</a></h2>
+<p><strong>決定</strong>: 対面・同時刻・同じ画面で2人が書くのは、<code>cameras.json</code> I/Oと座標系（W01）、ボクセル彫刻の行列化（W12）、離散ラプラシアン <code>L</code>（W14）の3か所のみ。計12時間。</p>
+<p><strong>日付</strong>: 2026-08-14 ／ <strong>計画書</strong>: §3-3</p>
+<h3 id="根拠-5">根拠<a class="hash" href="#根拠-5" aria-label="このセクションへのリンク">#</a></h3>
+<p>D-04 で共同作業に3段階の濃さを置いた。</p>
+<div class="table-wrap"><table class="md"><thead><tr><th>濃さ</th><th>形</th><th>コスト</th></tr></thead><tbody><tr><td><strong>強</strong>（ペアプロ）</td><td>対面・同時刻・同じ画面</td><td><strong>2倍</strong></td></tr><tr><td>中（分担実装）</td><td>各自の時間で書き、PRは一緒に見る</td><td>1.1倍</td></tr><tr><td>弱（レビューのみ）</td><td></td><td>1.05倍</td></tr></tbody></table></div>
+<p><strong>「強」は速度を半分にする。</strong> だから総予算の約4%（12時間）に抑える。<strong>これ以上は増やせない。</strong></p>
+<h3 id="3か所を選んだ理由">3か所を選んだ理由<a class="hash" href="#3か所を選んだ理由" aria-label="このセクションへのリンク">#</a></h3>
+<div class="table-wrap"><table class="md"><thead><tr><th>箇所</th><th>理由</th></tr></thead><tbody><tr><td><code>cameras.json</code> I/O と座標系変換</td><td><strong>事故が起きると全工程が汚染される。</strong> 引き継ぎ資料 §10-5 が「事故が起きやすい」と警告した箇所。D-11 参照</td></tr><tr><td>ボクセル彫刻の行列化</td><td>カメラ幾何（関口）とボクセル/画像座標（松田）が噛み合う箇所。高速化ネタでもある</td></tr><tr><td>離散ラプラシアン <code>L</code> の構成と求解</td><td><strong>幾何と解析の唯一の交点。</strong> 共同開発としての意味がここに集約される。D-07 の核3</td></tr></tbody></table></div>
+<h3 id="動かせないもの">動かせないもの<a class="hash" href="#動かせないもの" aria-label="このセクションへのリンク">#</a></h3>
+<p><strong>W01 のペアプロだけは時期をずらせない。</strong> ここが決まらないと2人とも着工できない（インターフェースが確定しないため）。</p>
+<hr>
+<h2 id="d-07">D-07. 松田側に技術核を3つ確保する（⚠ 2026-08-16 撤回）<a class="hash" href="#d-07" aria-label="このセクションへのリンク">#</a></h2>
+<blockquote><p><strong>⚠ <a href="#d-37">D-37</a> で撤回。</strong> 個人の研究志望に紐づく記述を計画書から外したため。
+<strong>技術的な中身（合成データ生成器・メッシュ処理・離散ラプラシアン）は G2 / G4 / ペアプロ#3 としてそのまま残っている。</strong> 落としたのは「誰の研究のためにやるか」という動機の部分だけ。
+<strong>注意：これは松田が Q-a で「納得できる」と同意した枠組みである。次に会うときに口頭で伝えること</strong>（<a href="#d-37">D-37</a>）。
+<strong>以下は撤回前の記録。</strong></p></blockquote>
+<p><strong>決定</strong>: 松田側に「合成データ生成器」「メッシュ処理」「離散ラプラシアン <code>L</code> の構成」を技術核として明示的に確保する。</p>
+<p><strong>日付</strong>: 2026-08-14 ／ <strong>計画書</strong>: §3-4</p>
+<h3 id="根拠-6">根拠<a class="hash" href="#根拠-6" aria-label="このセクションへのリンク">#</a></h3>
+<p><strong>引き継ぎ資料 §5 の役割分担では、松田が「作業の受け皿」になっていて、3DCG研究への助走になっていなかった。</strong></p>
+<p>関口側は「悪条件最小二乗＝志望研究室のテーマ」に直結する計算核を4つ確保していたのに対し、松田側にそれに相当するものが無かった。<strong>片方だけが研究への助走を得る構造</strong>であり、共同開発として不適切。松田が3DCG研究室志望であることが判明した時点で、対称性を持たせる組み替えが必要になった。</p>
+<h3 id="核3が最も重要である理由">核3が最も重要である理由<a class="hash" href="#核3が最も重要である理由" aria-label="このセクションへのリンク">#</a></h3>
+<div class="table-wrap"><table class="md"><thead><tr><th>担当</th><th>内容</th><th>学問的位置</th></tr></thead><tbody><tr><td>松田</td><td>行列 <code>L</code> の構成。一様重み vs cotan重みの実装と、形状の歪みへの影響</td><td>離散微分幾何</td></tr><tr><td>関口</td><td>出来上がった疎対称行列を CG法＋前処理で解く。反復回数・収束の測定</td><td>数値線形代数</td></tr></tbody></table></div>
+<p><strong>ここが2人の専門が実際に交わる唯一の点。</strong>「担当を分けて2つ作った」ではなく「<strong>同じ数式を、幾何側と解析側から2人で作った</strong>」と言える箇所が1つあることが、共同開発としての説明を根本的に強くする。就活でも研究室訪問でも、この1点があるかないかで話の強さが変わる。</p>
+<h3 id="引き継ぎ資料からの変更点">引き継ぎ資料からの変更点<a class="hash" href="#引き継ぎ資料からの変更点" aria-label="このセクションへのリンク">#</a></h3>
+<p>引き継ぎ資料 §4-4 ではメッシュ平滑化を関口の単独担当にしていたが、<strong>配分として逆だった。</strong> 離散ラプラシアン作用素は離散微分幾何の中心的な道具であり、松田の専門と重なる。→ 共同担当に変更。</p>
+<hr>
+<h2 id="d-08">D-08. リアルタイム描画は扱わない<a class="hash" href="#d-08" aria-label="このセクションへのリンク">#</a></h2>
+<p><strong>決定</strong>: 本プロジェクトは静止画の一括処理とし、リアルタイム描画は主軸に置かない。松田の旨味は「ジオメトリ処理とレンダリング」に置く。</p>
+<p><strong>日付</strong>: 2026-08-14 ／ <strong>計画書</strong>: §3-5</p>
+<h3 id="根拠-7">根拠<a class="hash" href="#根拠-7" aria-label="このセクションへのリンク">#</a></h3>
+<p>松田の志向は「リアルタイム・Unity・GUI寄り」だが、<strong>本テーマは静止画の一括処理であり、リアルタイム描画が本質的に登場しない。</strong> Unityは引き継ぎ資料 §12 で接続コスト（数値計算部分と言語をまたぐ）を理由に不採用と結論済み。</p>
+<p><strong>3DCG研究室の評価軸としては、ジオメトリ処理のほうがむしろ王道である。</strong> したがって松田にとって不利益な配置ではない。</p>
+<h3 id="逃げ道">逃げ道<a class="hash" href="#逃げ道" aria-label="このセクションへのリンク">#</a></h3>
+<p>リアルタイム描画をどうしても成果物に入れたい場合の受け皿として、<strong>ボクセル彫刻の進行過程を可視化するビューア</strong>（削られていく様子をリアルタイム表示）を L4 項目として残す。デモ動画として最も見栄えがする部分でもある。</p>
+<p><strong>ただし D-19 の環境制約（内蔵GPU）により、実現性は控えめに見積もる。</strong></p>
+<h3 id="この決定が崩れる条件---閉じた2026-08-16">この決定が崩れる条件 → <strong>✅ 閉じた（2026-08-16）</strong><a class="hash" href="#この決定が崩れる条件---閉じた2026-08-16" aria-label="このセクションへのリンク">#</a></h3>
+<p><strong>松田が「リアルタイム描画を主軸にしたい」と答えた場合、テーマ自体を再検討する。</strong> 第二候補として「物理シミュレーション × Unity」を残してある（引き継ぎ資料 §12）。</p>
+<p><strong>着工前なら乗り換えコストはゼロ、着工後だと全部無駄になる。</strong> だから確認シート Q2 を最優先の設問に置いている。</p>
+<p><strong>2026-08-15 追記</strong>: 松田のBlenderに VRM / MMD / Rokoko（モーションキャプチャのライブ連携）が入っていることが判明し、<strong>キャラクター／アニメーション寄りである可能性が上がった。</strong> 確認シート Q2 と Q15（志望分野）を「着工前に必ず確認」へ格上げした。ただしアドオンが入っていることは、使い込んだことも研究したいことも意味しない。<strong>推測であり、決めつけない。</strong></p>
+<p><strong>2026-08-16 追記（決着）</strong>: 松田は Q-c に<strong>「了承する。ジオメトリ処理で問題ない」</strong>と回答し、志望分野は<strong>東京都市大学・画像工学研究室（画像の三次元化ほか）</strong>と判明した。<strong>アドオンからの推測は外れていた。</strong> 「決めつけない」としておいたのは正しかった。<strong>この決定が崩れる条件は満たされず、テーマ再検討の分岐は閉じる</strong>（→ <a href="#d-30">D-30</a>）。</p>
+<hr>
+<h2 id="d-09">D-09. Approveコメントに要約を必須化する<a class="hash" href="#d-09" aria-label="このセクションへのリンク">#</a></h2>
+<p><strong>決定</strong>: PRのApproveコメントには「<strong>このPRが何をしているか、自分の言葉で1〜3行</strong>」を必ず書く。</p>
+<p><strong>日付</strong>: 2026-08-14 ／ <strong>計画書</strong>: §3-2・§8-2</p>
+<h3 id="根拠-8">根拠<a class="hash" href="#根拠-8" aria-label="このセクションへのリンク">#</a></h3>
+<p><strong>形式的な「LGTM」だけの承認を、構造的に禁止するため。</strong></p>
+<p>これが書けないなら、まだ理解していないということ。書けるまで質問する。対面で会えるので、その場で聞けばよい。</p>
+<p><strong>運用コストはほぼゼロで、効果は2つ。</strong></p>
+<ol><li>副担当が「何をやっているか説明できる」状態を担保する（D-03 の目的そのもの）</li><li><strong>就活で使える。</strong> PR履歴という証拠付きで「相互レビューで互いの専門を理解した」と言える</li></ol>
+<h3 id="関連する運用">関連する運用<a class="hash" href="#関連する運用" aria-label="このセクションへのリンク">#</a></h3>
+<p><strong>対面で決めたことは、その場でIssueかPRにコメントとして残す。</strong> GitHub上に議論が残らないと、就活で見せられる材料が減る。口頭で全部済ませると、リポジトリには結果のコードしか残らない。</p>
+<hr>
+<h2 id="d-10">D-10. 座標系をOpenCV規約に統一する<a class="hash" href="#d-10" aria-label="このセクションへのリンク">#</a></h2>
+<p><strong>決定</strong>: カメラ座標系・画像座標系ともOpenCV規約。外部パラメータは world → camera。世界座標系のみ「+Z 上」でBlenderと揃える。</p>
+<p><strong>日付</strong>: 2026-08-14 ／ <strong>計画書</strong>: §4-1</p>
+<h3 id="根拠-9">根拠<a class="hash" href="#根拠-9" aria-label="このセクションへのリンク">#</a></h3>
+<p><strong>OpenCVを選ぶ理由</strong>: 引き継ぎ資料 §8 で「OpenCVの <code>solvePnP</code> / <code>triangulatePoints</code> を回帰テストのリファレンスとして残す」と決まっている。<strong>リファレンスと規約がずれていると、答え合わせのたびに変換が挟まりデバッグが成立しない。</strong></p>
+<p><strong>世界座標だけ「+Z 上」にする理由</strong>: Blenderも +Z 上の右手系。揃えることで<strong>世界座標の変換が不要</strong>になり、変換が必要なのはカメラ座標と画像座標だけになる。変換の箇所が減れば事故も減る。</p>
+<hr>
+<h2 id="d-11">D-11. 座標変換を1ファイルに閉じ込め、機械的に検査する<a class="hash" href="#d-11" aria-label="このセクションへのリンク">#</a></h2>
+<p><strong>決定</strong>: <code>src/recon3d/io/coords.py</code> の中の関数以外では座標変換を一切書かない。テストで自動検出する。</p>
+<p><strong>日付</strong>: 2026-08-14 ／ <strong>計画書</strong>: §4-3</p>
+<h3 id="根拠-10">根拠<a class="hash" href="#根拠-10" aria-label="このセクションへのリンク">#</a></h3>
+<p><strong>規約を決めることより、規約を破れない構造を作ることが本質。</strong></p>
+<p>想定している事故の形はこれ：</p>
+<blockquote><p><code>diag(1,-1,-1)</code> や <code>H - 1 - v</code> という4行の変換が10か所にコピーされ、<strong>どこか1か所で符号を間違えて数週間溶ける。</strong></p></blockquote>
+<p>これは3D復元で最も頻度が高く、しかも<strong>それらしい結果が出てしまう</strong>ため発見が遅れる種類のバグ。人間の注意力に頼る対策は失敗する前提で設計する。</p>
+<p>→ <code>tests/test_conventions.py</code> で <code>src/</code> 全体を走査し、<code>coords.py</code> 以外に変換のリテラルが現れたら<strong>テストを落とす。</strong></p>
+<p><strong>ペアプロ対象にした理由</strong>（D-06）: 2人で一度作れば、以降は互いに違反を指摘できるようになる。</p>
+<h3 id="関連する検証">関連する検証<a class="hash" href="#関連する検証" aria-label="このセクションへのリンク">#</a></h3>
+<p><code>cameras.json</code> の読み込み時に <strong><code>det(R) ≈ +1</code></strong> を検証する（D-12）。座標変換の符号を間違えた場合、ほぼ確実にここに現れる（<code>−1</code> なら鏡映）。</p>
+<hr>
+<h2 id="d-12">D-12. <code>cameras.json</code> のスキーマ設計（4つの判断）<a class="hash" href="#d-12" aria-label="このセクションへのリンク">#</a></h2>
+<p><strong>決定</strong>: スキーマは計画書 §5-1 のとおり。<code>convention</code> ブロック、<code>extrinsic_form</code>、<code>source</code>、<code>mask</code> パスを持つ。</p>
+<p><strong>日付</strong>: 2026-08-14 ／ <strong>計画書</strong>: §5</p>
+<h3 id="判断①-convention-ブロックをファイル自身に埋め込む">判断① <code>convention</code> ブロックをファイル自身に埋め込む<a class="hash" href="#判断①-convention-ブロックをファイル自身に埋め込む" aria-label="このセクションへのリンク">#</a></h3>
+<p>規約はドキュメントにも書くが、<strong>データファイル自身にも書く。</strong> 半年後に <code>data/</code> から出てきたJSONが、どの規約で書かれたか<strong>単体で分かる</strong>状態にするため。読み込み時に検証し、想定と違えば例外を投げる。</p>
+<h3 id="判断②-extrinsic_form-を明示する">判断② <code>extrinsic_form</code> を明示する<a class="hash" href="#判断②-extrinsic_form-を明示する" aria-label="このセクションへのリンク">#</a></h3>
+<p><code>X_cam = R·X_world + t</code>（world→camera）なのか、その逆なのかを文字列で持つ。</p>
+<p><strong>ここが曖昧だと <code>R</code> と <code>Rᵀ</code> の取り違えが起き、しかもそれらしい結果が出てしまうため発見が遅れる。3D復元で最も頻度の高い事故。</strong></p>
+<h3 id="判断③-source-フィールドが実験設計の骨格になる">判断③ <code>source</code> フィールドが実験設計の骨格になる<a class="hash" href="#判断③-source-フィールドが実験設計の骨格になる" aria-label="このセクションへのリンク">#</a></h3>
+<p>取りうる値：<code>"turntable_gt"</code> / <code>"dlt"</code> / <code>"bundle_adjusted"</code></p>
+<p>引き継ぎ資料 §5 の「回転台の真値 vs ①の推定値」の切り替えが、<strong>この1フィールドだけで表現できる。</strong> 同じ形式のまま中身を差し替えれば、<strong>下流のコードを一切変更せずに条件を切り替えられる。</strong></p>
+<p><strong>これが撤退ライン L2 への切り替えコストをゼロにしている</strong>（D-25）。バンドル調整が収束しなくても、<code>source</code> を <code>turntable_gt</code> に固定すればコード変更なしでVisual Hullに全リソースを振れる。</p>
+<h3 id="判断④-mask-のパスを同じファイルに入れる">判断④ <code>mask</code> のパスを同じファイルに入れる<a class="hash" href="#判断④-mask-のパスを同じファイルに入れる" aria-label="このセクションへのリンク">#</a></h3>
+<p>引き継ぎ資料 §5 の「④が待っているのは <code>cameras.json</code> という1ファイルだけ」を文字通り実現する。ボクセル彫刻は <code>cameras.json</code> を読めば、画像もマスクもカメラ行列も全部たどれる。</p>
+<h3 id="補足pydantic-を使わない理由">補足：pydantic を使わない理由<a class="hash" href="#補足pydantic-を使わない理由" aria-label="このセクションへのリンク">#</a></h3>
+<p><code>dataclass</code> ベースで実装する。<strong>D-17（Blender用スクリプトは bpy + numpy のみ）の制約のため。</strong> <code>cameras.json</code> の書き出しに <code>io/cameras.py</code> を再利用したいが、そのためには <code>io/cameras.py</code> 自体も追加依存を持てない。</p>
+<hr>
+<h2 id="d-13">D-13. 単一リポジトリにする<a class="hash" href="#d-13" aria-label="このセクションへのリンク">#</a></h2>
+<p><strong>決定</strong>: リポジトリは1つ。モジュール境界＝担当境界に引く。</p>
+<p><strong>日付</strong>: 2026-08-14 ／ <strong>計画書</strong>: §6</p>
+<h3 id="根拠-11">根拠<a class="hash" href="#根拠-11" aria-label="このセクションへのリンク">#</a></h3>
+<p><strong>2つに分けると <code>cameras.json</code> の仕様変更のたびに2リポジトリ同時PRが必要になり、Git経験の浅い松田には負担が大きすぎる。</strong></p>
+<h3 id="モジュール境界の引き方">モジュール境界の引き方<a class="hash" href="#モジュール境界の引き方" aria-label="このセクションへのリンク">#</a></h3>
+<p>関口が <code>geometry/</code> と <code>solvers/</code>、松田が <code>vision/</code> と <code>mesh/</code> を主に触る形にしてあるため、<strong>日常的に同じ行を編集することがない。</strong></p>
+<p><strong><code>io/</code> だけが共有境界。</strong> ペアプロ3か所のうち2か所（<code>coords.py</code>、<code>cameras.py</code>）がここに集中しているのは偶然ではなく、<strong>共有部分を最小の1ディレクトリに閉じ込めた結果</strong>である。</p>
+<p><strong><code>mesh/smooth.py</code> が <code>solvers/cg.py</code> を呼ぶ</strong>のが、2人のコードが実際に接続する唯一の点（D-07 核3）。松田が <code>laplacian.py</code> で作った疎行列を、関口のCG法が解く。</p>
+<hr>
+<h2 id="d-14">D-14. <code>uv</code> を採用する<a class="hash" href="#d-14" aria-label="このセクションへのリンク">#</a></h2>
+<p><strong>決定</strong>: 環境管理は <code>uv</code>。<code>uv.lock</code> は必ずコミットする。</p>
+<p><strong>日付</strong>: 2026-08-14 ／ <strong>計画書</strong>: §7-1</p>
+<h3 id="根拠-12">根拠<a class="hash" href="#根拠-12" aria-label="このセクションへのリンク">#</a></h3>
+<p><code>uv sync</code> 一発で <code>uv.lock</code> から同一環境が再現される。<strong><code>venv</code> + <code>requirements.txt</code> と違い推移的依存まで完全に固定される</strong>ため、3台（Ubuntu / Mac / Windows）の環境差を潰せる。</p>
+<p><strong><code>uv.lock</code> をコミットすることが、環境同一性の根拠になる。</strong></p>
+<hr>
+<h2 id="d-15">D-15. Python を 3.11 に固定する<a class="hash" href="#d-15" aria-label="このセクションへのリンク">#</a></h2>
+<p><strong>決定</strong>: Python 3.11 系（3.11.13）に固定。</p>
+<p><strong>日付</strong>: 2026-08-14 仮決め → <strong>2026-08-15 確定</strong> ／ <strong>計画書</strong>: §7-2</p>
+<h3 id="根拠-13">根拠<a class="hash" href="#根拠-13" aria-label="このセクションへのリンク">#</a></h3>
+<p><strong>Blenderの内蔵Pythonとずれると、Blender内で自作モジュールを import できない。</strong></p>
+<h3 id="確定までの経緯">確定までの経緯<a class="hash" href="#確定までの経緯" aria-label="このセクションへのリンク">#</a></h3>
+<div class="table-wrap"><table class="md"><thead><tr><th>時点</th><th>状態</th></tr></thead><tbody><tr><td>2026-08-14</td><td>「Blender <strong>4.2 LTS</strong> が 3.11 だから」を根拠に 3.11 を<strong>仮決め</strong></td></tr><tr><td>2026-08-15</td><td>松田の実機を確認 → <strong>Blender 5.0.1 / 内蔵Python 3.11.13</strong>。想定と違うバージョンだったが、<strong>内蔵Pythonは同じ 3.11 系だったため仮決めした値がそのまま確定値になった</strong></td></tr></tbody></table></div>
+<p>出典: <code>blender_system/system-info.txt</code>（松田提出）</p>
+<h3 id="運用上の注意">運用上の注意<a class="hash" href="#運用上の注意" aria-label="このセクションへのリンク">#</a></h3>
+<p><strong>Blender 5.0.x は LTS ではない。</strong> 内蔵Pythonのバージョンは Blender のバージョンに紐づくため、松田が Blender を更新するとここが動く。</p>
+<p>→ <strong>開発期間中（〜2026-12）は Blender を 5.0.x に固定する。</strong> 更新が必要になった場合は、更新前に相談する。</p>
+<hr>
+<h2 id="d-16">D-16. <code>.gitattributes</code> を関口が初日に置く<a class="hash" href="#d-16" aria-label="このセクションへのリンク">#</a></h2>
+<p><strong>決定</strong>: <code>* text=auto eol=lf</code> を含む <code>.gitattributes</code> を、<strong>松田が clone する前に</strong> 関口が push する。</p>
+<p><strong>日付</strong>: 2026-08-14 ／ <strong>計画書</strong>: §7-3</p>
+<h3 id="根拠-14">根拠<a class="hash" href="#根拠-14" aria-label="このセクションへのリンク">#</a></h3>
+<p><strong>これが無いと、松田のWindowsでチェックアウトした瞬間に全ファイルがCRLFになり、以後すべてのPRが「全行変更」として表示されてレビュー不能になる。</strong></p>
+<p><strong>Git経験の浅い松田には自力で気づけない罠。</strong> かつ、後から直すのは面倒（全ファイルの再正規化が必要）。だから<strong>関口側が初日に潰しておく項目</strong>として明示する。</p>
+<p><strong>関連</strong>: パス操作は全て <code>pathlib.Path</code> を使う（文字列連結や <code>/</code> のハードコードを禁止）。これもクロスプラットフォーム対策。</p>
+<hr>
+<h2 id="d-17">D-17. Blender用スクリプトは <code>bpy</code> と <code>numpy</code> のみに依存させる<a class="hash" href="#d-17" aria-label="このセクションへのリンク">#</a></h2>
+<p><strong>決定</strong>: <code>tools/blender_*.py</code> は <code>bpy</code> と <code>numpy</code> のみに依存する。<code>io/cameras.py</code> も同様。</p>
+<p><strong>日付</strong>: 2026-08-14 ／ <strong>計画書</strong>: §7-4</p>
+<h3 id="根拠-15">根拠<a class="hash" href="#根拠-15" aria-label="このセクションへのリンク">#</a></h3>
+<p><strong><code>tools/blender_render.py</code> は Blender内蔵のPythonで実行されるため、<code>uv</code> で入れた scipy 等は使えない。</strong></p>
+<p><code>cameras.json</code> の書き出しに <code>io/cameras.py</code> を再利用したいが、そのためには <strong><code>io/cameras.py</code> 自体も numpy のみに依存している必要がある。</strong> D-12 で pydantic を採用せず <code>dataclass</code> にしたのはこの制約のため。</p>
+<h3 id="未確認事項---解消2026-08-16">未確認事項 → <strong>✅ 解消（2026-08-16）</strong><a class="hash" href="#未確認事項---解消2026-08-16" aria-label="このセクションへのリンク">#</a></h3>
+<p><del>Blender内蔵Pythonに numpy が入っていることを W01 に実機確認する</del> → <strong>松田の実機で <code>numpy 1.26.4</code> を確認</strong>（松田の回答・2026-08-16）。<strong>この制約は成立する。</strong> 純Pythonで書き直す分岐は消えた。</p>
+<hr>
+<h2 id="d-18">D-18. 自作とライブラリの線引き<a class="hash" href="#d-18" aria-label="このセクションへのリンク">#</a></h2>
+<p><strong>決定</strong>: 反復解法・最適化・幾何アルゴリズムは自作。BLASレベルとI/O・可視化はライブラリに任せる。</p>
+<p><strong>日付</strong>: 2026-08-14（引き継ぎ資料 §8 から維持） ／ <strong>計画書</strong>: §7-5</p>
+<h3 id="根拠-16">根拠<a class="hash" href="#根拠-16" aria-label="このセクションへのリンク">#</a></h3>
+<p><code>A @ x</code> を自作する意味はゼロだが、<strong>その上に載るCG法・LM法は完全に自作範囲。</strong> 学部でも研究でも疎行列演算をBLAS/SpMVに乗せるのは普通であり、欠点にならない。</p>
+<p><strong>自作範囲を明示的に確保していることが、「ライブラリを呼ぶだけでブラックボックスのまま終わる」リスクへの答えになっている</strong>（引き継ぎ資料 §12 で ② を却下した理由がこれ）。</p>
+<h3 id="c-rust-を採用しない理由引き継ぎ資料-8-より">C++ / Rust を採用しない理由（引き継ぎ資料 §8 より）<a class="hash" href="#c-rust-を採用しない理由引き継ぎ資料-8-より" aria-label="このセクションへのリンク">#</a></h3>
+<ul><li><strong>C++</strong>: CMake、Eigen、OpenCVビルド、環境差 → <strong>環境構築で2週間溶けるリスク</strong>。しかも結局Blender連携でPythonが必要</li><li><strong>Rust</strong>: この領域のエコシステムが薄い</li></ul>
+<p><strong>どうしても入れる場合</strong>: Phase 4 でプロファイリングし、最も重い1関数だけを pybind11 でC++化する。「ボトルネックを計測で特定し、該当箇所のみ置換して○倍高速化」のほうが全面C++より説明として強く、リスクも局所化される。</p>
+<hr>
+<h2 id="d-19">D-19. 合成データのレンダラを EEVEE にする<a class="hash" href="#d-19" aria-label="このセクションへのリンク">#</a></h2>
+<p><strong>決定</strong>: <code>tools/blender_render.py</code> の既定レンダラは EEVEE。Cycles はレンダリング品質の影響を見る追加実験でのみ使う。</p>
+<p><strong>日付</strong>: 2026-08-15 ／ <strong>計画書</strong>: §7-6</p>
+<h3 id="根拠-17">根拠<a class="hash" href="#根拠-17" aria-label="このセクションへのリンク">#</a></h3>
+<p><strong>松田の環境では Cycles が CPU レンダリングになる。</strong></p>
+<p><code>blender_system/system-info.txt</code> の Cycles 欄に挙がっているのは <code>CPU device capabilities: AVX2</code> の1行のみで、<strong>GPU計算デバイス（Intel oneAPI 等）が列挙されていない。</strong> GPUは内蔵の Intel Iris Xe。</p>
+<p>20方向 × 複数データセット × 反復試行のレンダリングを CPU Cycles で回すと、現実的な時間に収まらない。</p>
+<p><strong>そして要件から見て EEVEE で足りる。</strong> 本プロジェクトが合成データに求めるのは「<strong>カメラ行列・シルエット・真値メッシュと整合した、一貫性のある画像</strong>」であって、物理的に正確な大域照明ではない（D-01）。特徴点検出とセグメンテーションが成立すれば要件を満たす。</p>
+<h3 id="未確認事項---解消2026-08-16-2">未確認事項 → <strong>✅ 解消（2026-08-16）</strong><a class="hash" href="#未確認事項---解消2026-08-16-2" aria-label="このセクションへのリンク">#</a></h3>
+<p><del>Preferences → System → Cycles Render Devices に oneAPI が出るかを一度確認する</del>（松田の回答・2026-08-16）→ <strong>タブ（CUDA / OptiX / HIP / oneAPI）は並ぶが、選択できるデバイスは0件</strong>という回答だった。<strong>Cycles の GPU レンダリングは使えない。推定が実機で裏づけられ、EEVEE 既定の根拠が確定した。</strong></p>
+<h3 id="派生する影響">派生する影響<a class="hash" href="#派生する影響" aria-label="このセクションへのリンク">#</a></h3>
+<p><strong>L4 のリアルタイムビューア（D-08）の実現性も、内蔵GPU前提で控えめに見積もる。</strong> 解像度を落とすか、更新頻度を落とす前提で考える。</p>
+<h3 id="追記2026-08-15関口側は-blender-を導入しない">追記（2026-08-15）：関口側は Blender を導入しない<a class="hash" href="#追記2026-08-15関口側は-blender-を導入しない" aria-label="このセクションへのリンク">#</a></h3>
+<p><strong>ユーザー判断により、Blender 関連は全て松田に任せることが確定した。</strong> 関口のUbuntu機にはBlenderを入れない。</p>
+<p><strong>この決定への影響はない</strong>（EEVEEを選ぶ理由は松田の環境に由来するため）が、<strong>運用に3つ効く。</strong></p>
+<div class="table-wrap"><table class="md"><thead><tr><th>影響</th><th>対応</th></tr></thead><tbody><tr><td>レンダリング結果を関口が再現・検証できない</td><td><strong><code>tools/blender_*.py</code> の動作確認は松田のローカルのみ。</strong> D-24（CIからBlender依存テストを除外）の方針と一致しており、追加の対処は不要</td></tr><tr><td>Blenderスクリプトの副担当レビューが「読むだけ」になる</td><td>Approve規約（D-09）は維持。ただし<strong>Blender固有部分のレビュー対象は「設計と入出力の妥当性」に限定し、挙動の検証は松田に委ねる</strong>。これはレビューの形骸化ではなく、検証手段を持たない側が検証を装わないための線引き</td></tr><tr><td>§3-6 で関口が担う予定だった「<code>cameras.json</code> の書き出し」をBlender内で書けない</td><td><strong>担当を分割した。</strong> 関口は <code>io/cameras.py</code> 本体（純Python・Blender不要でテスト可能）を実装し、松田がそれをBlenderスクリプトから呼び出す接続部を書く。<strong>D-17（Blender用スクリプトは bpy と numpy のみに依存させる）が、この分割を成立させている</strong></td></tr></tbody></table></div>
+<p><strong>3つ目は D-17 の価値が事後的に上がった例。</strong> pydantic を採用せず <code>dataclass</code> にした判断（D-12）が、「関口がBlenderを持たない」という後から出てきた制約を吸収している。</p>
+<hr>
+<h2 id="d-20">D-20. マスク出力時は View Transform を Standard にする<a class="hash" href="#d-20" aria-label="このセクションへのリンク">#</a></h2>
+<p><strong>決定</strong>: マスク（シルエット）画像を出力する際、カラーマネジメントの View Transform を <code>Standard</code> に設定する。スクリプト内から明示的に設定し、UI設定に依存させない。</p>
+<p><strong>日付</strong>: 2026-08-15 ／ <strong>計画書</strong>: §7-6</p>
+<h3 id="根拠-18">根拠<a class="hash" href="#根拠-18" aria-label="このセクションへのリンク">#</a></h3>
+<p><strong>Blenderの既定のビュー変換は AgX（4.0 以降）で、トーンマッピングを掛けるため画素値がそのまま出ない。</strong></p>
+<p>シルエット／マスクは「白＝物体・黒＝背景」の二値が正しく出ることが要件なので、<strong>ここでトーンマッピングが挟まると閾値処理が壊れる。</strong></p>
+<p><strong>スクリプトから設定する理由</strong>: 人が設定を戻し忘れる事故を防ぐため。D-11 と同じ思想（規約を破れない構造を作る）。</p>
+<h3 id="関連する方針">関連する方針<a class="hash" href="#関連する方針" aria-label="このセクションへのリンク">#</a></h3>
+<p><strong>マスクはカラー画像を後から閾値処理して作るのではなく、Blender側で直接出力する</strong>（アルファまたは Holdout / Cryptomatte 等）。<del>手法は松田に委ねる</del>が、<strong>「マスクの生成方法」を <code>docs/notes/</code> に1本残すこと。</strong></p>
+<p><strong>2026-08-16 改訂</strong>: 松田から<strong>「Blenderでマスク処理をしたことがないため判断不可」</strong>という回答があったため、<strong>「手法は松田に委ねる」を撤回する。</strong> 関口が候補を提示し、W02 に2人で決める（→ <a href="#d-35">D-35</a>）。<strong><code>docs/notes/</code> に1本残す方針は維持する</strong>（書き手は実装した側）。</p>
+<hr>
+<h2 id="d-21">D-21. ボクセル投影をチャンク分割で実装する<a class="hash" href="#d-21" aria-label="このセクションへのリンク">#</a></h2>
+<p><strong>決定</strong>: <code>geometry/carving.py</code> は、ボクセルをチャンクに分割して投影する。全ボクセルを一度に <code>4×N</code> へ展開しない。チャンクサイズは外部パラメータにする。</p>
+<p><strong>日付</strong>: 2026-08-15 ／ <strong>計画書</strong>: §7-6</p>
+<h3 id="根拠-19">根拠<a class="hash" href="#根拠-19" aria-label="このセクションへのリンク">#</a></h3>
+<p>256³ = <strong>1677万ボクセル</strong>。占有グリッド自体は小さいが、<strong>計画書 §7-5 の「行列で一括投影する」方式は中間バッファが大きい。</strong></p>
+<div class="table-wrap"><table class="md"><thead><tr><th>配列</th><th>256³</th><th>128³</th></tr></thead><tbody><tr><td>占有グリッド（uint8）</td><td>17 MB</td><td>2 MB</td></tr><tr><td>全ボクセル中心の同次座標 <code>4×N</code>（float64）</td><td><strong>537 MB</strong></td><td>67 MB</td></tr><tr><td>投影結果 <code>3×N</code>（float64・カメラ1台分）</td><td><strong>403 MB</strong></td><td>50 MB</td></tr></tbody></table></div>
+<p>素直に書くと 256³ で<strong>一時的に 1 GB 前後</strong>を要求する。松田のGPUは内蔵（Iris Xe）でシステムメモリを共有するため、実効メモリはさらに目減りする。</p>
+<p><strong>メモリ 8 GB だと厳しく、16 GB なら通る</strong>という線。<del>松田のメモリ容量が未回答</del> <strong>→ 2026-08-16 に 16 GB と判明（<a href="#d-32">D-32</a>）。256³ を既定として維持する。</strong></p>
+<p><strong>それでもチャンク分割は撤回しない。</strong> 16 GB は「OS・ブラウザ・Blender・内蔵GPUの共有分を差し引いた実効値」で見ると余裕のある数字ではなく、<strong>素直に書けば 1 GB 前後の一時確保が残る</strong>ため。<strong>どちらに転んでも動く実装にしておく</strong>方針は維持する。</p>
+<h3 id="ループではなく行列演算方針との関係">「ループではなく行列演算」方針との関係<a class="hash" href="#ループではなく行列演算方針との関係" aria-label="このセクションへのリンク">#</a></h3>
+<p><strong>§7-5 の方針は維持する。</strong> チャンク内では行列演算で書く。チャンク分割はメモリ制約への対応であって、ループ実装への後退ではない。</p>
+<h3 id="副次的な利点-2">副次的な利点<a class="hash" href="#副次的な利点-2" aria-label="このセクションへのリンク">#</a></h3>
+<p><strong>E7（実装方式の速度比較）の独立変数にチャンクサイズを追加できる。</strong> キャッシュ効率との兼ね合いで最適値が出るはずで、実験項目として素直に成立する。</p>
+<hr>
+<h2 id="d-22">D-22. <code>main</code> 一本・squash merge にする<a class="hash" href="#d-22" aria-label="このセクションへのリンク">#</a></h2>
+<p><strong>決定</strong>: 長期ブランチは <code>main</code> のみ。<code>main</code> は保護（直push禁止・PR必須）。マージは squash merge。レビュー承認は W03 から必須化。</p>
+<p><strong>日付</strong>: 2026-08-14 ／ <strong>計画書</strong>: §8-1</p>
+<h3 id="根拠-20">根拠<a class="hash" href="#根拠-20" aria-label="このセクションへのリンク">#</a></h3>
+<ul><li><strong><code>develop</code> を作らない</strong>: 2人では過剰</li><li><strong>squash merge</strong>: 履歴が読みやすい。<strong>public化後に読まれる前提</strong>（D-26 参照）</li><li><strong>W01–W02 は承認不要</strong>: 松田がGitに慣れるまでの猶予。慣れる前に必須化すると、単に待ち時間が増えるだけになる</li></ul>
+<h3 id="issue-の粒度">Issue の粒度<a class="hash" href="#issue-の粒度" aria-label="このセクションへのリンク">#</a></h3>
+<blockquote><p><strong>1 Issue = 1 PR = 1〜2週で終わる単位。</strong></p></blockquote>
+<p>Phase単位のIssue（例：「Phase 2 を完了する」）は作らない。<strong>進捗が見えず、レビュー単位としても大きすぎる。</strong></p>
+<hr>
+<h2 id="d-23">D-23. テストを3層に分ける<a class="hash" href="#d-23" aria-label="このセクションへのリンク">#</a></h2>
+<p><strong>決定</strong>: 単体テスト（画像なしの合成シーン）／リファレンス回帰テスト／E2Eテストの3層。</p>
+<p><strong>日付</strong>: 2026-08-14 ／ <strong>計画書</strong>: §9-1</p>
+<h3 id="第1層画像を使わない合成シーンが主力になる理由">第1層：画像を使わない合成シーンが主力になる理由<a class="hash" href="#第1層画像を使わない合成シーンが主力になる理由" aria-label="このセクションへのリンク">#</a></h3>
+<p><code>tests/fixtures/synthetic_scene.py</code> に、3D点をランダム生成して既知のカメラ行列で投影するだけの生成器を置く。重要な性質が3つ。</p>
+<ol><li><strong>画像処理を一切経由しない</strong>ので、幾何アルゴリズムのバグだけを切り分けられる</li><li><strong>関口が10分で作れる</strong>ので、<strong>松田のBlenderデータの完成を待たずに Phase 2 を開始できる</strong></li><li><code>noise_px</code> を変えれば、<strong>ノイズに対する頑健性がそのまま実験項目になる</strong></li></ol>
+<h3 id="第2層phase-0-でライブラリ版を先に作る最大の理由">第2層：Phase 0 でライブラリ版を先に作る最大の理由<a class="hash" href="#第2層phase-0-でライブラリ版を先に作る最大の理由" aria-label="このセクションへのリンク">#</a></h3>
+<p>自作版とOpenCV版を許容誤差付きで照合する。</p>
+<div class="table-wrap"><table class="md"><thead><tr><th>自作</th><th>リファレンス</th></tr></thead><tbody><tr><td><code>geometry/dlt.py</code></td><td><code>cv2.solvePnP</code></td></tr><tr><td><code>geometry/triangulate.py</code></td><td><code>cv2.triangulatePoints</code></td></tr><tr><td><code>solvers/cg.py</code></td><td><code>scipy.sparse.linalg.cg</code></td></tr></tbody></table></div>
+<p><strong>正解が手元にあるとデバッグの難易度が桁で下がる。</strong> これが引き継ぎ資料 §7 で Phase 0 を挟むと決めたもう一つの理由。</p>
+<hr>
+<h2 id="d-24">D-24. CI を Ubuntu + Windows で回す<a class="hash" href="#d-24" aria-label="このセクションへのリンク">#</a></h2>
+<p><strong>決定</strong>: GitHub Actions で、push時に Ubuntu と Windows の2環境で <code>pytest</code> を実行する。Blender依存のテストはCIから除外。</p>
+<p><strong>日付</strong>: 2026-08-14 ／ <strong>計画書</strong>: §9-2</p>
+<h3 id="根拠-21">根拠<a class="hash" href="#根拠-21" aria-label="このセクションへのリンク">#</a></h3>
+<p><strong>実利</strong>: <strong>松田のWindowsで動かないコードに関口が気づけない、という事故を自動で防ぐ。</strong> パス区切りと改行コードの問題が即座に出る（D-16 と対になる対策）。</p>
+<p><strong>就活</strong>: CIバッジがREADMEに付いているリポジトリは、そうでないものと印象が違う。<strong>設定コストは1時間程度</strong>なので、費用対効果が明確に良い。</p>
+<h3 id="blender依存テストを除外する理由">Blender依存テストを除外する理由<a class="hash" href="#blender依存テストを除外する理由" aria-label="このセクションへのリンク">#</a></h3>
+<p><strong>Blenderのインストールに時間がかかりすぎる</strong>（CIの実行時間が実用的でなくなる）。これらは松田のローカルで手動確認とする。</p>
+<hr>
+<h2 id="d-25">D-25. 撤退ラインを先に決め、判定時期を固定する<a class="hash" href="#d-25" aria-label="このセクションへのリンク">#</a></h2>
+<p><strong>決定</strong>: L1〜L4 の4段階を定め、判定を W11終了時（11/1）と W15終了時（11/29）の2回に固定する。</p>
+<p><strong>日付</strong>: 2026-08-14 ／ <strong>計画書</strong>: §12</p>
+<h3 id="根拠-22">根拠<a class="hash" href="#根拠-22" aria-label="このセクションへのリンク">#</a></h3>
+<p><strong>野心的な構成なので、先に「どこまで諦めるか」を決めておく。</strong></p>
+<p><strong>判定時期を先に決めておく理由が重要</strong>：これを共有していないと、判定のタイミングで「諦めるのか」という議論になって揉める。<strong>先に合意しておけば、判定は単なる手続きになる。</strong></p>
+<h3 id="切り替えコストがゼロである理由">切り替えコストがゼロである理由<a class="hash" href="#切り替えコストがゼロである理由" aria-label="このセクションへのリンク">#</a></h3>
+<p><strong>判定①で L2 に落ちる場合、<code>cameras.json</code> の <code>source</code> を <code>turntable_gt</code> に固定するだけで済み、コード変更が不要</strong>（D-12 判断③）。この設計があるおかげで、撤退が「作り直し」にならない。</p>
+<h3 id="どちらに倒れても成果物になる">どちらに倒れても成果物になる<a class="hash" href="#どちらに倒れても成果物になる" aria-label="このセクションへのリンク">#</a></h3>
+<ul><li><strong>L2 に落ちた場合</strong>: 松田の担当（メッシュ側）が主軸になる</li><li><strong>L1 に落ちた場合</strong>: 関口側が主軸になる</li></ul>
+<p>L1 と L2 は独立して成立するため、<strong>この撤退ラインの存在が、ウォーターフォール的計画の最大の弱点（後半での破綻）を吸収している。</strong></p>
+<hr>
+<h2 id="d-26">D-26. 却下した提案の一覧（再提案不要）<a class="hash" href="#d-26" aria-label="このセクションへのリンク">#</a></h2>
+<p><strong>これらは検討済みで却下されている。再提案する場合は、却下理由に反論すること。</strong></p>
+<div class="table-wrap"><table class="md"><thead><tr><th>提案</th><th>却下の理由</th><th>日付</th></tr></thead><tbody><tr><td><strong>スコープ削減3件</strong>（Marching Cubes を自作しない / UV展開を自作しない / 前処理を2種に限定。計 −45h）</td><td><strong>関口が明示的に却下。</strong> 315時間の工程時間を受け入れるという判断。削減せず全構成を維持する</td><td>2026-08-14</td></tr><tr><td>実写データのみで進める</td><td>形状の真値が存在せず、Hausdorff距離での評価が不可能（D-01）</td><td>2026-08-14</td></tr><tr><td>実写と合成を最初から並行</td><td>二系統のデータローダとテストの維持コストが工数を圧迫する</td><td>2026-08-14</td></tr><tr><td>完全な役割分担（松田＝作業の受け皿）</td><td>松田が3DCG研究室志望のため、片方だけが研究助走を得る構造は不適（D-07）</td><td>2026-08-14</td></tr><tr><td><strong>副担当はレビューのみ・実装しない</strong></td><td><strong>実態と合わなかった。「詳しい人が主軸となって一緒に作る」形に改訂（D-04）</strong></td><td><strong>2026-08-15 改訂</strong></td></tr><tr><td>リポジトリを2つに分ける</td><td><code>cameras.json</code> の仕様変更のたびに2リポジトリ同時PRが必要。Git経験の浅い松田に負担が重すぎる（D-13）</td><td>2026-08-14</td></tr><tr><td>大学のPBL・演習科目向けの提出文書を整備する</td><td>このプロジェクトは授業と無関係であることを確認済み</td><td>2026-08-14</td></tr><tr><td>関口の開発環境を Ubuntu 単独に絞る</td><td>松田がWindowsである時点でクロスプラットフォーム対応は既に必須。Macを残す追加コストはほぼゼロ</td><td>2026-08-14</td></tr><tr><td>Unity / C++ / Rust の採用</td><td>引き継ぎ資料 §8・§12 で不採用と結論済み（D-18）。<strong>2026-08-16 に松田から「Python が遅ければ C++ でも」との提案があったが、維持</strong>（D-32）</td><td>2026-08-14</td></tr><tr><td>「①を完成させてから④」の順次開発</td><td>松田が6週間何もできない。①-b が詰まった瞬間に全体が止まる（単一障害点）</td><td>引き継ぎ資料 §5</td></tr></tbody></table></div>
+<p><strong>2026-08-16 の回答で出た提案の採否は <a href="#d-34">D-34</a> にまとめてある。</strong></p>
+<hr>
+<h2 id="d-27">D-27. 既存リポジトリ <code>4bitcom_HandM</code> をそのまま使う<a class="hash" href="#d-27" aria-label="このセクションへのリンク">#</a></h2>
+<p><strong>決定</strong>: 3D復元プロジェクトは<strong>新しいリポジトリを立てず、既存の <code>4bitcom_HandM</code> で進める。</strong> リポジトリ名の変更は public 化の直前に行う。</p>
+<p><strong>日付</strong>: 2026-08-15 ／ <strong>計画書</strong>: §6 ／ <strong>判断者</strong>: 関口から委任を受けて決定</p>
+<h3 id="経緯">経緯<a class="hash" href="#経緯" aria-label="このセクションへのリンク">#</a></h3>
+<p>push の際に GitHub からリダイレクト警告が出て、リポジトリが <strong><code>4bitcom</code> → <code>4bitcom_HandM</code></strong> に改名されていたことが判明した（松田による改名と思われる）。これを機に「3D復元は専用リポジトリを新設すべきか」を検討した。</p>
+<h3 id="根拠-23">根拠<a class="hash" href="#根拠-23" aria-label="このセクションへのリンク">#</a></h3>
+<p><strong>D-13（単一リポジトリにする）と同じ論理が、そのまま「新旧2リポジトリ運用」にも当てはまる。</strong></p>
+<p>D-13 は「2つに分けると <code>cameras.json</code> の仕様変更のたびに2リポジトリ同時PRが必要になり、Git経験の浅い松田には負担が大きすぎる」という理由でリポジトリ分割を却下している。<strong>新リポジトリを立てることは、この負担を別の形で持ち込む。</strong></p>
+<div class="table-wrap"><table class="md"><thead><tr><th>新設した場合のコスト</th><th>内容</th></tr></thead><tbody><tr><td>松田への操作負担</td><td>新リポジトリ作成 or Collaborator 承認、clone のやり直し、リモート設定</td></tr><tr><td>履歴の断絶</td><td><code>docs/</code> の計画書群と <code>blender_system/</code> の履歴が切れる。<code>git filter-repo</code> での移植は<strong>Git初心者と組む状況では非現実的</strong></td></tr><tr><td>二重管理の期間</td><td>移行中はどちらが正なのか曖昧になる</td></tr></tbody></table></div>
+<p><strong>一方、新設で得られるはずだった利点は、いずれも別の手段で代替できる。</strong></p>
+<div class="table-wrap"><table class="md"><thead><tr><th>期待した利点</th><th>代替手段</th></tr></thead><tbody><tr><td>内容に合ったリポジトリ名（確認シート Q17）</td><td><strong>改名は後からできる。</strong> 実際すでに1回改名されている。public 化の直前に変えれば十分</td></tr><tr><td>練習コミット（<code>ぬ</code>・<code>テスト編集</code>・<code>こんにちは</code>）を履歴から排除</td><td><strong>排除する必要がない。</strong> Git に不慣れな状態から始めた記録として自然であり、むしろ「継続的に開発した」の起点になる。本番の履歴は W01 以降の squash merge されたPRで構成される（D-22）</td></tr></tbody></table></div>
+<h3 id="派生する決定">派生する決定<a class="hash" href="#派生する決定" aria-label="このセクションへのリンク">#</a></h3>
+<ol><li><del><strong><code>doc/</code> → <code>docs/</code> にリネームする。</strong> 計画書 §6 のディレクトリ構成は <code>docs/</code> を前提にしており、実体と食い違っている。<strong>ただし実施は W01</strong>（並行セッションとの競合を避けるため、着工時にまとめて行う）。</del> → <strong>✅ 2026-08-17 実施。</strong> あわせて<strong>文書のファイル名から <code>3d-reconstruction-</code> の接頭辞を落とした</strong>（<code>plan.md</code> / <code>decisions.md</code> / <code>progress.md</code>）。松田からの「ファイル数が少ないのに似た名前で長い」という指摘（2026-08-16）への対応。</li><li><strong>ローカルの remote URL を更新する。</strong> 現在も旧名 <code>4bitcom</code> を指しており、GitHub のリダイレクトに依存している状態。<strong>リダイレクトは恒久的な保証がなく、旧名で別のリポジトリが作られると誤った宛先に push しうる。</strong> ``<code> git remote set-url origin https://github.com/matsudaryusei/4bitcom_HandM.git </code>``</li><li><strong>確認シート Q17（リポジトリ名）の位置づけを下げる。</strong> 「W01 までに決める」から「<strong>public 化の前に決める</strong>」へ。着工をブロックしない。</li><li><del><strong><code>tmp.md</code>（Git練習用ファイル）の扱いは松田に委ねる。</strong> 関口側から消さない。松田が作ったものであり、消す実益もない。</del> → <strong>✅ 2026-08-17、作成者側で削除された</strong>（コミット <code>fbb196f</code>）。<strong>判断を委ねた結果であり、この項は解消。</strong></li></ol>
+<h3 id="この決定が崩れる条件---解消2026-08-16">この決定が崩れる条件 → <strong>✅ 解消（2026-08-16）</strong><a class="hash" href="#この決定が崩れる条件---解消2026-08-16" aria-label="このセクションへのリンク">#</a></h3>
+<p><strong>松田が「3D復元とは別の共同作業もこのリポジトリで続けたい」と考えている場合。</strong> その場合はリポジトリの性格が「2人の作業場」のままになり、public 化の対象として不適になる。</p>
+<p><strong>2026-08-16 追記</strong>: 2026-08-16 の確認で直接聞いたところ、<strong>「ここは3D復元プロジェクト用にしていい（完成後に public 化する）」</strong>との回答を得た。<strong>この決定は確定。</strong> あわせて <strong>Collaborator 追加済み・リポジトリ設定の変更権限も関口に委任（随時相談しながら）</strong>と回答があり、W01 の <code>main</code> 保護設定と <code>.gitattributes</code> の先置きが実行可能になった。</p>
+<hr>
+<h2 id="d-28">D-28. 分担の比重は固定せず、実績を記録して更新する（2026-08-16 発展的に解消）<a class="hash" href="#d-28" aria-label="このセクションへのリンク">#</a></h2>
+<blockquote><p><strong><a href="#d-36">D-36</a> に吸収された。</strong> 本決定は「担当表を実績に合わせて更新し続ける」運用だったが、<strong>そもそも担当表を持たない形（ジャンル制）にしたため、更新する対象が無くなった。</strong>
+<strong>記録を残すこと自体は続ける</strong>（<code>progress.md</code> にジャンル別の実働時間）。<strong>以下は元の記録。</strong> 「表に現実を合わせない」という結論は D-36 の出発点になっている。</p></blockquote>
+<p><strong>決定</strong>: 計画書 §3-6 の担当表は<strong>初期案</strong>と位置づける。実際の分担は <code>progress.md</code> に週次で記録し、<strong>実績に合わせて担当表を更新していく。</strong></p>
+<p><strong>日付</strong>: 2026-08-15 ／ <strong>計画書</strong>: §3-6 ／ <strong>判断者</strong>: 関口</p>
+<h3 id="根拠-24">根拠<a class="hash" href="#根拠-24" aria-label="このセクションへのリンク">#</a></h3>
+<p><strong>副担当の比重は、モジュールの内容によって必然的に変わる。</strong></p>
+<div class="table-wrap"><table class="md"><thead><tr><th>状況</th><th>副担当の比重</th></tr></thead><tbody><tr><td>可視化が主体（ヤコビアンの疎パターン、収束グラフ）</td><td>高くなる。半分近く書くこともある</td></tr><tr><td>専門性が高く手が出せない（Schur補元の導出と実装）</td><td>ゼロ。レビューのみ</td></tr><tr><td>独立したテストを切り出せる（メッシュの整合性検証）</td><td>中程度</td></tr></tbody></table></div>
+<p><strong>着工前に机上で引いた表が、この変動を正しく予測できるはずがない。</strong> 表を固定して運用すると、次のどちらかが起きる。</p>
+<ol><li>表に合わせて不自然な分担をする（<strong>手段が目的化する</strong>）</li><li>表を無視して進み、<strong>計画書が実態を映さなくなる</strong></li></ol>
+<p>どちらも避けたいので、<strong>表を動かす前提にして、動かした事実を記録する</strong>運用にした。</p>
+<h3 id="なぜ記録までするのか">なぜ「記録」までするのか<a class="hash" href="#なぜ記録までするのか" aria-label="このセクションへのリンク">#</a></h3>
+<p>比重を可変にするだけなら記録は要らない。それでも残すのは3つの理由から。</p>
+<ol><li><strong>歯止めの判定に要る。</strong> D-04 の「全体平均で3割まで」は、<strong>累積で見ないと判定できない。</strong> 週単位の実感では分からない。</li><li><strong>計画書の更新漏れを検出できる。</strong> 記録に「初期案からの変更」欄を置き、計画書側を直したかを併記する。</li><li><strong>就活の説明材料になる。</strong> 「相互レビューで互いの専門を理解した」を、<strong>どの機能を誰が書いたかという具体で</strong>語れる。PR履歴と対になり、証拠としての強度が上がる（D-09 と同じ発想）。</li></ol>
+<h3 id="運用">運用<a class="hash" href="#運用" aria-label="このセクションへのリンク">#</a></h3>
+<ul><li><strong>週次</strong>（週1回の対面Issue切りの場・§8-3）に1行追加</li><li><strong>Phase の切れ目</strong>に振り返りを書き、必要なら計画書 §3-6 を更新</li><li>更新したら、進捗記録の「決定を変えた記録」と本書の改訂履歴の<strong>両方</strong>に残す</li></ul>
+<h3 id="この決定のコスト">この決定のコスト<a class="hash" href="#この決定のコスト" aria-label="このセクションへのリンク">#</a></h3>
+<p><strong>週あたり5〜10分の記録作業が増える。</strong> 315h の予算に対しては誤差だが、<strong>続かなければ意味がない</strong>種類の作業なので、<strong>週1の対面の場に紐付けて習慣化する</strong>（単独のタスクにしない）。</p>
+<hr>
+<h2 id="d-29">D-29. 同席作業を既定とし、ペアプロと区別する<a class="hash" href="#d-29" aria-label="このセクションへのリンク">#</a></h2>
+<p><strong>決定</strong>: <strong>同じ場所で各自の作業をする「同席作業」を既定の働き方とする。</strong> これはペアプロ（1つのコードを2人で書く）とは別物として扱う。</p>
+<p><strong>日付</strong>: 2026-08-15 ／ <strong>計画書</strong>: §3-3</p>
+<h3 id="背景">背景<a class="hash" href="#背景" aria-label="このセクションへのリンク">#</a></h3>
+<p>関口の認識：<strong>平日はほぼ毎日会える。相手が作業しているところを目にすることが多い。任せっきりにならず共同で作業するつもりでいる。</strong></p>
+<p>この条件は、それまでの文書が暗黙に想定していた働き方（各自が別の時間・場所で作業し、PRで同期する）とは異なる。</p>
+<h3 id="根拠2つの軸を混同していた">根拠：2つの軸を混同していた<a class="hash" href="#根拠2つの軸を混同していた" aria-label="このセクションへのリンク">#</a></h3>
+<p>D-04 までの記述は「共同作業の濃さ」を1軸で捉えていた。しかし実際には<strong>独立した2軸</strong>がある。</p>
+<div class="table-wrap"><table class="md"><thead><tr><th>軸</th><th>選択肢</th><th>throughput への影響</th></tr></thead><tbody><tr><td><strong>同席するか</strong>（いつ・どこで）</td><td>同席作業 / 非同席</td><td><strong>ほぼゼロ</strong></td></tr><tr><td><strong>同じコードを書くか</strong>（何を）</td><td>ペアプロ / 分担実装 / レビューのみ</td><td>ペアプロは<strong>半分</strong></td></tr></tbody></table></div>
+<p><strong>混同すると「一緒に作業する ＝ 高コスト」という誤った結論になる。</strong> 実際には、同席していても各自が別のファイルを書いていれば throughput は落ちない。</p>
+<h3 id="同席作業が最も割の良い形である理由">同席作業が最も割の良い形である理由<a class="hash" href="#同席作業が最も割の良い形である理由" aria-label="このセクションへのリンク">#</a></h3>
+<p><strong>費用がほぼ掛からないのに、利点だけがある。</strong></p>
+<ol><li><strong>質問の敷居が下がる。</strong> 「これ聞いていいのかな」と迷う時間が消える。専門が違う2人にとってこれは大きい</li><li><strong>相手が何をしているかが自然に分かる。</strong> D-03 が PR レビューで実現しようとしていたことの一部が、日常的に達成される</li><li><strong>詰まりが早く解ける。</strong> 数値計算のデバッグは「詰まって数日溶ける」形で工数を食う（D-03 補足）。その場で聞ける相手がいることの効果は、見積もりに表れない部分で大きい</li></ol>
+<p><strong>したがって、ペアプロを3か所に限定していること（D-06）は「普段は別々に作業する」という意味ではない。</strong> 普段から同席し、そのうえで<strong>同じコードを2人で書く</strong>のを3か所に限る、という意味である。</p>
+<h3 id="副作用github-に議論が残らなくなる">副作用：GitHub に議論が残らなくなる<a class="hash" href="#副作用github-に議論が残らなくなる" aria-label="このセクションへのリンク">#</a></h3>
+<p><strong>これは実害が出るので明記する。</strong></p>
+<p>同席が増えるほど、<strong>議論が口頭で完結し、リポジトリに結果のコードしか残らなくなる。</strong> このプロジェクトの目的の1つは「Git/GitHubを用いた共同開発の実績」（引き継ぎ資料 §1）であり、<strong>議論の痕跡が無いリポジトリは、その証拠として弱い。</strong></p>
+<p>D-09（Approveコメント規約）と計画書 §8-3 の「対面で決めたことはIssueかPRにコメントで残す」は、<strong>この副作用への対策として、同席が増えるほど重要度が上がる。</strong></p>
+<blockquote><p><strong>口頭で決めた設計判断は、その場でIssueかPRに1〜2行書く。</strong></p></blockquote>
+<p>面倒に見えるが、<strong>後から「なぜこうしたか」を思い出せなくなるコストのほうが高い。</strong> 本書（決定記録）が存在するのも同じ理由である。</p>
+<h3 id="この決定が分担表に与える影響">この決定が分担表に与える影響<a class="hash" href="#この決定が分担表に与える影響" aria-label="このセクションへのリンク">#</a></h3>
+<p><strong>§3-6 の担当表は「話の出発点」に格下げされる。</strong></p>
+<p>同席していれば、分担はその場の会話で決まる。<strong>事前に書いた表が、目の前の会話に勝つ理由はない。</strong> 表は最初の1〜2週の叩き台として使い、実績（<code>progress.md</code>）に合わせて書き換えていく（D-28）。</p>
+<p>同じ理由で、副担当の実装比率3割は<strong>事前の制約から事後の計器へ</strong>位置づけを変えた（D-04 の再修正節）。</p>
+<hr>
+<h2 id="d-30">D-30. テーマを確定する（再検討の分岐を閉じる）<a class="hash" href="#d-30" aria-label="このセクションへのリンク">#</a></h2>
+<p><strong>決定</strong>: <strong>本テーマ（多視点画像とシルエットを統合した3D形状復元）で確定。</strong> D-08 に置いていた「テーマ自体を再検討する」分岐を閉じる。第二候補（物理シミュレーション × Unity）は破棄する。</p>
+<p><strong>日付</strong>: 2026-08-16 ／ <strong>計画書</strong>: §3-5・§7-6 ／ <strong>根拠</strong>: 松田の回答（2026-08-16）Q-a・Q-c・Q-d</p>
+<h3 id="根拠-25">根拠<a class="hash" href="#根拠-25" aria-label="このセクションへのリンク">#</a></h3>
+<p><strong>着工前に確認すべき4点が全て肯定で返ってきた。</strong></p>
+<div class="table-wrap"><table class="md"><thead><tr><th>設問</th><th>回答</th></tr></thead><tbody><tr><td>Q-a 技術核3つで研究の助走になるか</td><td><strong>納得できる</strong>（不足点は1つ挙がった → <a href="#d-31">D-31</a>）</td></tr><tr><td>Q-c リアルタイム描画が登場しないことを了承できるか</td><td><strong>了承する。ジオメトリ処理で問題ない</strong></td></tr><tr><td>Q-d 志望研究室の分野</td><td><strong>東京都市大学・画像工学研究室。</strong> 画像の三次元化／透過と映り込みの表現／流体の表現</td></tr><tr><td>Q-e 主担当＋副担当の協働モデル</td><td><strong>了承</strong></td></tr></tbody></table></div>
+<p><strong>Q-d が決定的だった。</strong> 志望研究室の筆頭テーマが<strong>「画像の三次元化」</strong>であり、これは本プロジェクトの主題そのものである。<strong>懸念していた「3DCG系だがアニメーション寄りで、復元は畑違い」という構図ではなかった。</strong></p>
+<p>さらに松田は、近い分野として<strong>ジオメトリ処理・形状解析／レンダリング・シェーディング／画像生成・ニューラルレンダリング</strong>の3つを挙げている。§3-4 の技術核（合成データ生成器・メッシュ処理・離散ラプラシアン）は1つ目に正面から当たり、2つ目は <a href="#d-31">D-31</a> で受ける。</p>
+<h3 id="この決定の効果">この決定の効果<a class="hash" href="#この決定の効果" aria-label="このセクションへのリンク">#</a></h3>
+<p><strong>着工前に判断を要する項目がゼロになった。</strong> 以降、テーマ・役割分担・協働モデルを覆す提案は、<strong>本書の該当項目の根拠に反論したうえで</strong>行うこと。</p>
+<h3 id="残った非対称">残った非対称<a class="hash" href="#残った非対称" aria-label="このセクションへのリンク">#</a></h3>
+<p><strong>3つ目（画像生成・ニューラルレンダリング）は本プロジェクトでは扱わない。</strong> NeRF / 3D Gaussian Splatting 系は、<strong>「数理を自作して理解する」という本プロジェクトの芯（引き継ぎ資料 §4）とは学習コストの質が違う</strong>ため、18週の枠には入れない。<strong>ただし §15 の語り口では「古典手法を自作して原理を押さえたうえで、学習ベース手法に進む」という接続の仕方ができる。</strong> 研究室訪問ではこの並べ方が効く。</p>
+<hr>
+<h2 id="d-31">D-31. レンダリング設計を追加実験（E8）の候補として受ける<a class="hash" href="#d-31" aria-label="このセクションへのリンク">#</a></h2>
+<blockquote><p><strong>2026-08-16 に位置づけを変更。</strong> 当初は「松田の技術核1の拡張」として書いたが、<a href="#d-37">D-37</a> で個人の志望に紐づく記述を外したため、<strong>「G2 と G8 にまたがる追加実験の候補」という位置づけに改めた。</strong> 採否の判断（W04）と中身は変えていない。</p></blockquote>
+<p><strong>決定</strong>: 松田が Q-a で挙げた不足点「<strong>レンダリング技術の設計</strong>」を、<strong>核1（合成データ生成器）の拡張として受ける。</strong> 具体化は W04（Phase 1）に確定し、本命は <strong>E8「レンダリング条件 vs 復元精度」</strong> の追加。</p>
+<p><strong>日付</strong>: 2026-08-16 ／ <strong>計画書</strong>: §11（実験設計）・§16（採否は W04）</p>
+<h3 id="根拠-26">根拠<a class="hash" href="#根拠-26" aria-label="このセクションへのリンク">#</a></h3>
+<p><strong>要望は正当で、かつ志望分野と一貫している。</strong> 松田の志望研究室のテーマには「透過と映り込みの表現」が含まれており、レンダリングへの関心は思いつきではない。</p>
+<p><strong>しかし「レンダリング品質を上げる」方向に伸ばすと、本プロジェクトの評価軸と噛み合わない。</strong> 合成データに求めているのは物理的な正確さではなく、カメラ行列・シルエット・真値メッシュとの整合性である（<a href="#d-19">D-19</a>）。<strong>綺麗な絵を作っても、この計画では測る対象がない。</strong></p>
+<p><strong>だから「レンダリングを研究する」ではなく「レンダリング条件を独立変数にする」形にする。</strong></p>
+<div class="table-wrap"><table class="md"><thead><tr><th>案</th><th>採否</th><th>理由</th></tr></thead><tbody><tr><td><strong>照明・シェーディング・露出・背景を振り、マスクIoU と復元精度への影響を測る（E8）</strong></td><td><strong>本命</strong></td><td><strong>既存の評価基盤（Hausdorff距離・IoU）をそのまま使えるため追加工数が小さい。</strong> かつ「レンダリング設計が復元精度を左右する」という主張は、画像工学研究室の文脈でそのまま語れる</td></tr><tr><td>EEVEE / Cycles の品質比較</td><td>副次</td><td><a href="#d-19">D-19</a> で既に「余力があれば」の追加実験として存在。CPU レンダリングのため枚数を絞る必要がある</td></tr><tr><td>レンダラそのものを自作する</td><td><strong>却下</strong></td><td>18週に収まらない。<a href="#d-18">D-18</a>（自作とライブラリの線引き）の趣旨にも反する</td></tr><tr><td>物理ベースの材質表現を作り込む</td><td><strong>却下</strong></td><td>測る対象がない。合成データの要件から外れる</td></tr></tbody></table></div>
+<h3 id="工数">工数<a class="hash" href="#工数" aria-label="このセクションへのリンク">#</a></h3>
+<p><strong>E8 を追加しても総工数は増やさない。</strong> レンダリング条件を振るのは既存の <code>tools/blender_render.py</code> のパラメータ操作であり、<strong>評価は Phase 4 の実験枠（40h）の中で E1〜E7 と同じ計測基盤に乗る。</strong> 採否を W04 まで待つのは、<strong>W02 の実装で松田がどれだけ余裕を持てるかを見てから決めるため。</strong></p>
+<h3 id="この決定が崩れる条件-2">この決定が崩れる条件<a class="hash" href="#この決定が崩れる条件-2" aria-label="このセクションへのリンク">#</a></h3>
+<p><strong>W02〜W03 で G2 の実装が遅れている場合、E8 は落とす。</strong> <strong>E1〜E7（本体の実験）は維持し、追加のほうを削る。</strong><strong>追加要望への対応が、本体の遅延を招いてはならない。</strong></p>
+<hr>
+<h2 id="d-32">D-32. ボクセル 256³ を維持し、実装言語は Python 単一のままとする<a class="hash" href="#d-32" aria-label="このセクションへのリンク">#</a></h2>
+<p><strong>決定</strong>: ボクセル解像度は <strong>256³ を既定として維持</strong>（W12 の実測で確定）。<strong>実装言語は Python 単一を維持し、C++ 等の他言語は導入しない。</strong></p>
+<p><strong>日付</strong>: 2026-08-16 ／ <strong>計画書</strong>: §7-6・§3-5 ／ <strong>根拠</strong>: 松田の回答（2026-08-16）Q-b と Q-c のコメント</p>
+<h3 id="前段メモリは-16-gb-だった">前段：メモリは 16 GB だった<a class="hash" href="#前段メモリは-16-gb-だった" aria-label="このセクションへのリンク">#</a></h3>
+<p><strong>松田のPCは 16 GB / Core i7-1360P / 空き 82.6 GB / ノートPC。</strong> <a href="#d-21">D-21</a> が引いていた「8 GB だと厳しく、16 GB なら通る」の線に対し、<strong>通る側だった。</strong></p>
+<p><strong>そして関口のUbuntu機と CPU 型番まで同一だった。</strong> 性能差がないため、<strong>片方で測った処理時間がもう片方でそのまま通用する。</strong> E7（実装方式の速度比較）の測定を2台に分担できる副次的な利点がある。</p>
+<p><strong>チャンク分割（<a href="#d-21">D-21</a>）は撤回しない。</strong> 実効メモリには内蔵GPUの共有分が食い込むため、一時確保 1 GB は依然として危うい。</p>
+<h3 id="本題c-導入の提案への回答">本題：C++ 導入の提案への回答<a class="hash" href="#本題c-導入の提案への回答" aria-label="このセクションへのリンク">#</a></h3>
+<p>松田は Q-c のコメントで次のように書いている。</p>
+<blockquote><p>「数値計算部分との言語をまたぐ接続コストが高いため不採用にしてある」との記述があるが、実装で処理が Python だと遅いなどの問題がある場合は C++ など他言語を用いた開発でも可能</p></blockquote>
+<p><strong>提案としては筋が通っている</strong>（速度が問題なら速い言語を使う）。<strong>それでも採らない。</strong> 理由は速度ではなく<strong>接続コストと工数</strong>にある。</p>
+<div class="table-wrap"><table class="md"><thead><tr><th>論点</th><th>判断</th></tr></thead><tbody><tr><td>そもそも速度が問題になるか</td><td><strong>なる箇所は限られる。</strong> ボクセル彫刻とバンドル調整のみ。<strong>そこは行列化・チャンク分割・Numba で対処する方針が既にある</strong>（§7-5・<a href="#d-21">D-21</a>）</td></tr><tr><td>言語をまたぐコスト</td><td><strong><code>cameras.json</code> を挟む設計（§5）が、Python 単一を前提にしている。</strong> C++ を挟むとビルド環境が2人分・2 OS 分に増え、CI（Ubuntu + Windows の <code>uv run pytest</code>）も二重化する</td></tr><tr><td>松田の負担</td><td><strong>松田は Python 歴数か月で、主言語は C。</strong> 一見 C++ のほうが書きやすく見えるが、<strong>本人が「生成AIを使わずに書きたい」と明言している</strong>（<a href="#d-33">D-33</a>）以上、ビルド設定と FFI まで抱えるのは初速をさらに削る</td></tr><tr><td>就活・研究での見え方</td><td><strong>「Python で書いたら遅かったので C++ にした」より、「なぜ遅いかを測り、行列化と Numba でどこまで縮んだかを実験した（E7）」のほうが語れる。</strong> 遅さは本プロジェクトでは題材であって障害ではない</td></tr></tbody></table></div>
+<p><strong>したがって <a href="#d-18">D-18</a>（C++ / Rust を採用しない）と <a href="#d-26">D-26</a> の却下判断を維持する。</strong></p>
+<h3 id="この決定が崩れる条件-3">この決定が崩れる条件<a class="hash" href="#この決定が崩れる条件-3" aria-label="このセクションへのリンク">#</a></h3>
+<p><strong>W12 のボクセル彫刻で、Numba とチャンク分割を尽くしてもパイプラインが 10 分（§10 の目標）に収まらない場合。</strong> そのときも<strong>言語を替える前に、まず解像度を 128³ に落とす</strong>（切り替えコストが桁で違う）。</p>
+<hr>
+<h2 id="d-33">D-33. 松田の「生成AIを使わない」方針を前提に工程を組む<a class="hash" href="#d-33" aria-label="このセクションへのリンク">#</a></h2>
+<p><strong>決定</strong>: 松田が申告した「<strong>本開発においては生成AIを用いたコーディングを控えたい</strong>」という方針を<strong>そのまま前提として受け入れる。</strong> 説得しない。そのうえで、<strong>初速の遅れを関口側の準備で吸収する。</strong></p>
+<p><strong>日付</strong>: 2026-08-16 ／ <strong>計画書</strong>: §7-7</p>
+<h3 id="根拠-27">根拠<a class="hash" href="#根拠-27" aria-label="このセクションへのリンク">#</a></h3>
+<p><strong>この方針は本プロジェクトの目的と整合している。</strong> 目的の1つは松田の研究助走（引き継ぎ資料 §1）であり、<strong>自分で書かなければ核が身に付かない</strong>という判断は、目的から見て正しい。<strong>効率を理由に覆すべきものではない。</strong></p>
+<p><strong>ただしコストは実在する。</strong> 松田は Python 歴数か月・主言語 C・numpy / OpenCV / bpy いずれも未経験・Blender の Scripting タブ未使用・CLI レンダリングは「初めて見た」。<strong>W02 に <code>tools/blender_render.py</code> を書き始めるまでの段差が、想定より高い。</strong></p>
+<h3 id="対応段差を関口が均す中身は取り上げない">対応：段差を関口が均す（中身は取り上げない）<a class="hash" href="#対応段差を関口が均す中身は取り上げない" aria-label="このセクションへのリンク">#</a></h3>
+<div class="table-wrap"><table class="md"><thead><tr><th>対応</th><th>内容</th></tr></thead><tbody><tr><td><strong>入口を1本にする</strong></td><td>松田が最初に触る Python を <code>tools/blender_render.py</code> に限定する。<strong><code>bpy</code> と <code>numpy</code> だけで書ける</strong>（<a href="#d-17">D-17</a>）ため、ライブラリ知識を要求しない</td></tr><tr><td><strong>地図を先に渡す</strong></td><td>W01 中に <code>docs/notes/</code> へ「Blender の Scripting タブと CLI レンダリングの入口」を関口が1本書く（§3-7 の仕組みをそのまま使う）</td></tr><tr><td><strong>Git の練習に1時間取る</strong></td><td>本人の要望。branch → PR → レビュー → squash merge を1周する。<a href="#d-22">D-22</a> の「Approve必須は W03 から」と対になる</td></tr><tr><td><strong>レビューを教材にする</strong></td><td>PR レビューで型ヒント・<code>pathlib</code>・dataclass を指摘対象に含める。<strong>C 経験者にとっての差分を関口が説明する側に回る</strong>（§3-7 の「相手の専門外を前提に書く」の逆方向）</td></tr><tr><td><strong>前倒しで吸収する</strong></td><td>見積もり（§3-1 の 315h）は変えない。<strong>Phase 0 は夏休み中で時間が取りやすいため、初速の遅れはここで吸収する</strong></td></tr></tbody></table></div>
+<h3 id="やらないこと">やらないこと<a class="hash" href="#やらないこと" aria-label="このセクションへのリンク">#</a></h3>
+<p><strong>担当範囲を減らさない。</strong> 技術核3つ（§3-4）は維持する。<strong>「Python に不慣れだから中核を関口が書く」は、このプロジェクトの目的を壊す。</strong> <a href="#d-04">D-04</a>（副担当も一部を実装する）と同じ論理で、<strong>手が届く形に切り出す</strong>のであって、取り上げるのではない。</p>
+<h3 id="観測する指標">観測する指標<a class="hash" href="#観測する指標" aria-label="このセクションへのリンク">#</a></h3>
+<p><strong>W02〜W03 の実績を <code>progress.md</code> に記録する。</strong> 松田側の着手から動作までに要した時間が、見積もりの2倍を超えているようなら、<strong>W04 の Phase 1 で E8（<a href="#d-31">D-31</a>）を落とし、スコープを本体に寄せる。</strong></p>
+<hr>
+<h2 id="d-34">D-34. 松田の回答のうち採用しなかったもの（2026-08-16）<a class="hash" href="#d-34" aria-label="このセクションへのリンク">#</a></h2>
+<p><strong>記録の目的</strong>: 「言ったのに反映されていない」を防ぐため、<strong>採らなかった提案と理由をここに残す。</strong> <a href="#d-26">D-26</a>（却下した提案の一覧）の続き。</p>
+<div class="table-wrap"><table class="md"><thead><tr><th>提案（回答での言及）</th><th>判断</th><th>理由</th></tr></thead><tbody><tr><td><strong>処理が遅ければ C++ 等の他言語で実装してもよい</strong></td><td><strong>不採用</strong></td><td>接続コスト・CI の二重化・本人の負担。速度は Numba とチャンク分割で対処し、E7 の題材にする → <a href="#d-32">D-32</a></td></tr><tr><td><strong>「レンダリング技術の設計」が足りない</strong></td><td><strong>部分採用</strong></td><td>要望そのものは受ける。ただし<strong>レンダラ自作や品質作り込みではなく、E8（レンダリング条件 vs 復元精度）として受ける</strong> → <a href="#d-31">D-31</a></td></tr><tr><td>実写の被写体候補に<strong>神社などの風景</strong>を挙げた</td><td><strong>主対象としては不採用</strong></td><td>ターンテーブル撮影ができず、真値メッシュも得られない。<strong>E1〜E5 の評価対象にならない。</strong> ただし Phase 4 の「実環境でも動く」実証の追加素材としてなら可</td></tr><tr><td>実写の被写体候補に<strong>ぬいぐるみ</strong>を挙げた</td><td><strong>保留（優先度は下）</strong></td><td>輪郭が毛羽立つためシルエット法（④）に不利で、E5 の比較が濁る。<strong>フィギュアのほうが条件に合う</strong>（凹み・無地面・非鏡面） → <a href="#d-02">D-02</a></td></tr></tbody></table></div>
+<p><strong>いずれも「筋が悪い」という話ではない。</strong> 本プロジェクトの評価軸（真値との比較が成立するか）から外れる、という理由で落としている。</p>
+<hr>
+<h2 id="d-35">D-35. マスク生成方式は関口が候補を提示し、W02 に2人で決める<a class="hash" href="#d-35" aria-label="このセクションへのリンク">#</a></h2>
+<p><strong>決定</strong>: <a href="#d-20">D-20</a> の「マスクの生成方法は松田に委ねる」を<strong>撤回する。</strong> 関口が候補と判断材料を1枚にまとめて W01 中に渡し、<strong>W02 の着手前に2人で決める。</strong></p>
+<p><strong>日付</strong>: 2026-08-16 ／ <strong>計画書</strong>: §7-6 ／ <strong>根拠</strong>: 松田の回答（2026-08-16）N5</p>
+<h3 id="根拠-28">根拠<a class="hash" href="#根拠-28" aria-label="このセクションへのリンク">#</a></h3>
+<p><strong>松田の回答は「Blenderでマスク処理をしたことがないため判断不可」だった。</strong> 選択肢（アルファチャンネル / Holdout / Cryptomatte / Compositor）のいずれにもチェックが付いていない。</p>
+<p><strong>委ねる相手が判断材料を持っていないなら、委ねるのは委任ではなく放置である。</strong> <a href="#d-20">D-20</a> は「Blender のことは松田が詳しい」という前提で書かれていたが、<strong>その前提が特定領域では成立していなかった。</strong></p>
+<p><strong>マスクの品質はパイプライン全体の精度を決める。</strong> シルエット法（④）の入力そのものであり、ここが濁ると E5（最重要実験）の数字が意味をなさない。<strong>「経験がないから適当に決める」で通せる箇所ではない。</strong></p>
+<h3 id="誰が何をするか">誰が何をするか<a class="hash" href="#誰が何をするか" aria-label="このセクションへのリンク">#</a></h3>
+<div class="table-wrap"><table class="md"><thead><tr><th>担当</th><th>内容</th></tr></thead><tbody><tr><td><strong>関口</strong></td><td>候補（アルファ / Holdout / Cryptomatte）の<strong>利点・欠点・実装量</strong>を1枚にまとめる。<strong>Blender を持っていないため、手を動かす検証はできない</strong>（<a href="#d-19">D-19</a> 追記）。<strong>あくまで判断材料の提示まで</strong></td></tr><tr><td><strong>松田</strong></td><td>実際に試して、<strong>出力が二値として使えるかを目視と数値で確認する。</strong> 決めた方式と理由を <code>docs/notes/</code> に1本残す（<a href="#d-20">D-20</a> の方針は維持）</td></tr><tr><td><strong>2人</strong></td><td>W02 の着手前に方式を決める。<strong>同席作業の場で十分</strong>（ペアプロ枠は使わない。<a href="#d-06">D-06</a> の3か所は増やさない）</td></tr></tbody></table></div>
+<blockquote><p><strong>2026-08-24 追記（期日の改訂）</strong>：<strong>候補の提示（関口）が W01 中にできなかったため、「W02 の着手前」という期日は成立しなくなった。</strong>
+<strong>期日を「W02 中」に改める。</strong> W03 以降の G3 がここで止まるため、W02 を越えさせないこと。手順は <a href="tasks/T07-mask-options.html">T07</a>。</p></blockquote>
+<h3 id="この決定の一般化">この決定の一般化<a class="hash" href="#この決定の一般化" aria-label="このセクションへのリンク">#</a></h3>
+<p><strong>「相手の専門だから委ねる」ことと、「相手がその作業を実際にやったことがある」ことは別である。</strong> 今後 §3-6 の担当表で「委ねる」と書いてある箇所も、<strong>着手前に「判断材料を持っているか」を一度聞く。</strong> 持っていなければ、材料を作る側に回る。</p>
+<hr>
+<h2 id="d-36">D-36. 担当を「人」ではなく「作業ジャンル」で管理する<a class="hash" href="#d-36" aria-label="このセクションへのリンク">#</a></h2>
+<p><strong>決定</strong>: 計画書 §3-6 の担当表（「関口が主担当のモジュール」「松田が主担当のモジュール」）を<strong>廃止する。</strong> 代わりに<strong>作業ジャンル G1〜G9</strong>（§3-3）を定義し、<strong>誰がやるかは着手する場面で決める。</strong></p>
+<p><strong>日付</strong>: 2026-08-16 ／ <strong>計画書</strong>: §3-2・§3-3 ／ <strong>判断者</strong>: 関口</p>
+<h3 id="経緯-2">経緯<a class="hash" href="#経緯-2" aria-label="このセクションへのリンク">#</a></h3>
+<p><strong>開発メンバーの追加を検討し始めたことがきっかけ。</strong> 人ごとの担当表は、<strong>人が1人増えるたびに全面的に書き直さなければならない。</strong></p>
+<p>そして書き直したところで当たらない。<a href="#d-28">D-28</a> が既に「<strong>実際の分担はやってみないと分からない</strong>」と認めており、<a href="#d-29">D-29</a> は「<strong>同席しているのだから、その場の会話が事前の表に勝つ</strong>」と書いている。<strong>表を維持するコストだけが残っていた。</strong></p>
+<h3 id="根拠-29">根拠<a class="hash" href="#根拠-29" aria-label="このセクションへのリンク">#</a></h3>
+<div class="table-wrap"><table class="md"><thead><tr><th>論点</th><th>人ベース（旧）</th><th>ジャンルベース（新）</th></tr></thead><tbody><tr><td>人が増えたとき</td><td><strong>表を作り直す。</strong> 増員のたびに設計判断が要る</td><td><strong>触らない。</strong> ジャンルは人数に依存しない</td></tr><tr><td>得意・不得意が判明したとき</td><td>表と実態がずれ、<a href="#d-28">D-28</a> の「更新運用」が必要になる</td><td><strong>ずれない。</strong> 誰が取ったかはIssueの履歴に残る</td></tr><tr><td>「今週これをやりたい」</td><td>表を書き換えるか、例外扱いにする</td><td><strong>そのまま取れる</strong></td></tr><tr><td>新しく入った人が読むもの</td><td>「自分の名前が無い表」</td><td><strong>「どんな作業があるか」の一覧。</strong> そのまま募集要項になる</td></tr><tr><td>抜けの検出</td><td>人の担当が空いた領域が見えにくい</td><td><strong>ジャンル単位で「誰も取っていない」が見える</strong></td></tr></tbody></table></div>
+<p><strong>決定的なのは4行目。</strong> 分担表は本来「これから入る人に説明する材料」でもあるのに、<strong>人名で書かれた表は、その人にとって読む価値がない。</strong> ジャンル表はそのまま「こういう作業があります」という案内になる。</p>
+<h3 id="失うもの承知のうえで受け入れる">失うもの（承知のうえで受け入れる）<a class="hash" href="#失うもの承知のうえで受け入れる" aria-label="このセクションへのリンク">#</a></h3>
+<div class="table-wrap"><table class="md"><thead><tr><th>失うもの</th><th>対応</th></tr></thead><tbody><tr><td><strong>「この領域は自分が責任を持つ」という主担当の意識</strong></td><td>Issue単位で担当者を明示することで代替する（§3-6 運用ルール1）。<strong>ジャンルは決めないが、Issueの持ち主は必ず1人決める</strong></td></tr><tr><td><strong>設計の一貫性</strong>（同じジャンルを別の人が交互に触ると、設計思想がぶれる）</td><td><strong>接続点（§3-5）だけはペアプロで固定し、そこに規約を集約する。</strong> 座標変換を1ファイルに閉じ込める <a href="#d-11">D-11</a> と同じ発想</td></tr><tr><td>専門性の蓄積（ずっと同じ領域を持てば深くなる）</td><td><strong>やりたい人が取り続けることは妨げない。</strong> 固定を禁止するのではなく、固定を前提にしないだけ</td></tr></tbody></table></div>
+<h3 id="廃止した記述">廃止した記述<a class="hash" href="#廃止した記述" aria-label="このセクションへのリンク">#</a></h3>
+<ul><li>計画書 §3-6 の担当表2つ（人ごとのモジュール割り当て）</li><li>「主担当／副担当」という役割名（<a href="#d-03">D-03</a>・<a href="#d-04">D-04</a>・<a href="#d-05">D-05</a> で作った枠組み）</li><li><strong><a href="#d-04">D-04</a> の「副担当の実装比率は全体平均3割まで」という計器</strong>（→ 測る対象が無くなった。<strong>代わりに <code>progress.md</code> はジャンル別の実働時間を記録する</strong>）</li></ul>
+<p><strong><a href="#d-03">D-03</a>〜<a href="#d-05">D-05</a> は消さずに残す。</strong> 「かつてこう決めていて、こういう理由で変えた」が残っていること自体が説明材料になる（本書の運用方針）。</p>
+<h3 id="維持するもの">維持するもの<a class="hash" href="#維持するもの" aria-label="このセクションへのリンク">#</a></h3>
+<ul><li><strong>ペアプロ3か所</strong>（<a href="#d-06">D-06</a>）。<strong>これは「人」ではなく「箇所」の決定なので影響を受けない</strong></li><li><strong>同席作業を既定とすること</strong>（<a href="#d-29">D-29</a>）</li><li><strong>Approveコメント規約</strong>（<a href="#d-09">D-09</a>）。<strong>むしろ重要度が上がる。</strong> 分担を固定しないぶん、他人のコードを読む機会がここに集約されるため</li></ul>
+<hr>
+<h2 id="d-37">D-37. 個人の研究志望に紐づく記述を計画書から外す<a class="hash" href="#d-37" aria-label="このセクションへのリンク">#</a></h2>
+<p><strong>決定</strong>: 計画書から、<strong>「関口の研究助走（悪条件最小二乗）」「松田の技術核3つ」「志望研究室の分野」「研究室訪問向けの語り口」</strong>を削除する。<strong>プロジェクトの目的は「共同開発の実績」「中身を自作して理解すること」「動く成果物と実験結果」の3つとする。</strong></p>
+<p><strong>日付</strong>: 2026-08-16 ／ <strong>計画書</strong>: §1・§3・§15 ／ <strong>判断者</strong>: 関口</p>
+<h3 id="根拠-30">根拠<a class="hash" href="#根拠-30" aria-label="このセクションへのリンク">#</a></h3>
+<ol><li><strong>計画が固まったため、役目を終えた。</strong> これらの記述は「<strong>このテーマで本当にいいのか</strong>」を判断するための材料だった。<a href="#d-30">D-30</a> でテーマが確定した時点で、判断材料としての役目は終わっている。</li><li><strong>メンバーが増えるため。</strong> 「特定の2人の進路にとって都合がいい」という理由づけは、<strong>後から入る人にとっては読む意味がないどころか、疎外感になる。</strong></li><li><strong>技術的な中身は何も変わらない。</strong> バンドル調整も離散ラプラシアンも E6（LMのλ）も<strong>そのまま残る。</strong> 落とすのは「<strong>誰の進路のためにやるか</strong>」という動機の記述だけであり、<strong>やることは1つも減らない。</strong></li></ol>
+<h3 id="削除した記述とその代わり">削除した記述と、その代わり<a class="hash" href="#削除した記述とその代わり" aria-label="このセクションへのリンク">#</a></h3>
+<div class="table-wrap"><table class="md"><thead><tr><th>削除したもの</th><th>代わりに残るもの</th></tr></thead><tbody><tr><td>§1 目的「関口の研究助走／松田の研究助走」</td><td><strong>①共同開発の実績 ②自作して理解すること ③成果物と実験結果</strong></td></tr><tr><td>§3-4「松田側の技術核3つ」</td><td><strong>G2（3DCG・データ生成）・G4（メッシュ処理）というジャンル</strong>（<a href="#d-36">D-36</a>）。<strong>中身は同一</strong></td></tr><tr><td>§3-5「松田の旨味はジオメトリ処理」</td><td><strong>§3-8「スコープの明示」。</strong> 誰の旨味かではなく、<strong>このプロジェクトが何を扱い何を扱わないか</strong>として書き直した</td></tr><tr><td>§7-6「アドオン構成から読める関心領域」の分析</td><td><strong>削除。</strong> <a href="#d-08">D-08</a>・<a href="#d-30">D-30</a> に経緯が残っている</td></tr><tr><td>§15「関口：研究室訪問」「松田：研究室訪問」</td><td><strong>§15「技術的な芯について」に統合。</strong> 内容は保持し、名前を外した</td></tr></tbody></table></div>
+<h3 id="注意">注意<a class="hash" href="#注意" aria-label="このセクションへのリンク">#</a></h3>
+<p><strong>技術核3つは、松田が 2026-08-16 の Q-a で「納得できる」と回答した項目である。</strong> 本人が同意した枠組みを外すことになるので、<strong>次に会うときに口頭で伝えること。</strong> 黙って消えていると、回答した意味が無かったことになる。</p>
+<p><strong><a href="#d-07">D-07</a>（技術核を3つ確保する）は撤回するが、項目自体は残す。</strong> 撤回の事実と理由を、そちらにも追記した。</p>
+<hr>
+<h2 id="d-38">D-38. プロジェクトをパッケージとして扱い、editable install で <code>import recon3d</code> を通す<a class="hash" href="#d-38" aria-label="このセクションへのリンク">#</a></h2>
+<p><strong>決定</strong>: <code>pyproject.toml</code> に <code>[build-system]</code>（hatchling）と <code>[tool.hatch.build.targets.wheel] packages = ["src/recon3d"]</code> を置き、<code>uv sync</code> に<strong>プロジェクト自身を editable install させる</strong>。あわせて、<strong>骨格作りの範囲を「<code>uv run pytest</code> が <code>1 passed</code> になるところまで」に固定する</strong>（計画書 §6-2）。</p>
+<p><strong>日付</strong>: 2026-08-20 ／ <strong>計画書</strong>: §6-2・§6-3 ／ <strong>判断者</strong>: 関口</p>
+<h3 id="経緯-3">経緯<a class="hash" href="#経緯-3" aria-label="このセクションへのリンク">#</a></h3>
+<p><code>.gitignore</code>・pytest・<code>.python-version</code> が入り、G6 の「器」で残るのは<strong>ディレクトリ骨格だけ</strong>になった。ところが <code>src/recon3d/</code> を置いても、<strong><code>import recon3d</code> が通る設定を決めていなければテストが書けない。</strong> 骨格に着手する前に、この1点を決める必要があった。</p>
+<h3 id="根拠-31">根拠<a class="hash" href="#根拠-31" aria-label="このセクションへのリンク">#</a></h3>
+<ol><li><strong>CLI エントリポイントを持つ計画だから</strong>（§6 の <code>tools/run_pipeline.py</code>）。対抗案だった pytest の <code>pythonpath = ["src"]</code> は設定1行で済むが、<strong>通るのは pytest 実行中だけ</strong>で、<code>uv run python tools/run_pipeline.py</code> からは <code>import recon3d</code> が通らない。<strong>あとで必ず作り直しになる。</strong></li><li><strong><code>uv sync</code> 1回で全端末に揃うから。</strong> editable install は <code>uv sync</code> が自動で行うため、3台（Windows / Ubuntu / mac）で<strong>手順が増えない</strong>。<code>PYTHONPATH</code> を各自の環境変数に設定させる案は、環境差の温床になるので採らない。</li><li><strong><code>src/</code> レイアウトの利点を保てるから。</strong> インストールされたものを import するので、<strong>リポジトリのルートで実行したときだけ通る</strong>という事故が起きない。</li></ol>
+<h3 id="実装上の落とし穴確認済み">実装上の落とし穴（確認済み）<a class="hash" href="#実装上の落とし穴確認済み" aria-label="このセクションへのリンク">#</a></h3>
+<ul><li>⚠️ <strong><code>packages = ["src/recon3d"]</code> の明示は必須。</strong> <code>[project] name</code> が <code>4bitcom-HandM</code> でパッケージ名 <code>recon3d</code> と一致しないため、省略すると hatchling がビルド対象を決められず <strong><code>uv sync</code> が失敗する</strong>（2026-08-20 に再現を確認）。</li><li><strong><code>uv.lock</code> が1行変わる</strong>：<code>source = { virtual = "." }</code> → <code>source = { editable = "." }</code>。依存関係は増えないので、この差分はコミットしてよい。</li><li><strong><code>src/recon3d/</code> がまだ無い状態でも <code>uv sync</code> は成功する</strong>（空のwheelが建つ）。つまり<strong>設定だけ先に入れてもリポジトリは壊れない</strong>が、<strong><code>import recon3d</code> は骨格ができるまで通らない</strong>。</li><li>⚠️ <strong>ただし、その順序でやると後から <code>src/</code> を作っても <code>uv sync</code> が再ビルドしない</strong>（<code>Audited</code> で素通りし、<code>import recon3d</code> が失敗し続ける）。<strong><code>uv sync --reinstall-package 4bitcom-handm</code> が必要</strong>（2026-08-20 に遭遇・解消）。<code>git pull</code> で <code>src/</code> ごと受け取る端末では起きないため、<strong>この落とし穴を踏むのは設定を先に入れた1台だけ</strong>。</li></ul>
+<h3 id="骨格の範囲を同時に決めた理由">骨格の範囲を同時に決めた理由<a class="hash" href="#骨格の範囲を同時に決めた理由" aria-label="このセクションへのリンク">#</a></h3>
+<p>§6 のツリーは<strong>完成時の姿</strong>であり、そのまま「作るもの一覧」として読むと、<strong>着手前に空ファイルを数十個置く</strong>ことになる。それは着手時に「空ファイルを消して作り直す」無駄なコンフリクトを生むだけなので、<strong>骨格は <code>__init__.py</code> と <code>.gitkeep</code> だけ</strong>とし、<strong>個別モジュールは実装する人が担当週に作る</strong>と決めた（§6-2）。<strong>完了判定を <code>uv run pytest</code> の結果という機械的な基準に置いた</strong>ので、「どこまでやれば終わりか」で揉める余地が無い。</p>
+<h3 id="この決定が崩れる条件-4">この決定が崩れる条件<a class="hash" href="#この決定が崩れる条件-4" aria-label="このセクションへのリンク">#</a></h3>
+<ul><li><strong>配布形態を変える場合</strong>（例：Blender アドオンとして固める）。そのときは <code>[project.scripts]</code> や同梱方法を含めて組み直す。</li><li><strong>hatchling 以外のビルドバックエンドに移る場合</strong>。<code>packages</code> の書き方が変わる。</li></ul>
+<hr>
+<h2 id="d-39">D-39. リポジトリを同期フォルダ（iCloud Drive 等）の下に置かない<a class="hash" href="#d-39" aria-label="このセクションへのリンク">#</a></h2>
+<p><strong>決定</strong>: 各自の作業コピーは<strong>ローカルのディレクトリ</strong>に置く（例：<code>~/Projects/4bitcom</code>）。<strong>iCloud Drive・OneDrive・Dropbox・Google Drive の同期フォルダ配下には clone しない。</strong></p>
+<p><strong>日付</strong>: 2026-08-20 ／ <strong>計画書</strong>: §7-8 ／ <strong>判断者</strong>: 関口</p>
+<h3 id="経緯-4">経緯<a class="hash" href="#経緯-4" aria-label="このセクションへのリンク">#</a></h3>
+<p>骨格が完成し <code>uv run pytest</code> が <code>1 passed</code> になった直後、<strong>同じ端末で同じコマンドが <code>ModuleNotFoundError: No module named 'recon3d'</code> で落ちた。</strong> 調べた結果、<strong>コードの問題ではなく iCloud Drive が原因</strong>だった。</p>
+<ol><li><code>uv</code> は <code>.venv</code> に macOS の <strong><code>hidden</code> フラグ</strong>を付ける（これは正常な動作）</li><li><strong>iCloud Drive がそのフラグを <code>.venv</code> 配下の全ファイルに伝播させる</strong>（691ファイル中691件）</li><li>CPython の <code>site.py</code>（<code>addpackage</code>）は、<strong><code>hidden</code> が付いた <code>.pth</code> ファイルを読み飛ばす</strong></li><li>editable install のパスを教える <code>_editable_impl_*.pth</code> が無視され、<code>src/</code> が <code>sys.path</code> に入らない → <strong><code>import recon3d</code> が失敗</strong></li></ol>
+<p><code>chflags nohidden</code> で外すと直るが、<strong>1分ほどで iCloud が付け直す</strong>ため対症療法にならない。あわせて <code>.venv/lib 2</code> という<strong>衝突コピー</strong>も生成されていた。</p>
+<h3 id="根拠-32">根拠<a class="hash" href="#根拠-32" aria-label="このセクションへのリンク">#</a></h3>
+<ol><li><strong>Git と役割が完全に重複している。</strong> 同期はリポジトリの仕事であり、ファイル同期サービスが上に重なると<strong>衝突コピーという「誰も編集していない差分」</strong>が生まれるだけ。</li><li><strong>壊れ方が分かりにくい。</strong> 今回の症状は「さっきまで通っていたテストが、何も変えていないのに落ちる」。<strong>原因がコードの外にあるため、デバッグに時間を取られる</strong>（実際に取られた）。</li><li><strong><code>.venv</code> は再生成できる。</strong> 同期して守る価値がそもそも無い（<code>.gitignore</code> 済み）。</li></ol>
+<h3 id="やったこと">やったこと<a class="hash" href="#やったこと" aria-label="このセクションへのリンク">#</a></h3>
+<p><code>~/Library/Mobile Documents/com~apple~CloudDocs/vscode/Project/4bitcom</code> → <strong><code>~/Projects/4bitcom</code></strong> へ移動し、<code>rm -rf .venv &amp;&amp; uv sync</code> で作り直した。<strong><code>.git/</code> ごと移動するため、remote 設定・追跡ブランチ・履歴はそのまま</strong>（<code>git remote -v</code>・<code>git ls-remote origin</code>・<code>git status -b</code> で確認済み）。移動後は <code>hidden</code> 0件、<code>uv run pytest</code> は <code>1 passed</code>。</p>
+<h3 id="他の端末への注意">他の端末への注意<a class="hash" href="#他の端末への注意" aria-label="このセクションへのリンク">#</a></h3>
+<ul><li><strong>Windows の OneDrive は同じ罠を持つ。</strong> <code>デスクトップ</code> や <code>ドキュメント</code> が既定で OneDrive 配下になっている構成が多いので、<strong>clone する場所を最初に確認すること</strong>（例：<code>C:\dev\4bitcom</code>）。</li><li><strong>症状が出るのは <code>.pth</code> を使う仕組み全般</strong>（editable install）。<a href="#d-38">D-38</a> の方式に固有の弱点ではなく、<code>pythonpath</code> 方式に逃げても<strong>別の形で衝突コピー問題は残る</strong>ので、D-38 は維持する。</li></ul>
+<hr>
+<h2 id="改訂履歴">改訂履歴<a class="hash" href="#改訂履歴" aria-label="このセクションへのリンク">#</a></h2>
+<div class="table-wrap"><table class="md"><thead><tr><th>日付</th><th>内容</th></tr></thead><tbody><tr><td>2026-08-15</td><td>本書を新設。計画書から根拠を分離</td></tr><tr><td>2026-08-15</td><td>D-04 追加（副担当も一部を実装する形へ改訂）。D-05 追加</td></tr><tr><td>2026-08-15</td><td>D-15 を確定に更新（Blender 5.0.1 / Python 3.11.13）。D-19・D-20・D-21 追加（松田の環境情報を受けて）</td></tr><tr><td>2026-08-15</td><td><strong>D-04 の歯止めを「各モジュール3割」→「全体平均3割」に修正</strong>（比重は内容によって変わるため）</td></tr><tr><td>2026-08-15</td><td><strong>D-19 に追記</strong>（関口側はBlenderを導入しないことが確定。<code>cameras.json</code> 書き出しの担当分割を含む）</td></tr><tr><td>2026-08-15</td><td><strong>D-27・D-28 追加</strong>（リポジトリの扱い／分担比重を実績で更新する運用）</td></tr><tr><td>2026-08-15</td><td><strong>D-29 追加</strong>（同席作業を既定とし、ペアプロと区別する）。あわせて <strong>D-04 の3割を「事前の制約」から「事後の計器」へ再修正</strong>。§3-6 の担当表を「話の出発点」に格下げ</td></tr><tr><td><strong>2026-08-16</strong></td><td><strong>松田の回答（2026-08-16 受領）を反映。D-30〜D-35 追加</strong>（テーマ確定／レンダリング設計の受け皿／256³ と Python 単一の維持／生成AI不使用を前提とした工程／不採用の記録／マスク方式の決め方）</td></tr><tr><td><strong>2026-08-16</strong></td><td><strong>D-08 の「崩れる条件」を閉じた</strong>（リアルタイム描画の了承・志望分野の判明。アドオンからの推測は外れていた）</td></tr><tr><td><strong>2026-08-16</strong></td><td><strong>D-17・D-19 の「未確認事項」を解消</strong>（Blender内蔵 numpy 1.26.4 / Cycles に選択可能なGPUデバイス無し）。<strong>D-21 にメモリ 16GB 確定を反映</strong>（チャンク分割は維持）</td></tr><tr><td><strong>2026-08-16</strong></td><td><strong>D-20 を改訂</strong>（マスク方式を「松田に委ねる」から撤回 → D-35）。<strong>D-27 の「崩れる条件」を解消</strong>（本リポジトリを3D復元専用にしてよいと回答）</td></tr><tr><td><strong>2026-08-16</strong></td><td><strong>D-36 追加。担当を「人」から「作業ジャンル G1〜G9」へ組み替え</strong>（メンバー追加の検討がきっかけ）。<strong>D-03・D-04・D-05・D-28 の役割名と歯止めは撤回</strong>（項目は履歴として残す）</td></tr><tr><td><strong>2026-08-16</strong></td><td><strong>D-37 追加。個人の研究志望に紐づく記述を計画書から削除</strong>（技術核3つ・研究助走・志望分野・研究室訪問の語り口）。<strong>D-07 を撤回。D-31 は「実験候補」として位置づけを変更。技術的な中身は変えていない</strong></td></tr><tr><td><strong>2026-08-20</strong></td><td><strong>D-38 追加。<code>import recon3d</code> を editable install で通すことに確定</strong>（pytest の <code>pythonpath</code> 案は却下）。<strong>あわせて骨格作りの範囲を計画書 §6-2 に明文化</strong>（完了判定は <code>uv run pytest</code> が <code>1 passed</code>）</td></tr><tr><td><strong>2026-08-20</strong></td><td><strong>D-39 追加。リポジトリを同期フォルダの下に置かないことを決定</strong>（iCloud Drive が <code>.venv</code> の <code>.pth</code> を hidden 化し、<code>import recon3d</code> が壊れる事象に遭遇。<code>~/Projects/4bitcom</code> へ移動して解決）</td></tr></tbody></table></div>
+  </main>
+</div>
+<footer class="foot">
+  <p>このページは <code>docs/decisions.md</code> から自動生成しています。編集は md 側で。</p>
+</footer>
+</body>
+</html>

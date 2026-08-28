@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>T01 — ペアプロ#1：座標系と cameras.json を決めて実装する</title>
+<link rel="stylesheet" href="../../assets/style.css">
+</head>
+<body>
+<header class="topbar">
+  <div class="topbar-inner">
+    <nav class="crumbs"><a href="../../index.html">ドキュメント</a><span class="sep">/</span><a href="README.html">tasks/</a></nav>
+    <span class="src">docs/tasks/T01-pairpro1-io.md</span>
+  </div>
+</header>
+<div class="layout">
+  <details class="toc"><summary class="toc-title">目次</summary><ul><li class="lv2"><a href="#着手前に読むもの">着手前に読むもの</a></li><li class="lv2"><a href="#なぜ最優先なのか">なぜ最優先なのか</a></li><li class="lv2"><a href="#進め方2時間の割り振り">進め方（2時間の割り振り）</a></li><li class="lv2"><a href="#ステップ0ブランチを切る">ステップ0：ブランチを切る</a></li><li class="lv2"><a href="#ステップ1規約を声に出して読み合わせる20分">ステップ1：規約を声に出して読み合わせる（20分）</a></li><li class="lv2"><a href="#ステップ2docs-conventionsmd-を書く20分">ステップ2：docs/conventions.md を書く（20分）</a></li><li class="lv2"><a href="#ステップ3docs-schema-camerasmd-を書く20分">ステップ3：docs/schema/cameras.md を書く（20分）</a></li><li class="lv2"><a href="#ステップ4テストを先に書く20分">ステップ4：テストを先に書く（20分）</a></li><li class="lv2"><a href="#ステップ5実装する30分">ステップ5：実装する（30分）</a></li><li class="lv2"><a href="#ステップ6完了判定10分">ステップ6：完了判定（10分）</a></li><li class="lv2"><a href="#テストが落ちたときの読み方">テストが落ちたときの読み方</a></li><li class="lv2"><a href="#つまずいたら">つまずいたら</a></li><li class="lv2"><a href="#終わったら">終わったら</a></li></ul></details>
+  <main class="page">
+<h1 id="t01--ペアプロ1座標系と-camerasjson-を決めて実装する">T01 — ペアプロ#1：座標系と <code>cameras.json</code> を決めて実装する<a class="hash" href="#t01--ペアプロ1座標系と-camerasjson-を決めて実装する" aria-label="このセクションへのリンク">#</a></h1>
+<p><a href="../next.html">← 次にやること一覧に戻る</a></p>
+<div class="table-wrap"><table class="md table--headless"><thead><tr><th></th><th></th></tr></thead><tbody><tr><td>ジャンル</td><td><strong>G6 基盤・I/O</strong>（<a href="../plan.html#s3-3">計画書 §3-3</a>）</td></tr><tr><td>目安時間</td><td><strong>2時間・2人そろってやる</strong>（<a href="../plan.html#s13">計画書 §13⑤</a>）</td></tr><tr><td>前提</td><td><code>git pull</code> 済み・<code>uv sync</code> 済み・<code>uv run pytest</code> が <code>1 passed</code> になること</td></tr><tr><td>作るもの</td><td><code>docs/conventions.md</code> / <code>docs/schema/cameras.md</code> / <code>src/recon3d/io/coords.py</code> / <code>src/recon3d/io/cameras.py</code> / <code>tests/test_conventions.py</code></td></tr><tr><td>仕様の出どころ</td><td><a href="../plan.html#s4">計画書 §4（座標系）</a>・<a href="../plan.html#s5">§5（<code>cameras.json</code>）</a> ／ <a href="../decisions.html#d-10">D-10</a>・<a href="../decisions.html#d-11">D-11</a>・<a href="../decisions.html#d-12">D-12</a>・<a href="../decisions.html#d-17">D-17</a></td></tr></tbody></table></div>
+<hr>
+<h2 id="着手前に読むもの">着手前に読むもの<a class="hash" href="#着手前に読むもの" aria-label="このセクションへのリンク">#</a></h2>
+<blockquote><p>⏰ <strong>この手順書は、当日ではなく前もって各自1回読んでおいてください。</strong>
+通読に<strong>25〜30分</strong>かかります。2時間の枠の中で読むと、実際に手を動かす時間が2割減ります。</p></blockquote>
+<p><strong>このタスクは、<a href="../plan.html#s7-7">計画書 §7-7</a> で「未経験」に挙がっている項目を4つ同時に使います。</strong>
+<strong>知らないまま2時間の枠に入ると、2時間が全部そこで溶けます。</strong> 先に目を通しておいてください（合計3〜4時間）。</p>
+<div class="table-wrap"><table class="md"><thead><tr><th>初めて出てくること</th><th>どこで使うか</th><th>資料</th></tr></thead><tbody><tr><td><strong><code>dataclass</code></strong></td><td><code>cameras.py</code> のデータ構造</td><td><a href="../learning.html">学びの入口 G6</a></td></tr><tr><td><strong><code>pytest</code></strong>（<code>assert</code>・<code>pytest.raises</code>・<code>tmp_path</code>）</td><td>ステップ4 のテスト3本</td><td><a href="../learning.html">学びの入口 G6</a></td></tr><tr><td><strong>NumPy</strong>（<code>@</code> と <code>*</code> の違い・<code>shape</code>）</td><td><code>coords.py</code> の行列計算</td><td><a href="../learning.html">学びの入口 G6</a></td></tr><tr><td><strong>型ヒント</strong></td><td>シグネチャの読み書き</td><td><a href="../learning.html">学びの入口 共通</a></td></tr></tbody></table></div>
+<p><strong>分からない言葉が出たら</strong> → <a href="../glossary.html">用語集</a>（<code>editable install</code>・<code>smoke test</code>・<code>再投影誤差</code> など）。</p>
+<h2 id="なぜ最優先なのか">なぜ最優先なのか<a class="hash" href="#なぜ最優先なのか" aria-label="このセクションへのリンク">#</a></h2>
+<p><strong>ここが決まらないと、他のジャンルが1行も書けません。</strong></p>
+<ul><li>G1（数理コア）は「カメラ行列がどっち向きか」が決まらないと式が書けない</li><li>G2（Blender）は「どの形式で書き出すか」が決まらないと出力できない</li><li>G5（ボクセル）は画像座標の上下が決まらないと投影できない</li></ul>
+<p><strong>しかも座標系のミスは、動くけれど答えが鏡像になる</strong>という形で出るので、後から気づきにくい。だから<strong>最初に決めて、破れない構造にします</strong>（<a href="../decisions.html#d-11">D-11</a>）。</p>
+<hr>
+<h2 id="進め方2時間の割り振り">進め方（2時間の割り振り）<a class="hash" href="#進め方2時間の割り振り" aria-label="このセクションへのリンク">#</a></h2>
+<div class="table-wrap"><table class="md"><thead><tr><th>時間</th><th>やること</th><th>成果物</th></tr></thead><tbody><tr><td>0:00–0:20</td><td>ステップ1：規約を読み合わせる</td><td>（口頭）</td></tr><tr><td>0:20–0:40</td><td>ステップ2：<code>docs/conventions.md</code> を書く</td><td>文書</td></tr><tr><td>0:40–1:00</td><td>ステップ3：<code>docs/schema/cameras.md</code> を書く</td><td>文書</td></tr><tr><td>1:00–1:20</td><td>ステップ4：<code>tests/</code> を先に書く</td><td>テスト</td></tr><tr><td>1:20–1:50</td><td>ステップ5：<code>io/coords.py</code>・<code>io/cameras.py</code> を実装する</td><td>コード</td></tr><tr><td>1:50–2:00</td><td>ステップ6：PR を出す</td><td>PR</td></tr></tbody></table></div>
+<blockquote><p><strong>テストを先に書きます。</strong> 「何ができたら正しいか」を先に固めてから実装すると、2人で分担しても答え合わせができます。</p></blockquote>
+<hr>
+<h2 id="ステップ0ブランチを切る">ステップ0：ブランチを切る<a class="hash" href="#ステップ0ブランチを切る" aria-label="このセクションへのリンク">#</a></h2>
+<pre><code class="lang-bash">git switch main
+git pull origin main
+uv sync
+git switch -c feat/io-coords-and-cameras</code></pre>
+<p><strong>numpy を入れます。</strong> まだ入っていないので、<strong>ここで1回だけ</strong>：</p>
+<pre><code class="lang-bash">uv add numpy
+uv run python -c "import numpy; print(numpy.__version__)"   # 数字が出れば OK</code></pre>
+<blockquote><p>⚠️ <strong>ステップ4（テストを書く）で numpy を使うので、必ず先に入れてください。</strong>
+<code>pyproject.toml</code> と <code>uv.lock</code> が変わります。<strong>両方コミットしてください。</strong> 他の端末は <code>git pull</code> 後に <code>uv sync</code> が要ります。</p></blockquote>
+<hr>
+<h2 id="ステップ1規約を声に出して読み合わせる20分">ステップ1：規約を声に出して読み合わせる（20分）<a class="hash" href="#ステップ1規約を声に出して読み合わせる20分" aria-label="このセクションへのリンク">#</a></h2>
+<p><a href="../plan.html#s4-1">計画書 §4-1 の表</a>を2人で開いて、<strong>1行ずつ声に出して確認します。</strong> ここで「あ、逆だと思ってた」を潰すのが目的です。</p>
+<p>確認する4点：</p>
+<ol><li><strong>世界座標</strong>：右手系・<strong>+Z が上</strong>（ターンテーブルの回転軸）・原点は回転台の中心</li><li><strong>カメラ座標</strong>：OpenCV規約。<strong>+X 右・+Y 下・+Z が光軸の前方</strong>（Blender と Y・Z の符号が逆）</li><li><strong>画像座標</strong>：OpenCV規約。<strong>原点は左上ピクセルの中心・+u 右・+v 下</strong></li><li><strong>外部パラメータの向き</strong>：<strong>world → camera</strong>。つまり <code>X_cam = R @ X_world + t</code></li></ol>
+<p><strong>世界座標の「+Z 上」だけ Blender に合わせてある</strong>理由も確認してください（世界座標の変換が不要になる。→ <a href="../decisions.html#d-10">D-10</a>）。</p>
+<hr>
+<h2 id="ステップ2docs-conventionsmd-を書く20分">ステップ2：<code>docs/conventions.md</code> を書く（20分）<a class="hash" href="#ステップ2docs-conventionsmd-を書く20分" aria-label="このセクションへのリンク">#</a></h2>
+<p><strong>計画書 §4 を丸写しするのではなく、「これを見れば実装できる」1枚にします。</strong></p>
+<pre><code class="lang-bash">touch docs/conventions.md</code></pre>
+<p><strong>必ず入れる項目（この5つが揃っていれば合格）</strong></p>
+<div class="table-wrap"><table class="md"><thead><tr><th>#</th><th>項目</th><th>中身</th></tr></thead><tbody><tr><td>1</td><td>4つの規約の表</td><td><a href="../plan.html#s4-1">計画書 §4-1</a> の表をそのまま</td></tr><tr><td>2</td><td><strong>図または文章での向きの説明</strong></td><td>「カメラから見て +X が右、+Y が<strong>下</strong>、被写体は +Z 方向にある」</td></tr><tr><td>3</td><td>Blender ↔ OpenCV の変換式</td><td><code>C = np.diag([1.0, -1.0, -1.0])</code> / <code>R_cv = C @ R_blender</code> / <code>t_cv = C @ t_blender</code> / <code>v_cv = H - 1 - v_blender</code></td></tr><tr><td>4</td><td><strong>禁止事項</strong></td><td><strong>「座標変換を書いてよいのは <code>src/recon3d/io/coords.py</code> の中だけ。他のファイルに <code>diag(1,-1,-1)</code> や <code>H - 1 - v</code> が現れたら規約違反」</strong></td></tr><tr><td>5</td><td>違反の検出方法</td><td><code>tests/test_conventions.py</code> が機械的に検出すること（ステップ4）</td></tr></tbody></table></div>
+<blockquote><p><strong>4 が本体です。</strong> 規約は「守ろうね」では守られないので、<strong>書ける場所を1ファイルに閉じ込めます</strong>（<a href="../decisions.html#d-11">D-11</a>）。</p></blockquote>
+<hr>
+<h2 id="ステップ3docs-schema-camerasmd-を書く20分">ステップ3：<code>docs/schema/cameras.md</code> を書く（20分）<a class="hash" href="#ステップ3docs-schema-camerasmd-を書く20分" aria-label="このセクションへのリンク">#</a></h2>
+<pre><code class="lang-bash">touch docs/schema/cameras.md</code></pre>
+<p><strong>必ず入れる項目</strong></p>
+<div class="table-wrap"><table class="md"><thead><tr><th>#</th><th>項目</th><th>中身</th></tr></thead><tbody><tr><td>1</td><td>JSON の実例まるごと1つ</td><td><a href="../plan.html#s5-1">計画書 §5-1</a> の JSON をそのまま貼る</td></tr><tr><td>2</td><td>フィールドの表</td><td>名前 / 型 / 必須か / 意味。<a href="../plan.html#s5-2">§5-2</a> を土台にする</td></tr><tr><td>3</td><td><strong><code>source</code> の3つの値の意味</strong></td><td><code>"turntable_gt"</code>（Blender の真値）/ <code>"dlt"</code>（自作 DLT の推定値）/ <code>"bundle_adjusted"</code>（バンドル調整後）。<strong>撤退ライン L2 への切り替えがこの1フィールドで済む</strong>（<a href="../plan.html#s12">§12</a>・<a href="../decisions.html#d-12">D-12</a>）</td></tr><tr><td>4</td><td>検証項目の表</td><td><a href="../plan.html#s5-3">§5-3</a> の4つ（<code>schema_version</code> / <code>convention</code> 一致 / <code>RᵀR ≈ I</code> / <strong><code>det(R) ≈ +1</code></strong>）</td></tr><tr><td>5</td><td>追加依存を入れない方針</td><td><strong>pydantic は使わず <code>dataclass</code> + 手書き検証</strong>（<a href="../decisions.html#d-17">D-17</a>）</td></tr></tbody></table></div>
+<p><strong>決めておくこと（ここで決めないと実装が止まります）</strong></p>
+<ul><li>相対パス（<code>"images/img_000.png"</code>）は<strong>何を基準にするか</strong> → <strong><code>cameras.json</code> 自身の置き場所からの相対</strong>にするのが素直です。決めたら文書に1行書く</li><li><code>reprojection_error_px</code> が <code>null</code> のときの扱い → <strong>「まだ測っていない」の意味</strong>と書く</li></ul>
+<hr>
+<h2 id="ステップ4テストを先に書く20分">ステップ4：テストを先に書く（20分）<a class="hash" href="#ステップ4テストを先に書く20分" aria-label="このセクションへのリンク">#</a></h2>
+<pre><code class="lang-bash">touch tests/test_conventions.py</code></pre>
+<p><strong>この3本を書きます。</strong> テストが「何が正しいか」の定義になるので、<strong>実装より先に書いてください。</strong></p>
+<h3 id="テスト1座標変換が-io-coordspy-の外に漏れていないこと">テスト1：座標変換が <code>io/coords.py</code> の外に漏れていないこと<a class="hash" href="#テスト1座標変換が-io-coordspy-の外に漏れていないこと" aria-label="このセクションへのリンク">#</a></h3>
+<p><code>src/</code> 全体を走査して、<code>io/coords.py</code> <strong>以外</strong>に変換のリテラルが現れたら失敗させます。検出するパターンの例：</p>
+<ul><li><code>diag(1, -1, -1)</code> / <code>diag([1.0, -1.0, -1.0])</code>（空白の有無を許す）</li><li><code>H - 1 - v</code> のような画像縦方向の反転</li><li><code>[[1,0,0],[0,-1,0],[0,0,-1]]</code> の直書き</li></ul>
+<p><strong>やり方</strong>：<code>src/</code> 配下の <code>*.py</code> を全部開き、<code>io/coords.py</code> はスキップ、残りの本文に正規表現をかけて、当たったら <code>pytest.fail(f"{path}: 座標変換は io/coords.py に書くこと")</code>。</p>
+<blockquote><p>⚠️ <strong><code>Path("src")</code> と書かないでください。</strong> これは<strong>コマンドを打った場所からの相対パス</strong>なので、リポジトリ直下以外から <code>pytest</code> を起動すると、
+<strong>エラーも出さずに0件走査して必ず pass します。</strong> 規約違反を永久に見逃す、一番たちの悪い壊れ方です。
+<strong>テストファイルの位置を基準にしてください</strong>（<code>Path(__file__).resolve().parents[1] / "src"</code> のような形）。
+<strong>あわせて「走査したファイルが0件なら fail させる」1行を必ず入れてください。</strong> これが空振りへの唯一の歯止めです。</p></blockquote>
+<blockquote><p><strong>いま <code>src/</code> にはまだ実装がほとんど無いので、このテストは最初から通ります。</strong> それでよいです。<strong>後から誰かが規約を破った瞬間に落ちる</strong>のが目的です。</p></blockquote>
+<h3 id="テスト2blender--opencv-の変換が仕様どおりであること">テスト2：Blender → OpenCV の変換が仕様どおりであること<a class="hash" href="#テスト2blender--opencv-の変換が仕様どおりであること" aria-label="このセクションへのリンク">#</a></h3>
+<p><strong>変換式は <a href="../plan.html#s4-2">計画書 §4-2</a> に決めてあります。テストに書く「期待値」は、先に紙で出してください。</strong></p>
+<blockquote><p><strong>ここは手順書に答えを書きません。</strong> 期待値を自分で出す作業が、そのまま<strong>規約を体に入れる作業</strong>だからです。
+<strong>2人で別々に紙に書いて、突き合わせてから</strong>テストに落とすと、片方の勘違いがその場で出ます。</p></blockquote>
+<p>出す期待値は3つです:</p>
+<div class="table-wrap"><table class="md"><thead><tr><th>#</th><th>入力</th><th>出すもの</th></tr></thead><tbody><tr><td>1</td><td><code>R_blender = I</code>（単位行列）、<code>t_blender = [0, 0, 5]</code></td><td><code>R_cv</code> と <code>t_cv</code> は何になるか（<strong>手計算で1行で出ます</strong>）</td></tr><tr><td>2</td><td>1 で出した <code>R_cv</code></td><td><code>R_cv.T @ R_cv</code> と <code>det(R_cv)</code> は何になるべきか</td></tr><tr><td>3</td><td><code>H = 1080</code> のとき <code>v_blender = 0</code> と <code>v_blender = H - 1</code></td><td>それぞれ <code>v_cv</code> は何になるか（<strong>端が端に写るか</strong>を見る）</td></tr></tbody></table></div>
+<p><strong>2 は「回転行列であること」の確認です。</strong> ここが崩れていたら変換式の書き方が間違っています。</p>
+<blockquote><p>💡 <strong>2人の答えが割れたら、それは規約の理解が割れているということです。</strong> <a href="../plan.html#s4-1">計画書 §4-1</a> に戻ってください。<strong>このズレを本番の実装中に見つけるより、いま見つけるほうが圧倒的に安いです。</strong></p></blockquote>
+<h3 id="テスト3壊れた-camerasjson-を読んだら例外が出ること">テスト3：壊れた <code>cameras.json</code> を読んだら例外が出ること<a class="hash" href="#テスト3壊れた-camerasjson-を読んだら例外が出ること" aria-label="このセクションへのリンク">#</a></h3>
+<p><strong>正常系1本と、異常系を <a href="../plan.html#s5-3">計画書 §5-3 の検証4項目</a> ぶん</strong>書きます。
+異常系は「<strong>1か所だけ壊した</strong> JSON」を作り、<code>load_cameras()</code> が例外を投げることを <code>pytest.raises</code> で確認します。</p>
+<p><strong>§5-3 の4項目は、それぞれ「どう壊せば引っかかるか」を考えて JSON を作ってください。</strong></p>
+<div class="table-wrap"><table class="md"><thead><tr><th>§5-3 の検証項目</th><th>壊し方は自分で決める</th></tr></thead><tbody><tr><td><code>schema_version</code> が既知か</td><td></td></tr><tr><td><code>convention</code> が想定と一致するか</td><td></td></tr><tr><td><code>RᵀR ≈ I</code>（回転行列が壊れていないか）</td><td></td></tr><tr><td><strong><code>det(R) ≈ +1</code></strong>（鏡映になっていないか）</td><td>← <strong>座標変換の符号ミスを捕まえる本命。ここは必ず書く</strong></td></tr></tbody></table></div>
+<blockquote><p><strong>「どう壊すか」を考えることが、そのまま「何を守っているか」の理解になります。</strong> だからここは空けてあります。
+思いつかない項目があったら、<a href="../plan.html#s5-3">計画書 §5-3</a> の右列「検出できる事故」を読んでください。</p></blockquote>
+<p>テスト用の JSON は <code>tests/fixtures/</code> に置くか、テスト内で <code>tmp_path</code> に書き出してください。</p>
+<hr>
+<h2 id="ステップ5実装する30分">ステップ5：実装する（30分）<a class="hash" href="#ステップ5実装する30分" aria-label="このセクションへのリンク">#</a></h2>
+<blockquote><p>⚠️ <strong>実装本体はこの手順書には載せていません。</strong> 「生成AIを使わずに書きたい」という方針（<a href="../decisions.html#d-33">D-33</a>）を尊重するためです。
+<strong>下に置くのは「関数の形（シグネチャ）と、その関数が何をするか」だけ</strong>です。中身は2人で書いてください。<strong>ステップ4のテストが通れば正解です。</strong></p>
+<p><strong>さらに、下の <code>dataclass</code> の分け方は一案にすぎません。</strong> <a href="../plan.html#s5-1">計画書 §5-1</a> の JSON と往復できるなら、<strong>まとめても分けても構いません。</strong>
+「どこで区切ると読みやすいか」は設計そのものなので、<strong>そこは決め直してよい</strong>ところです（変えたら <a href="../decisions.html">decisions.md</a> に1行）。</p></blockquote>
+<h3 id="src-recon3d-io-coordspy"><code>src/recon3d/io/coords.py</code><a class="hash" href="#src-recon3d-io-coordspy" aria-label="このセクションへのリンク">#</a></h3>
+<pre><code class="lang-python">"""座標変換。プロジェクト内で座標変換を書いてよいのはこのファイルだけ（docs/conventions.md）。"""
+
+import numpy as np
+
+# Blender ↔ OpenCV のカメラ座標変換行列（+Y と +Z の符号を反転する）
+C = np.diag([1.0, -1.0, -1.0])
+
+
+def blender_to_opencv_rt(R_blender: np.ndarray, t_blender: np.ndarray) -&gt; tuple[np.ndarray, np.ndarray]:
+    """Blender 規約の (R, t) を OpenCV 規約に変換する。
+
+    引数:
+        R_blender: (3, 3) 回転行列
+        t_blender: (3,)  並進ベクトル
+    戻り値:
+        (R_cv, t_cv)
+    """
+
+
+def blender_v_to_opencv_v(v_blender: np.ndarray | float, height: int) -&gt; np.ndarray | float:
+    """画像の縦座標を Blender/OpenGL（左下原点）から OpenCV（左上原点）に変換する。"""
+
+
+def world_to_camera(R: np.ndarray, t: np.ndarray, x_world: np.ndarray) -&gt; np.ndarray:
+    """世界座標の点をカメラ座標へ移す。X_cam = R @ X_world + t
+
+    1点なら (3,) を、まとめて渡すなら (N, 3) を受けられるようにする。
+
+    ⚠️ (N, 3) をそのまま `R @ x_world` に渡してはいけない。形が合わない。
+       しかも N == 3 のときだけ例外が出ず、黙って違う答えを返す。
+       まとめて扱う書き方は自分で確かめること（テストは N != 3 の点でも通ること）。
+    """</code></pre>
+<h3 id="src-recon3d-io-cameraspy"><code>src/recon3d/io/cameras.py</code><a class="hash" href="#src-recon3d-io-cameraspy" aria-label="このセクションへのリンク">#</a></h3>
+<pre><code class="lang-python">"""cameras.json の読み書きと検証（docs/schema/cameras.md）。
+
+追加依存は入れない。dataclass と json だけで書く（D-17）。
+"""
+
+from dataclasses import dataclass
+from pathlib import Path
+
+SCHEMA_VERSION = "1.0"
+
+
+@dataclass
+class Convention:
+    world_up: str
+    handedness: str
+    camera: str
+    image_origin: str
+    extrinsic_form: str
+
+
+@dataclass
+class Intrinsics:
+    fx: float
+    fy: float
+    cx: float
+    cy: float
+    # distortion は dict のままでよい（当面ゼロ固定のため）
+
+
+@dataclass
+class View:
+    image: str
+    mask: str | None
+    R: list[list[float]]
+    t: list[float]
+    source: str                      # "turntable_gt" | "dlt" | "bundle_adjusted"
+    turntable_angle_deg: float | None
+    reprojection_error_px: float | None
+
+
+@dataclass
+class CameraSet:
+    schema_version: str
+    convention: Convention
+    image_size: tuple[int, int]
+    intrinsics: Intrinsics
+    views: list[View]
+    meta: dict
+
+
+def load_cameras(path: Path) -&gt; CameraSet:
+    """読み込んで validate() を必ず通す。不正なら例外を投げる。"""
+
+
+def save_cameras(cameras: CameraSet, path: Path) -&gt; None:
+    """書き出す前に validate() を通す。壊れたファイルを世に出さない。"""
+
+
+def validate(cameras: CameraSet) -&gt; None:
+    """4項目を検査し、違反があれば ValueError を投げる。
+
+    1. schema_version が SCHEMA_VERSION と一致するか
+    2. convention が docs/conventions.md の値と一致するか
+    3. すべての R について R.T @ R ≈ I
+    4. すべての R について det(R) ≈ +1   ← 符号ミス（鏡映）の検出
+    """</code></pre>
+<hr>
+<h2 id="ステップ6完了判定10分">ステップ6：完了判定（10分）<a class="hash" href="#ステップ6完了判定10分" aria-label="このセクションへのリンク">#</a></h2>
+<p><strong>下が全部通ったら終わりです。</strong></p>
+<pre><code class="lang-bash">uv run pytest -v</code></pre>
+<ul><li class="task"><input type="checkbox" disabled> <code>tests/test_import.py</code> に加えて、<strong><code>tests/test_conventions.py</code> の3本以上が pass</strong></li><li class="task"><input type="checkbox" disabled> <code>uv run python -c "from recon3d.io import coords, cameras; print('ok')"</code> が <code>ok</code> を返す</li><li class="task"><input type="checkbox" disabled> <code>docs/conventions.md</code> に<strong>「座標変換は <code>io/coords.py</code> にだけ書く」</strong>が明記されている</li><li class="task"><input type="checkbox" disabled> <code>docs/schema/cameras.md</code> に<strong>JSON の実例まるごと1つ</strong>と<strong>検証4項目</strong>が載っている</li><li class="task"><input type="checkbox" disabled> <code>git status</code> に<strong>消し忘れの一時ファイルが無い</strong></li></ul>
+<p>PR を出す：</p>
+<pre><code class="lang-bash">git add -A
+git commit -m "feat(io): 座標系規約と cameras.json の読み書き・検証を追加（ペアプロ#1）"
+git push -u origin feat/io-coords-and-cameras</code></pre>
+<p>GitHub で PR を作成。説明文には<strong>「何を」「なぜ」を1〜3段落</strong>（<a href="../plan.html#s8-2">計画書 §8-2</a>）。<code>io/</code> は共有境界なので<strong>必ず2人でレビュー</strong>します（<a href="../plan.html#s6-1">計画書 §6-1</a>）。</p>
+<hr>
+<h2 id="テストが落ちたときの読み方">テストが落ちたときの読み方<a class="hash" href="#テストが落ちたときの読み方" aria-label="このセクションへのリンク">#</a></h2>
+<p><strong>落ちるのが普通です。</strong> pytest の出力は最初とっつきにくいので、<strong>どこを見ればいいか</strong>だけ先に書いておきます。</p>
+<p>例として、画像の縦反転で <code>- 1</code> を書き忘れた実装を通すと、こう出ます:</p>
+<pre><code>=================================== FAILURES ===================================
+_______________________________ test_bottom_edge _______________________________
+
+    def test_bottom_edge():
+&gt;       assert blender_v_to_opencv_v(0, 1080) == 1079
+E       assert 1080 == 1079
+E        +  where 1080 = blender_v_to_opencv_v(0, 1080)
+
+test_demo.py:5: AssertionError
+=========================== short test summary info ============================
+FAILED test_demo.py::test_bottom_edge - assert 1080 == 1079
+============================== 1 failed in 0.01s ===============================</code></pre>
+<p><strong>見る順番は下から上です。</strong></p>
+<div class="table-wrap"><table class="md"><thead><tr><th>見る場所</th><th>読み方</th></tr></thead><tbody><tr><td>一番下 <code>1 failed</code></td><td><strong>いくつ落ちたか。</strong> <code>1 passed, 1 failed</code> のように混在します</td></tr><tr><td><code>FAILED ... :: 関数名</code></td><td><strong>どのテストが落ちたか。</strong> <code>::</code> の右が関数名</td></tr><tr><td><code>test_demo.py:5</code></td><td><strong>落ちた行。</strong> ここをエディタで開く</td></tr><tr><td><code>E assert 1080 == 1079</code></td><td><strong><code>E</code> の行が失敗の中身。</strong> 左が実際の値、右が期待した値</td></tr><tr><td><code>+ where 1080 = ...(0, 1080)</code></td><td><strong>どの呼び出しがその値を返したか。</strong> pytest が自動で展開してくれます</td></tr><tr><td><code>&gt;</code> が付いた行</td><td>落ちた文そのもの</td></tr></tbody></table></div>
+<p><strong>この例なら</strong>：期待は 1079、実際は 1080。<strong>1 だけ多い</strong>ので、<code>height - v</code> を <code>height - 1 - v</code> にすればよい、と読めます。</p>
+<p><strong>よく使うオプション</strong></p>
+<pre><code class="lang-bash">uv run pytest -v                          # どのテストが通ったかを一覧で出す
+uv run pytest tests/test_conventions.py   # このファイルだけ動かす
+uv run pytest -k identity                 # 名前に identity を含むテストだけ動かす
+uv run pytest -x                          # 最初の1件が落ちたらそこで止める</code></pre>
+<blockquote><p>⚠️ <strong><code>E   ModuleNotFoundError: No module named 'numpy'</code> が出たら</strong>、<code>uv add numpy</code> がまだです（ステップ0）。
+<strong><code>No module named 'recon3d'</code> なら</strong> <code>uv sync</code> を1回（下の表）。</p></blockquote>
+<h2 id="つまずいたら">つまずいたら<a class="hash" href="#つまずいたら" aria-label="このセクションへのリンク">#</a></h2>
+<div class="table-wrap"><table class="md"><thead><tr><th>症状</th><th>対処</th></tr></thead><tbody><tr><td><code>ModuleNotFoundError: No module named 'recon3d'</code></td><td><code>uv sync</code> を1回。それでも直らなければ <code>uv sync --reinstall-package 4bitcom-handm</code>（<a href="../plan.html#s6-3">計画書 §6-3</a>）</td></tr><tr><td>同じ症状が数分後に再発する</td><td><strong>リポジトリが iCloud / OneDrive の同期フォルダの下にある</strong>可能性。<a href="../plan.html#s7-8">計画書 §7-8</a> を読んで移動してください</td></tr><tr><td><strong><code>det(R) = -1</code> になる</strong></td><td><strong><code>C</code> の符号の付け方が違います。</strong> <code>C</code> で<strong>符号を反転させる軸が奇数本</strong>だと <code>det = -1</code>（鏡映）になります。規約の <code>diag(1, -1, -1)</code> は2本なので <code>+1</code>。<code>diag(1, 1, -1)</code> や <code>diag(-1, -1, -1)</code> にしていないか見てください</td></tr><tr><td><strong><code>det</code> は合っているが、値が規約と合わない</strong></td><td><strong>掛ける順序の可能性。</strong> <code>C @ R</code> と <code>R @ C</code> は<strong>別の行列</strong>ですが、<strong><code>det</code> はどちらも同じ</strong>なので <code>det</code> では気づけません。規約は <code>C @ R</code> です（<a href="../plan.html#s4-2">計画書 §4-2</a>）</td></tr><tr><td>変換後の <code>t</code> の符号で悩む</td><td><code>t</code> はベクトルなので <code>C @ t</code>。<code>R</code> と同じ <code>C</code> を左から掛けるだけです</td></tr></tbody></table></div>
+<hr>
+<h2 id="終わったら">終わったら<a class="hash" href="#終わったら" aria-label="このセクションへのリンク">#</a></h2>
+<ol><li><a href="../progress.html">進捗ログ</a> の<strong>今週の表</strong>に<strong>G6 の行</strong>を1行足す（実働・やったこと・PR番号）。<strong>その週の節がまだ無ければ、<a href="../progress.html">進捗ログの「書き方」</a>のテンプレをコピーして作る</strong></li><li><a href="../next.html">次にやること</a> の T01 の状態を <code>✅ 完了（日付・PR番号）</code> に書き換える</li><li><strong>決めたこと（相対パスの基準など）を PR コメントに残す。</strong> 口頭で済ませると GitHub に何も残りません（<a href="../plan.html#s8-3">計画書 §8-3</a>）</li></ol>
+  </main>
+</div>
+<footer class="foot">
+  <p>このページは <code>docs/tasks/T01-pairpro1-io.md</code> から自動生成しています。編集は md 側で。</p>
+</footer>
+</body>
+</html>

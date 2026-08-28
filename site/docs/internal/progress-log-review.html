@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>進捗ログのレビュー手順（AI向け）</title>
+<link rel="stylesheet" href="../../assets/style.css">
+</head>
+<body>
+<header class="topbar">
+  <div class="topbar-inner">
+    <nav class="crumbs"><a href="../../index.html">ドキュメント</a><span class="sep">/</span><span>internal/</span></nav>
+    <span class="src">docs/internal/progress-log-review.md</span>
+  </div>
+</header>
+<div class="layout">
+  <details class="toc"><summary class="toc-title">目次</summary><ul><li class="lv2"><a href="#役割分担">役割分担</a></li><li class="lv3"><a href="#-aiは進捗ログを書かない">⛔ AIは進捗ログを書かない</a></li><li class="lv3"><a href="#呼ばれ方">呼ばれ方</a></li><li class="lv3"><a href="#作業完了の報告を受けたとき">作業完了の報告を受けたとき</a></li><li class="lv3"><a href="#指摘の出し方">指摘の出し方</a></li><li class="lv2"><a href="#1-毎週見るもの">1. 毎週見るもの</a></li><li class="lv3"><a href="#1-1-歯止めの判定">1-1. 歯止めの判定</a></li><li class="lv3"><a href="#1-1b-文書の同期30秒で見る">1-1b. 文書の同期（30秒で見る）</a></li><li class="lv3"><a href="#1-2-成果物として残っているか">1-2. 成果物として残っているか</a></li><li class="lv2"><a href="#2-その週にだけ見るもの">2. その週にだけ見るもの</a></li><li class="lv2"><a href="#3-記録を続けさせるための注意">3. 記録を続けさせるための注意</a></li></ul></details>
+  <main class="page">
+<h1 id="進捗ログのレビュー手順ai向け">進捗ログのレビュー手順（AI向け）<a class="hash" href="#進捗ログのレビュー手順ai向け" aria-label="このセクションへのリンク">#</a></h1>
+<p><strong>作成</strong>: 2026-08-17
+<strong>対象</strong>: <code>../progress.md</code>
+<strong>読む人</strong>: このプロジェクトの進捗管理を担当するAI。メンバーは読まなくてよい。</p>
+<hr>
+<h2 id="役割分担">役割分担<a class="hash" href="#役割分担" aria-label="このセクションへのリンク">#</a></h2>
+<p><strong>AIは開発のサポート。開発そのものも、その記録も、メンバーがやる。</strong>（2026-08-17・関口）</p>
+<div class="table-wrap"><table class="md"><thead><tr><th></th><th>誰が</th></tr></thead><tbody><tr><td>実装・コミット</td><td><strong>メンバー</strong></td></tr><tr><td>進捗ログの記入・個人メモ</td><td><strong>メンバー</strong></td></tr><tr><td><strong>進捗の更新</strong>（<code>../README.md</code> §1 の現在地、<code>../next.md</code> の「いまの状況」ブロック）</td><td><strong>AI</strong></td></tr><tr><td><code>../next.md</code> の<strong>状態列</strong>（<code>⬜</code>→<code>🔄</code>→<code>✅</code>）</td><td><strong>メンバー</strong>（本人がやった記録なので）</td></tr><tr><td><strong><code>../../Discuss.md</code> への記述</strong>（完了報告に不備があったとき）</td><td><strong>AI</strong></td></tr><tr><td>記入されたログのレビュー（指摘のみ）</td><td>AI</td></tr></tbody></table></div>
+<p><strong>AIの主業務はこの2つ（進捗の更新／Discuss.md への記述）。</strong> それ以外のファイルに書き足すときは、メンバーの記録を奪っていないか一度確認する。</p>
+<h3 id="-aiは進捗ログを書かない">⛔ AIは進捗ログを書かない<a class="hash" href="#-aiは進捗ログを書かない" aria-label="このセクションへのリンク">#</a></h3>
+<p><strong><code>../progress.md</code> への記入は、メンバーが行う。AIは1行も書き足さない。</strong>（2026-08-17・関口の指示）</p>
+<p>理由：ログは「実際にどう進んだか」の記録であり、<strong>手を動かした本人しか書けない。</strong> 詰まった点・工夫した点・振り返りを本人の言葉で残すことが目的なので（Discuss.md 08/17）、AIが埋めると記録として成立しない。</p>
+<p><strong>AIがやるのは、書かれたものを読んで足りない項目を指摘することだけ。</strong> 文面の提案を求められた場合も、<strong>ログファイルを直接編集せず、会話の中で案を示すにとどめる。</strong></p>
+<p><strong>同じ理由で <code>../next.md</code> の状態列と <code>../notes/</code> にも書かない。</strong> どちらも「本人が何をやったか」の記録なので、AIが埋めると記録として成立しない。
+<strong><code>../tasks/</code> の手順書については、<a href="ai-session-context.html"><code>ai-session-context.md</code> の「越えてはいけない線」</a>を必ず読むこと</strong>（実装や導出を書き足さない）。</p>
+<h3 id="呼ばれ方">呼ばれ方<a class="hash" href="#呼ばれ方" aria-label="このセクションへのリンク">#</a></h3>
+<p>メンバーが週次記録を書いたあと、進捗ログとこのファイルを渡して「レビューして」と言う。<strong>書き足す前ではなく、書いたあとに走らせる。</strong></p>
+<h3 id="作業完了の報告を受けたとき">作業完了の報告を受けたとき<a class="hash" href="#作業完了の報告を受けたとき" aria-label="このセクションへのリンク">#</a></h3>
+<p>メンバーが「この作業が終わりました」と口頭・チャットで報告してきた場合（ログ記入とは別）、<strong>成果物を実際に見て、不備があれば <code>../../Discuss.md</code> に書く。</strong>（2026-08-17・関口の指示）</p>
+<pre><code class="lang-markdown">### MM/DD
+
+from Claude to &lt;作成者&gt;
+
+（不備の内容。何が・計画書のどこと違うか・いつまでに直すか）</code></pre>
+<ul><li><strong>宛先は「作成者」。</strong> 分からなければ <code>git log --format='%h | %an | %s'</code> でそのファイルのコミット作者を見る。<strong>それでも判断できなければ関口に聞く。憶測で宛てない</strong></li><li>報告してきた人と作成者が別人のことがある（関口が全体の進捗としてまとめて報告する運用のため）</li><li><strong>不備が無ければ何も書かない。</strong> 「確認しました」だけの投稿で流れを埋めない</li><li>未着手のタスクは不備ではない。<strong>書くのは「完成したと言われたものの中にある欠け」だけ</strong></li></ul>
+<h3 id="指摘の出し方">指摘の出し方<a class="hash" href="#指摘の出し方" aria-label="このセクションへのリンク">#</a></h3>
+<ul><li><strong>多くても3件まで。</strong> 全部指摘すると次から見せてもらえなくなる</li><li>各件は「<strong>何が抜けているか / なぜ要るか（1行） / どこに何と書けばいいか</strong>」の3点セット</li><li><strong>書き方の細かさ（表記ゆれ・粒度）は指摘しない。</strong> 判断に効かない</li><li>埋まっていない欄そのものは指摘対象ではない。<strong>後の判断に使う欄が埋まっていないとき</strong>だけ指摘する</li></ul>
+<hr>
+<h2 id="1-毎週見るもの">1. 毎週見るもの<a class="hash" href="#1-毎週見るもの" aria-label="このセクションへのリンク">#</a></h2>
+<h3 id="1-1-歯止めの判定">1-1. 歯止めの判定<a class="hash" href="#1-1-歯止めの判定" aria-label="このセクションへのリンク">#</a></h3>
+<p>累積表と当週の行から、以下に当たっていないか確認する。<strong>当たっていたら必ず指摘する。</strong></p>
+<div class="table-wrap"><table class="md"><thead><tr><th>状態</th><th>指摘する内容</th></tr></thead><tbody><tr><td>あるジャンルの実績が見積もりの <strong>2倍</strong>を超えた</td><td>そのジャンルに人を寄せるか、<strong>スコープを削る</strong>（計画書 §12 の撤退ライン）</td></tr><tr><td><strong>3週続けて誰も取らなかった</strong>ジャンルがある</td><td>前提知識が足りていないか優先度がずれている。<strong>計画書 §3-7 の解説メモを先に入れる</strong></td></tr><tr><td>週の実働合計が <strong>12h を下回る</strong>状態が3週続いた</td><td>18週で終わらない。<strong>期間延長（〜2027年2月）かスコープ削減の判断が要る</strong></td></tr><tr><td>実績が見積もりの 1.5 倍以内</td><td>想定どおり。指摘しない</td></tr></tbody></table></div>
+<p>見積もりにはデバッグ時間が入っていない（<a href="../decisions.html#d-03">決定記録 D-03</a>）。<strong>実績との比が出たら、残りの週の計画を直せる</strong>ので、比が安定してきた時点で一度伝える。</p>
+<h3 id="1-1b-文書の同期30秒で見る">1-1b. 文書の同期（30秒で見る）<a class="hash" href="#1-1b-文書の同期30秒で見る" aria-label="このセクションへのリンク">#</a></h3>
+<p><strong>週次記録が書かれたとき、次の3つがズレていないかを見る。</strong> ズレていたら1件として指摘してよい。</p>
+<div class="table-wrap"><table class="md"><thead><tr><th>見るもの</th><th>期待</th></tr></thead><tbody><tr><td><code>../next.md</code> の状態列</td><td><strong>進捗ログで「やった」と書かれたタスクが <code>✅</code> になっているか</strong></td></tr><tr><td><code>../README.md</code> の §1（現在地）</td><td>完了したジャンルの行が更新されているか</td></tr><tr><td><code>../next.md</code> の「いまの状況」</td><td>週が進んでいるか</td></tr></tbody></table></div>
+<p><strong>3つとも古い場合でも指摘は1件にまとめる。</strong> 細かく分けて数を使わない。</p>
+<h3 id="1-2-成果物として残っているか">1-2. 成果物として残っているか<a class="hash" href="#1-2-成果物として残っているか" aria-label="このセクションへのリンク">#</a></h3>
+<p><strong>実測値・判断の根拠は、その週に書かないと二度と再現できない。</strong> 以下が週の記述から読み取れるのに本書に無ければ指摘する。</p>
+<ul><li><strong>測った数値</strong>（処理時間・誤差・メモリ・件数）→ 節目の記録の表に入れる</li><li><strong>口頭で決めたこと</strong> → IssueかPRのコメントに1〜2行。毎日会えるぶん口頭で済みがちで、<strong>GitHubに何も残らないと就活で見せる材料が減る</strong></li><li><strong>計画書・決定記録を変えたのに「決定を変えた記録」が空</strong> → <a href="../decisions.html#d-28">D-28</a> は決定記録の改訂履歴と本書の<strong>両方</strong>に残す運用</li><li><strong>詰まって解決した手順</strong> → <code>docs/notes/</code> に1本。書き手は実装した本人（計画書 §8-3）</li></ul>
+<hr>
+<h2 id="2-その週にだけ見るもの">2. その週にだけ見るもの<a class="hash" href="#2-その週にだけ見るもの" aria-label="このセクションへのリンク">#</a></h2>
+<p><strong>該当週のレビュー時に、この観点が記録に反映されているか確認する。</strong></p>
+<div class="table-wrap"><table class="md"><thead><tr><th>週</th><th>見る観点</th><th>使い道</th></tr></thead><tbody><tr><td><del><strong>W01</strong></del></td><td><del>各自の環境で <code>uv sync</code> / <code>uv run pytest</code> が通ったか</del></td><td><strong>✅ 2026-08-24 に3台とも確認済み</strong>（<a href="../progress.html">進捗ログ</a> W01）</td></tr><tr><td><strong>W02</strong></td><td><strong>ペアプロ#1（<a href="../tasks/T01-pairpro1-io.html">T01</a>）が2時間で終わったか</strong> ← <strong>W01 から持ち越し</strong></td><td>超過したなら <strong>W12・W14 のペアプロ見積もりも見直す</strong></td></tr><tr><td><strong>W02</strong></td><td><strong>Git 練習（<a href="../tasks/T05-git-practice.html">T05</a>）が実際に取れたか</strong> ← <strong>W01 から持ち越し。W03 が目前なので、この週に判断する</strong></td><td>取れていないなら <strong>Approve必須化（W03〜）を後ろにずらす</strong>（計画書 §8-1・§7-7）</td></tr><tr><td><strong>W02</strong></td><td>ジャンル制の初回運用（<a href="../tasks/T06-labels-and-board.html">T06</a>）。Issue に担当者を入れるのが「着手時」で回ったか</td><td>回らないなら <strong>計画書 §3-2 の決め方を直す</strong>（<a href="../decisions.html#d-36">D-36</a>）</td></tr><tr><td><strong>W02</strong></td><td><strong>マスク生成方式（<a href="../tasks/T07-mask-options.html">T07</a>）が決まったか</strong></td><td><strong>未決なら W03 以降の G3 が止まる</strong>（<a href="../decisions.html#d-35">D-35</a>）。<strong>W02 中に決めること</strong></td></tr><tr><td><strong>W02–W03</strong></td><td>Python / bpy に不慣れなメンバーが最初のコードを書くまでに要した時間</td><td>生成AIを使わない方針（<a href="../decisions.html#d-33">D-33</a>）の実コスト。<strong>見積もりの2倍を超えていたら E8（<a href="../decisions.html#d-31">D-31</a>）を落とす判断材料にする</strong>（W04）</td></tr><tr><td><strong>W03</strong></td><td>Phase 0 の実測値4項目が埋まったか</td><td><strong>埋まらないと Phase 1 の数値目標が決められない。最優先で指摘する</strong></td></tr><tr><td><strong>W04</strong></td><td>数値目標の具体値・E8 の採否が決まったか</td><td>実測を根拠に決める週</td></tr><tr><td><strong>W11</strong></td><td>判定①（11/1）の結果と根拠数値</td><td><strong>未記入なら判定が無かったことになる。必ず指摘する</strong></td></tr><tr><td><strong>W12</strong></td><td>ボクセル解像度の実測（各開発機のピークメモリ）</td><td>256³ 維持の可否（<a href="../decisions.html#d-21">D-21</a>・<a href="../decisions.html#d-32">D-32</a>）</td></tr><tr><td><strong>W15</strong></td><td>判定②（11/29）の結果と根拠数値</td><td>同上</td></tr><tr><td><strong>W16–W18</strong></td><td>評価実験の結果が数値で残っているか</td><td>最終成果物の中身になる</td></tr></tbody></table></div>
+<hr>
+<h2 id="3-記録を続けさせるための注意">3. 記録を続けさせるための注意<a class="hash" href="#3-記録を続けさせるための注意" aria-label="このセクションへのリンク">#</a></h2>
+<ul><li><strong>週1の対面の場に紐付ける。</strong> 単独タスクにすると続かない（<a href="../decisions.html#d-28">D-28</a>）。記入が飛んだ週があっても遡って責めない</li><li>記録作業のコストは<strong>週5〜10分</strong>を上限と考える。それを超える指摘はしない</li><li><strong>表を埋めることが目的ではない。</strong> 「遅れているジャンルに人を寄せる」「見積もりを直す」という判断につながらない欄は、空のままでよい</li><li>このファイルの観点が実態と合わなくなったら、<strong>指摘するより先にこのファイルを直す</strong></li></ul>
+  </main>
+</div>
+<footer class="foot">
+  <p>このページは <code>docs/internal/progress-log-review.md</code> から自動生成しています。編集は md 側で。</p>
+</footer>
+</body>
+</html>

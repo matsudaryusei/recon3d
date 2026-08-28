@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>T09 — 合成データ用の3Dモデルを探す（凹み形状が必須）</title>
+<link rel="stylesheet" href="../../assets/style.css">
+</head>
+<body>
+<header class="topbar">
+  <div class="topbar-inner">
+    <nav class="crumbs"><a href="../../index.html">ドキュメント</a><span class="sep">/</span><a href="README.html">tasks/</a></nav>
+    <span class="src">docs/tasks/T09-find-3d-model.md</span>
+  </div>
+</header>
+<div class="layout">
+  <details class="toc"><summary class="toc-title">目次</summary><ul><li class="lv2"><a href="#なぜ凹みが必須なのか">なぜ「凹み」が必須なのか</a></li><li class="lv2"><a href="#探す条件">探す条件</a></li><li class="lv2"><a href="#ライセンスで見るところ">ライセンスで見るところ</a></li><li class="lv2"><a href="#ステップ">ステップ</a></li><li class="lv2"><a href="#完了判定">完了判定</a></li><li class="lv2"><a href="#つまずいたら">つまずいたら</a></li><li class="lv2"><a href="#終わったら">終わったら</a></li></ul></details>
+  <main class="page">
+<h1 id="t09--合成データ用の3dモデルを探す凹み形状が必須">T09 — 合成データ用の3Dモデルを探す（<strong>凹み形状が必須</strong>）<a class="hash" href="#t09--合成データ用の3dモデルを探す凹み形状が必須" aria-label="このセクションへのリンク">#</a></h1>
+<p><a href="../next.html">← 次にやること一覧に戻る</a></p>
+<div class="table-wrap"><table class="md table--headless"><thead><tr><th></th><th></th></tr></thead><tbody><tr><td>ジャンル</td><td><strong>G2 3DCG</strong></td></tr><tr><td>目安時間</td><td>1時間</td></tr><tr><td>前提</td><td>なし（Blender で開ければなお良い）</td></tr><tr><td>作るもの</td><td><strong><code>docs/notes/model-candidates.md</code></strong>（候補3件と、ライセンスの確認結果）</td></tr><tr><td>仕様の出どころ</td><td><a href="../plan.html#s2">計画書 §2 被写体の設計要件</a> ／ <a href="../decisions.html#d-02">D-02</a> ／ <a href="../plan.html#s14">計画書 §14</a> の 8</td></tr></tbody></table></div>
+<hr>
+<blockquote><p><strong>先に読むもの</strong>：特にありません。<strong><code>凹み形状</code>・<code>閉じたメッシュ</code>・<code>真値</code> の意味だけ <a href="../glossary.html">用語集</a> で確認しておくと選びやすくなります。</strong></p></blockquote>
+<h2 id="なぜ凹みが必須なのか">なぜ「凹み」が必須なのか<a class="hash" href="#なぜ凹みが必須なのか" aria-label="このセクションへのリンク">#</a></h2>
+<p><strong>このプロジェクトは2つの復元手法を組み合わせて、片方の弱点をもう片方で埋めるのが芯です。</strong></p>
+<div class="table-wrap"><table class="md"><thead><tr><th>手法</th><th>苦手な条件</th></tr></thead><tbody><tr><td>① 多視点復元（特徴点ベース）</td><td><strong>無地でテクスチャのない面</strong> → 特徴点が取れず、点群に穴が空く</td></tr><tr><td>④ シルエット復元（ボクセル彫刻）</td><td><strong>凹んだ形状</strong> → 原理的に削れない（外から見えない窪みは彫れない）</td></tr></tbody></table></div>
+<p><strong>両方の弱点を同時に持つ被写体でないと、「組み合わせた意味」が数字に出ません。</strong>
+つまり <strong>無地の面 ＋ 凹み</strong> の両方が要ります。<strong>マグカップがちょうどこの2つを満たします</strong>（陶器の無地の面＋内側の窪み）。</p>
+<blockquote><p><strong>凹みの無いモデルを選ぶと、最重要実験 E5 が成立しません。</strong> ここだけは妥協できない条件です（→ <a href="../decisions.html#d-02">D-02</a>）。</p></blockquote>
+<hr>
+<h2 id="探す条件">探す条件<a class="hash" href="#探す条件" aria-label="このセクションへのリンク">#</a></h2>
+<div class="table-wrap"><table class="md"><thead><tr><th>#</th><th>条件</th><th>判定のしかた</th></tr></thead><tbody><tr><td>1</td><td><strong>内側に凹みがある</strong></td><td>断面を想像して、<strong>外から一直線に見えない窪みがあるか</strong>。マグカップの内側・壺・お椀・ヘルメットの内側など</td></tr><tr><td>2</td><td><strong>無地の面がある</strong></td><td>全面に模様が入っていないこと。<strong>木目や布のテクスチャで覆われたモデルは①が有利になりすぎる</strong></td></tr><tr><td>3</td><td><strong>閉じたメッシュ</strong>（穴が空いていない）</td><td>真値との比較に使うため。板だけのモデルは不可</td></tr><tr><td>4</td><td><strong>ポリゴン数が極端でない</strong></td><td>数千〜数十万程度。数百万は Blender が重くなる</td></tr><tr><td>5</td><td><strong>ライセンスが確認できる</strong></td><td><strong>下記参照</strong></td></tr></tbody></table></div>
+<p><strong>探す場所の例</strong>：Poly Haven / Blender の公式デモファイル / Sketchfab の CC0・CC-BY 絞り込み / Thingiverse など。<strong>「マグカップ」「cup」「mug」「bowl」で探すのが早いです。</strong></p>
+<p><strong>副データ（<code>synthetic_bunny</code>）も1つ確保してください</strong>（<a href="../plan.html#s2">計画書 §2</a>）。</p>
+<p><strong>こちらは主データと条件が逆です。</strong> 目的は<strong>「①（多視点復元）が最も上手くいく条件で、どこまでの性能が出るか」を測ること</strong>なので、</p>
+<div class="table-wrap"><table class="md"><thead><tr><th>副データの条件</th><th>なぜ</th></tr></thead><tbody><tr><td><strong>テクスチャが豊富</strong>（模様・色の変化が多い）</td><td><strong>特徴点がたくさん取れる</strong>必要があります。無地だと①が本来の力を出せません</td></tr><tr><td><strong>凹みが少ない</strong></td><td>凹みは④の弱点を見るためのもので、こちらの目的ではありません</td></tr></tbody></table></div>
+<blockquote><p>⚠️ <strong>名前に引きずられないでください。</strong> <code>synthetic_bunny</code> はデータセットの呼び名で、<strong>Stanford Bunny をそのまま使う指定ではありません。</strong>
+<strong>Stanford Bunny は無彩色のスキャンデータでテクスチャを持たず、耳の間や顎の下に凹部もあります。</strong> そのまま使うと上の2条件を満たしません。
+<strong>テクスチャを貼って使うか、条件に合う別のモデルを選んでください。</strong> どちらにするかは選ぶ人が決めてよいので、<strong>選んだ理由をメモに1行残してください。</strong></p></blockquote>
+<hr>
+<h2 id="ライセンスで見るところ">ライセンスで見るところ<a class="hash" href="#ライセンスで見るところ" aria-label="このセクションへのリンク">#</a></h2>
+<p><strong>このリポジトリは完成後に public 化する前提です</strong>（<a href="../decisions.html#d-27">D-27</a>）。<strong>モデルをコミットしなくても、成果物の画像に写ります。</strong></p>
+<div class="table-wrap"><table class="md"><thead><tr><th>ライセンス</th><th>使えるか</th><th>必要なこと</th></tr></thead><tbody><tr><td><strong>CC0 / Public Domain</strong></td><td>◎ そのまま使える</td><td>表記は任意（<strong>それでも書いておく</strong>）</td></tr><tr><td><strong>CC-BY</strong></td><td>○ 使える</td><td><strong>作者名・出典 URL・ライセンス名の表記が必須</strong></td></tr><tr><td><strong>CC-BY-SA</strong></td><td>△ 使えるが注意</td><td>派生物にも同じライセンスが要求される。<strong>避けたほうが無難</strong></td></tr><tr><td><strong>CC-BY-NC</strong></td><td>✕ <strong>避ける</strong></td><td>非商用限定。就活での提示は微妙なので使わない</td></tr><tr><td><strong>不明・記載なし</strong></td><td>✕ <strong>使わない</strong></td><td>確認できないものは候補に入れない</td></tr></tbody></table></div>
+<blockquote><p><strong><code>data/</code> は <code>.gitignore</code> で除外されています</strong>（<a href="../plan.html#s6">計画書 §6</a>）。<strong>モデル本体はコミットしません。</strong>
+<strong>コミットするのは「どこから取ってきたか」の記録だけ</strong>です。それがこのメモです。</p></blockquote>
+<hr>
+<h2 id="ステップ">ステップ<a class="hash" href="#ステップ" aria-label="このセクションへのリンク">#</a></h2>
+<pre><code class="lang-bash">git switch main &amp;&amp; git pull origin main
+git switch -c docs/model-candidates
+mkdir -p docs/notes
+touch docs/notes/model-candidates.md</code></pre>
+<p><strong>下の骨組みを貼って埋めます。</strong></p>
+<pre><code class="lang-markdown"># 合成データ用 3Dモデルの候補
+
+**条件**: 凹み形状が必須（計画書 §2・D-02）。無地の面があること。閉じたメッシュであること。
+
+## 主データ候補（`synthetic_cup` 相当・凹みあり）
+
+### 候補1
+- 名前 / URL:
+- ライセンス:
+- 作者:
+- ファイル形式（.blend / .obj / .fbx など）:
+- ポリゴン数:
+- **凹みの確認**: （どこが凹んでいるか。1行）
+- **無地の面の確認**: （どこが無地か。1行）
+- 良い点 / 気になる点:
+
+### 候補2
+（同じ形）
+
+### 候補3
+（同じ形）
+
+## 副データ候補（`synthetic_bunny`・**テクスチャが豊富・凹みが少ない**）
+
+### 候補1
+（同じ形）
+
+## 推す案
+
+（1段落。なぜこれか）
+
+## 表記が必要な場合の記載文
+
+（CC-BY を選んだ場合、README に載せる1行をここに用意しておく）
+例: "Mug model by &lt;作者&gt; (&lt;URL&gt;), licensed under CC BY 4.0."</code></pre>
+<hr>
+<h2 id="完了判定">完了判定<a class="hash" href="#完了判定" aria-label="このセクションへのリンク">#</a></h2>
+<ul><li class="task"><input type="checkbox" disabled> <strong>主データの候補が3件</strong>あり、全部に<strong>ライセンス名と URL</strong> が書いてある</li><li class="task"><input type="checkbox" disabled> <strong>3件すべてについて「どこが凹んでいるか」が1行で書いてある</strong>（これが無いと選べません）</li><li class="task"><input type="checkbox" disabled> <strong>副データの候補が1件以上</strong>あり、<strong>テクスチャの有無</strong>が書いてある（無ければ「貼る必要あり」と明記）</li><li class="task"><input type="checkbox" disabled> <strong>CC-BY を含む候補がある場合、README に載せる表記文が用意されている</strong></li><li class="task"><input type="checkbox" disabled> 推す案が1つ決まっている</li></ul>
+<p><strong>できれば</strong>：推した候補を Blender で開いて、<strong>上下・左右がひっくり返っていないか</strong>と<strong>スケール（1単位＝何 m か）</strong>を見てください。ここがずれると <a href="T01-pairpro1-io.html">T01</a> で決めた座標系の話とつながります。</p>
+<hr>
+<h2 id="つまずいたら">つまずいたら<a class="hash" href="#つまずいたら" aria-label="このセクションへのリンク">#</a></h2>
+<div class="table-wrap"><table class="md"><thead><tr><th>症状</th><th>対処</th></tr></thead><tbody><tr><td><strong>ライセンスがどこにも書いていない</strong></td><td><strong>候補から外す。</strong> 「確認できないものは使わない」が本プロジェクトの方針です（public 化するため）</td></tr><tr><td><strong>凹みがあるか判断できない</strong></td><td><strong>断面を想像する。</strong>「外から一直線に見えない窪みがあるか」だけです。マグカップの内側・お椀・壺・ヘルメットの内側が該当します</td></tr><tr><td>良いモデルだがポリゴン数が数百万ある</td><td>候補には残してよいですが、<strong>「重い」と備考に書く</strong>。Blender の Decimate で減らせますが、その手間も見積もりに入ります</td></tr><tr><td><strong>モデルが <code>.fbx</code> や <code>.gltf</code> で、開けるか不安</strong></td><td>Blender はどれも読めます。<strong>開けたかどうかを備考に書けば十分</strong>です</td></tr><tr><td><strong>全面にテクスチャが貼ってある</strong></td><td><strong>条件2（無地の面）を満たしません。</strong> ただし Blender でマテリアルを外せば無地にできるので、「加工が要る」と書いて候補に残してよい</td></tr><tr><td><strong>テクスチャ付きの副データが見つからない</strong></td><td><strong>形と模様は別々に調達できます。</strong> 凹みの少ないモデル（Stanford Bunny・Blender 内蔵の Suzanne など）を取ってきて、<strong>テクスチャ画像を貼る</strong>のが早道です。<strong>その場合は「テクスチャは別途貼った」とメモに書いてください</strong>（後で E5 の条件を説明するときに要ります）</td></tr><tr><td><strong>1時間で3件そろわない</strong></td><td><strong>2件でも出す。</strong> 2件あれば比較になります</td></tr></tbody></table></div>
+<h2 id="終わったら">終わったら<a class="hash" href="#終わったら" aria-label="このセクションへのリンク">#</a></h2>
+<ol><li><a href="../progress.html">進捗ログ</a> の今週の表に <strong>G2 の行</strong>を1行足す</li><li><a href="../next.html">次にやること</a> の T09 の状態を <code>✅ 完了</code> に書き換える</li><li><strong><a href="../plan.html#s14">計画書 §14</a> の 8 番</strong>に結果を書いて消し込む</li><li><strong><a href="../../Discuss.html">Discuss.md</a> で「どれにするか」を2人で決める。</strong> 決まったら <a href="../plan.html#s16">計画書 §16（未決定項目）</a> の該当行も消し込む</li></ol>
+  </main>
+</div>
+<footer class="foot">
+  <p>このページは <code>docs/tasks/T09-find-3d-model.md</code> から自動生成しています。編集は md 側で。</p>
+</footer>
+</body>
+</html>

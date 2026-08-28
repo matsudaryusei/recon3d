@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>手順書（tasks/）</title>
+<link rel="stylesheet" href="../../assets/style.css">
+</head>
+<body>
+<header class="topbar">
+  <div class="topbar-inner">
+    <nav class="crumbs"><a href="../../index.html">ドキュメント</a><span class="sep">/</span><span>tasks/</span></nav>
+    <span class="src">docs/tasks/README.md</span>
+  </div>
+</header>
+<div class="layout">
+  <details class="toc"><summary class="toc-title">目次</summary><ul><li class="lv2"><a href="#一覧">一覧</a></li><li class="lv2"><a href="#手順書の作り方新しいタスクを足すとき">手順書の作り方（新しいタスクを足すとき）</a></li><li class="lv2"><a href="#-どこまで書くか手順書を足す人へ">⚠️ どこまで書くか（手順書を足す人へ）</a></li></ul></details>
+  <main class="page">
+<h1 id="手順書tasks-">手順書（tasks/）<a class="hash" href="#手順書tasks-" aria-label="このセクションへのリンク">#</a></h1>
+<p><strong>ここは「やり方」だけを置く場所です。</strong></p>
+<ul><li><strong>どれをやるかを選ぶ</strong> → <strong><a href="../next.html">../next.md（次にやること）</a></strong></li><li><strong>言葉が分からない</strong> → <a href="../glossary.html">../glossary.md（用語集）</a></li><li><strong>書けそうにない</strong> → <a href="../learning.html">../learning.md（学びの入口）</a></li><li><strong>何を作るか（仕様）</strong> → <a href="../plan.html">../plan.md（計画書）</a></li><li><strong>なぜそう決めたか</strong> → <a href="../decisions.html">../decisions.md（決定記録）</a></li><li><strong>何をやったか</strong> → <a href="../progress.html">../progress.md（進捗ログ）</a></li></ul>
+<hr>
+<h2 id="一覧">一覧<a class="hash" href="#一覧" aria-label="このセクションへのリンク">#</a></h2>
+<blockquote><p><strong>これは見出しの写しです。優先度・状態・前提は <a href="../next.html">../next.md</a> が正。</strong></p></blockquote>
+<div class="table-wrap"><table class="md"><thead><tr><th>#</th><th>タスク</th><th>ジャンル</th><th>目安</th></tr></thead><tbody><tr><td><a href="T01-pairpro1-io.html">T01</a></td><td><strong>ペアプロ#1：座標系と <code>cameras.json</code> を決めて実装する</strong></td><td>G6 基盤・I/O</td><td>2h（2人）</td></tr><tr><td><a href="T02-oral-decisions.html">T02</a></td><td>保留になっている5件を口頭で決める</td><td>全員</td><td>15分</td></tr><tr><td><a href="T03-ci-workflow.html">T03</a></td><td>CI（GitHub Actions）の雛形を置く</td><td>G7 テスト・CI</td><td>1h</td></tr><tr><td><a href="T04-branch-protection.html">T04</a></td><td><code>main</code> ブランチを保護する（<strong>T03・T05 の後</strong>）</td><td>G7 テスト・CI</td><td>30分</td></tr><tr><td><a href="T05-git-practice.html">T05</a></td><td>Git の練習を1周する</td><td>全員</td><td>1h</td></tr><tr><td><a href="T06-labels-and-board.html">T06</a></td><td>ラベルを登録して Projects ボードを1枚作る</td><td>G9 ドキュメント・運用</td><td>45分</td></tr><tr><td><a href="T07-mask-options.html">T07</a></td><td>マスク生成方式の候補を1枚に</td><td>G3 画像処理</td><td>2h</td></tr><tr><td><a href="T08-blender-entry-note.html">T08</a></td><td>Blender スクリプトの入口メモ</td><td>G2 3DCG</td><td>1.5h</td></tr><tr><td><a href="T09-find-3d-model.html">T09</a></td><td>合成データ用の3Dモデルを探す</td><td>G2 3DCG</td><td>1h</td></tr><tr><td><a href="T10-read-scope.html">T10</a></td><td>スコープと撤退ラインに目を通す</td><td>全員</td><td>15分</td></tr></tbody></table></div>
+<hr>
+<h2 id="手順書の作り方新しいタスクを足すとき">手順書の作り方（新しいタスクを足すとき）<a class="hash" href="#手順書の作り方新しいタスクを足すとき" aria-label="このセクションへのリンク">#</a></h2>
+<p><strong>番号を1つ進めて、<code>T&lt;番号&gt;-&lt;内容&gt;.md</code> で作ります。</strong> 中身は既存のどれかをコピーして、下の6ブロックを埋めてください。</p>
+<div class="table-wrap"><table class="md"><thead><tr><th>ブロック</th><th>中身</th></tr></thead><tbody><tr><td>1. <strong>見出しの表</strong></td><td>ジャンル / 目安時間 / 前提 / 作るもの / <strong>仕様の出どころ（plan.md・decisions.md へのリンク）</strong></td></tr><tr><td>2. <strong>なぜやるのか</strong></td><td>2〜4段落。<strong>これが無いと「言われたからやる」になり、判断が入らなくなります</strong></td></tr><tr><td>3. <strong>ステップ</strong></td><td><strong>打ち込むコマンドをそのまま載せる。</strong> 「◯◯を設定する」で止めない</td></tr><tr><td>4. <strong>完了判定</strong></td><td><strong>チェックボックス。</strong> 「動いた」ではなく<strong>「何をどう見たら分かるか」</strong>を書く</td></tr><tr><td>5. <strong>つまずいたら</strong></td><td>症状 → 対処の表。<strong>実際に踏んだものを足していく</strong></td></tr><tr><td>6. <strong>終わったら</strong></td><td>進捗ログへの記録・next.md の更新・次に繋がるタスク</td></tr></tbody></table></div>
+<blockquote><p><strong>仕様そのものはここに書きません。</strong> 計画書に書いて、ここからリンクします。
+<strong>二重に書くと必ず食い違い、どちらが正か分からなくなります。</strong> 食い違ったときは<strong>計画書と決定記録が正</strong>です。</p></blockquote>
+<hr>
+<h2 id="-どこまで書くか手順書を足す人へ">⚠️ どこまで書くか（手順書を足す人へ）<a class="hash" href="#-どこまで書くか手順書を足す人へ" aria-label="このセクションへのリンク">#</a></h2>
+<p><strong>手順書は「工夫する余地を奪わない」ことを条件に書きます。</strong> 全部書けば親切、ではありません。</p>
+<div class="table-wrap"><table class="md"><thead><tr><th>全部書く</th><th>書かない（空けておく）</th></tr></thead><tbody><tr><td><strong>環境構築・ツールの操作</strong>（<code>uv</code>・Git・GitHub の画面）</td><td><strong>アルゴリズムの導出・数式の変形</strong></td></tr><tr><td><strong>設定ファイルの中身</strong>（<code>ci.yml</code>・ラベル定義）</td><td><strong>実装コード</strong>（関数の形と、通すべきテストまで）</td></tr><tr><td><strong>打つコマンドと、その期待出力</strong></td><td><strong>テストの期待値</strong>（自分で導いてもらう）</td></tr><tr><td><strong>完了したと分かる観測方法</strong></td><td><strong>比較の結論・設計の選択</strong>（どちらが良いか）</td></tr><tr><td><strong>詰まったときの対処</strong>（既知の罠）</td><td><strong>調べれば分かることの要約</strong></td></tr></tbody></table></div>
+<p><strong>判断の基準は1つです。</strong></p>
+<blockquote><p><strong>「そこで詰まって時間を使うことに、学びがあるか」</strong></p>
+<ul><li><code>uv sync</code> が通らずに2時間溶かす → <strong>学びはない。だから全部書く</strong></li><li>座標変換の符号を自分で導いて間違える → <strong>その間違いが理解になる。だから書かない</strong></li></ul></blockquote>
+<p><strong>迷ったら「書かない」側に倒し、代わりに <a href="../learning.html">学びの入口</a> に資料を1本足してください。</strong></p>
+  </main>
+</div>
+<footer class="foot">
+  <p>このページは <code>docs/tasks/README.md</code> から自動生成しています。編集は md 側で。</p>
+</footer>
+</body>
+</html>
