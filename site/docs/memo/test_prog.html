@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pythonでのテスト用プログラムの作成 2026/9/4</title>
+<link rel="stylesheet" href="../../assets/style.css">
+</head>
+<body>
+<header class="topbar">
+  <div class="topbar-inner">
+    <nav class="crumbs"><a href="../../index.html">ドキュメント</a><span class="sep">/</span><span>memo/</span></nav>
+    <span class="src">docs/memo/test_prog.md</span>
+  </div>
+</header>
+<div class="layout">
+  <details class="toc"><summary class="toc-title">目次</summary><ul><li class="lv2"><a href="#raw文字列">raw文字列</a></li><li class="lv2"><a href="#recompile">re.compile(...)</a></li><li class="lv2"><a href="#assertとは">assertとは</a></li><li class="lv2"><a href="#テスト用プログラムの関数について">テスト用プログラムの関数について</a></li><li class="lv3"><a href="#def-test_no_stray_coordinate_conversion-について">def test_no_stray_coordinate_conversion(): について</a></li><li class="lv3"><a href="#def-test_identity_rotation-について">def test_identity_rotation() について</a></li><li class="lv3"><a href="#def-test_rotation_is_orthogonal-について">def test_rotation_is_orthogonal() について</a></li><li class="lv3"><a href="#def-test_v_edges-について">def test_v_edges() について</a></li><li class="lv2"><a href="#テスト3壊れた-camerasjson-を読んだら例外が出ること">テスト3：壊れた cameras.json を読んだら例外が出ること</a></li><li class="lv3"><a href="#valid_camera_dict-について">valid_camera_dict() について</a></li><li class="lv3"><a href="#def-test_load_valid_cameras-について">def test_load_valid_cameras() について</a></li><li class="lv3"><a href="#with文とはclaude作一般的な説明">with文とは（Claude作一般的な説明）</a></li><li class="lv3"><a href="#with文が裏で呼んでいるもの__enter____exit__">with文が裏で呼んでいるもの（__enter__・__exit__）</a></li><li class="lv3"><a href="#pytestraises-の-__exit__-が具体的にやっていること">pytest.raises の __exit__ が具体的にやっていること</a></li><li class="lv3"><a href="#異常系4本の設計">異常系4本の設計</a></li></ul></details>
+  <main class="page">
+<h1 id="pythonでのテスト用プログラムの作成-2026-9-4">Pythonでのテスト用プログラムの作成 2026/9/4<a class="hash" href="#pythonでのテスト用プログラムの作成-2026-9-4" aria-label="このセクションへのリンク">#</a></h1>
+<p>Pythonでテスト用のプログラム開発時に</p>
+<pre><code class="lang-python">import re</code></pre>
+<p>という<strong>正規表現モジュール</strong>と</p>
+<pre><code class="lang-python">from pathlib import Path</code></pre>
+<p>ファイル・ディレクトリ(フォルダ)のパスをオブジェクトとして操作・処理ができるモジュールを利用</p>
+<p>Pathを記述するうえで<strong>raw文字列</strong>を知っている必要がある。</p>
+<h2 id="raw文字列">raw文字列<a class="hash" href="#raw文字列" aria-label="このセクションへのリンク">#</a></h2>
+<p>C言語やPythonでは通常``<code>\n</code>`<code>で改行を行うが、これは</code>`<code>\</code>`<code>が特殊な意味を持つためである。しかし、正規表現では</code>`<code>\s</code>`<code>や</code>`<code>\.</code>`<code>など</code>`<code>\</code>``を多用するため、これを文字列として使用すると問題が起こる。</p>
+<p>そのため</p>
+<pre><code class="lang-python">FORBIDDEN_PATTERNS = [
+    re.compile(r"diag\(\s*\[?1(\.0)?\s*,\s*-1(\.0)?\s*,\s*-1(\.0)?"), # diag(1,-1,-1)などのnumpyの対角行列を作る関数の正規表現
+    # 略
+]</code></pre>
+<p>のように<code>r"..."</code>と記述する必要がある。</p>
+<h2 id="recompile">re.compile(...)<a class="hash" href="#recompile" aria-label="このセクションへのリンク">#</a></h2>
+<p>上記の<code>FORBIDDEN_PATTERNS</code>にもある<code>re.compile(パターン文字列)</code>は、そのパターンをあらかじめ<strong>正規表現オブジェクト</strong>に変換する関数である。</p>
+<p>つまりやっていることは</p>
+<pre><code class="lang-python">pattern_str = r"diag\(\s*\[?1(\.0)?\s*,\s*-1(\.0)?\s*,\s*-1(\.0)?"  # ただのraw文字列
+pattern = re.compile(pattern_str)  # 検索に使える正規表現オブジェクトに変換</code></pre>
+<p>このように制作したオブジェクト``<code>pattern</code>``を以下のように使える。</p>
+<pre><code class="lang-python">pattern.search(text)   # text の中に正規表現patternがあるか探す</code></pre>
+<h2 id="assertとは">assertとは<a class="hash" href="#assertとは" aria-label="このセクションへのリンク">#</a></h2>
+<p>Pythonの<strong>組み込みの文</strong>。「ここでこの条件が成り立っているはず」という前提条件を宣言し、崩れていたら即座に失敗させるためのもの。</p>
+<pre><code class="lang-python">assert 条件
+assert 条件, メッセージ</code></pre>
+<ul><li>条件が<code>True</code>なら何も起きず、次の行へそのまま進む。</li><li>条件が<code>False</code>なら<strong>その場で<code>AssertionError</code>を発生させて処理を止める</strong>（メッセージを指定していれば、それも一緒に表示される）。</li></ul>
+<p>pytestはテスト関数内の普通の<code>assert</code>文を特別扱いする（assertion rewriting）。<code>assert 実際の値 == 期待値</code>と書いておくだけで、失敗時に</p>
+<pre><code>E       assert 1080 == 1079</code></pre>
+<p>のように<strong>実際の値と期待値の両方を自動で表示する</strong>。だから特別な比較関数を使わなくても、素の<code>assert</code>を書くだけで十分なテストになる。</p>
+<p>コード内での実例：</p>
+<ul><li><code>assert len(py_files) &gt; 0, "走査対象が0件（パスが間違っている可能性）"</code> → 条件が崩れたら指定したメッセージ付きで失敗</li><li><code>assert blender_v_to_opencv_v(0, H) == H - 1</code> → 期待値と一致しなければpytestが自動で両辺の値を表示して失敗</li><li><code>assert np.isclose(np.linalg.det(R_cv), 1.0)</code> → <code>np.isclose</code>が返す<code>True</code>/<code>False</code>をそのまま検査</li></ul>
+<p><strong><code>pytest.fail()</code>との違い</strong>：<code>assert</code>は「条件式が1つあり、それをそのまま検査する」形なのに対し、<code>pytest.fail(メッセージ)</code>は<strong>ループの途中など、条件式だけでは表現しづらい場所で明示的に失敗させたいとき</strong>に使う（<code>test_no_stray_coordinate_conversion</code>内で使用）。</p>
+<h2 id="テスト用プログラムの関数について">テスト用プログラムの関数について<a class="hash" href="#テスト用プログラムの関数について" aria-label="このセクションへのリンク">#</a></h2>
+<p><code>def test_no_stray_coordinate_conversion():</code>などpytestは関数名が<code>test_</code>で始まるものを自動的にテスト用の関数として実行する。</p>
+<h3 id="def-test_no_stray_coordinate_conversion-について">def test_no_stray_coordinate_conversion(): について<a class="hash" href="#def-test_no_stray_coordinate_conversion-について" aria-label="このセクションへのリンク">#</a></h3>
+<p>この関数について一行ずつ解説していく</p>
+<pre><code class="lang-python">    src_dir = Path(__file__).resolve().parents[1] / "src"</code></pre>
+<ul><li><code>__file__</code>は今実行されているファイルのパスが入っている特殊変数である。つまり<code>Path(__file__)</code>は今実行されているファイルのパスをオブジェクトに変換する操作を行っている。</li><li><code>.resolve()</code>で相対パスから絶対パスへの変更を行い、<code>../</code>など表現のあいまいさを無くす。</li><li><code>.parents[]</code>で親ディレクトリを遡ることができ<code>.parents[0]</code>で1つ上の階層である<code>tests</code>へ、<code>.parents[1]</code>で2つ上のリポジトリ直下までさかのぼることができる。</li></ul>
+<p>以上を踏まえると<code>.../4bitcom_HandM/src</code>という絶対パスを入手していることが分かる。</p>
+<p>もしそのまま<code>Path("src")</code>と書いてしまう場合「pytestを実行した場所」からの相対パスとなってしまう。この場合、リポジトリ直下以外から<code>pytest</code>を実行すると、<code>src_dir</code>が見つからず走査対象が0件になる。<strong>しかもこれはエラーにならず、単に何も検出されないまま静かにpassしてしまう</strong>（＝規約違反を永久に見逃す、一番たちの悪い壊れ方）。絶対パスでの記述にすることでこれを防ぐことができる。</p>
+<pre><code class="lang-python">    coords_file = src_dir / "recon3d" / "io" / "coords.py"</code></pre>
+<p>これは「座標変換を書いていい場所」のパスを組み立てている。</p>
+<pre><code class="lang-python">    py_files = list(src_dir.rglob("*.py"))</code></pre>
+<ul><li><code>rglob("*.py")</code>で<code>src_dir</code>配下をサブフォルダも含めて再帰的に検索し、<code>.py</code>ファイルを全部見つける。この時、<code>rglob</code>ではなく<code>glob</code>だと直下の階層だけを探索するため注意する必要がある。</li><li>戻り値がイテレータであるため<code>list()</code>でリスト化をして複数回の走査を可能にしている。</li></ul>
+<p><strong>ここでイテレータという訳の分からない概念が登場したので調べた範囲で解説(表の内容を抑えていればOK)</strong></p>
+<p>そもそもfor文は裏でこのような処理をしている(<code>for x in something:</code>と書いた場合)</p>
+<pre><code class="lang-python">it = iter(something)   # 1. something から「イテレータ」を取り出す
+while True:
+    try:
+        x = next(it)    # 2. イテレータに「次の値ちょうだい」と聞く
+    except StopIteration:
+        break            # 3. 「もう無いよ」と言われたら終了
+    # ここでforの中身が実行される</code></pre>
+<p>つまり<code>for</code>は毎回イテレータに対して<code>next()</code>を呼んで1個ずつ受け取っているだけである。実際にリストからイテレータを作ると以下のようになる。</p>
+<pre><code class="lang-python">&gt;&gt;&gt; numbers = [10, 20, 30]        # これは「リスト」
+&gt;&gt;&gt; it = iter(numbers)             # リストから「イテレータ」を作る
+&gt;&gt;&gt; it
+&lt;list_iterator object at 0x...&gt;    # ← リストとは別物の「イテレータ」という型
+&gt;&gt;&gt; next(it)
+10
+&gt;&gt;&gt; next(it)
+20
+&gt;&gt;&gt; next(it)
+30
+&gt;&gt;&gt; next(it)
+Traceback (most recent call last):
+StopIteration                      # ← もう無いので例外が飛ぶ</code></pre>
+<p>この結果からも<code>next(it)</code>を呼ぶたびに次の値が出てきていることが分かる。また、使い切ると<code>StopIteration</code>という例外処理が出てきているため<code>for</code>文はこの<code>StopIteration</code>をキャッチすることでループを終了させていることが分かる。</p>
+<p>リストとイテレータの違いは次のようになっている。</p>
+<pre><code class="lang-python">&gt;&gt;&gt; numbers = [10, 20, 30]
+&gt;&gt;&gt; numbers[0]          # リストはインデックスで何度でもアクセスできる
+10
+&gt;&gt;&gt; numbers[0]           # 何度呼んでも同じ結果
+10
+&gt;&gt;&gt; len(numbers)
+3</code></pre>
+<pre><code class="lang-python">&gt;&gt;&gt; it = iter([10, 20, 30])
+&gt;&gt;&gt; next(it)
+10
+&gt;&gt;&gt; next(it)
+20
+&gt;&gt;&gt; list(it)             # 残りをlist()でまとめて取り出す
+[30]
+&gt;&gt;&gt; list(it)             # ← もう空！一度取り出した値は消える
+[]</code></pre>
+<p>ここで重要なのは<strong>イテレータは一回きりの使い捨て</strong>ということであり、今どこまで進んだかという位置情報だけを内部に持っていて、前に戻れないという性質があると分かる。</p>
+<p><code>rglob()</code>で確認すると</p>
+<pre><code class="lang-python">&gt;&gt;&gt; from pathlib import Path
+&gt;&gt;&gt; it = Path("src").rglob("*.py")
+&gt;&gt;&gt; it
+&lt;generator object Path.rglob at 0x...&gt;   # イテレータの一種（generator）
+&gt;&gt;&gt; len(it)
+Traceback (most recent call last):
+TypeError: object of type 'generator' has no len()   # ← len()できない
+&gt;&gt;&gt; py_files = list(it)     # 全部取り出してリストに変換
+&gt;&gt;&gt; len(py_files)            # リストになったので len() が使える
+5</code></pre>
+<p><code>rglob()</code>は「ファイルシステムを探しながら、見つかるたびに1個ずつ返す」という動き方をするため、戻り値がイテレータ（正確にはジェネレータだけど流石にこれ以上調べるのはキツい）になっている。</p>
+<p>これを<code>list()</code>で包むことで、「もう全部探し終わった状態のリスト」に変換し<code>len()</code>やインデックスアクセスができるようにしている。</p>
+<p>まとめ</p>
+<div class="table-wrap"><table class="md"><thead><tr><th></th><th>リスト</th><th>イテレータ</th></tr></thead><tbody><tr><td>中身</td><td>全要素が最初から確定している</td><td>「次は？」と聞かれたら1個返す仕組みだけ持つ</td></tr><tr><td><code>len()</code></td><td>できる</td><td>できない</td></tr><tr><td><code>numbers[0]</code></td><td>できる</td><td>できない</td></tr><tr><td>何度も使える</td><td>できる</td><td><strong>一度使い切ると空になる</strong></td></tr><tr><td><code>for</code>で回す</td><td>できる</td><td>できる</td></tr></tbody></table></div>
+<p>話を戻すと、この行で<code>src/</code>以下にあるすべての<code>.py</code>ファイルのパス一覧を取得していることが分かる。</p>
+<pre><code class="lang-python">    assert len(py_files) &gt; 0, "走査対象が0件（パスが間違っている可能性）"</code></pre>
+<ul><li><code>assert 条件, メッセージ</code>で条件が<code>False</code>ならその場でテストが失敗して、メッセージが表示される。</li><li>ここでのチェックは、<code>py_files</code>が0件のとき「検出が正しく機能して0件だった」のか「単に<code>src_dir</code>のパスが間違っていて何も見つかっていないだけ」なのかを区別できないことへの対策。<strong>0件なら無条件に異常とみなして落とす</strong>ことで、上記の「空振りしたまま静かにpassする」危険を防いでいる。</li></ul>
+<pre><code class="lang-python">    for path in py_files:
+        if path == coords_file:
+            continue</code></pre>
+<p>1つずつファイルを確認し<code>coords_file</code>という許可された場所なら<code>continue</code>でスキップ。</p>
+<pre><code class="lang-python">        text = path.read_text(encoding="utf-8")</code></pre>
+<p>ファイルの中身をすべて文字列として読み込み、文字コードの違いによる読み込みエラーを防ぐ。</p>
+<pre><code class="lang-python">        for pattern in FORBIDDEN_PATTERNS:
+            if pattern.search(text):
+                pytest.fail(f"{path}: 座標変換は io/coords.py に書くこと")</code></pre>
+<p>前述した禁止パターンを1つずつあるか確かめる。<code>pattern.search(text)</code>はパターンが部分的に一致していたら真(<code>Match</code>)、見つからないなら偽(None)を返すため、見つかった場合は<code>pytest.fail(メッセージ)</code>で即座にテスト失敗として終了させ、どのファイルで違反したのかを表示する。</p>
+<h3 id="def-test_identity_rotation-について">def test_identity_rotation() について<a class="hash" href="#def-test_identity_rotation-について" aria-label="このセクションへのリンク">#</a></h3>
+<p><strong>「テストを先に書く」ため、まだ<code>coords.py</code>の実装は無い状態でこのテストを書く。</strong> 目的は「何ができたら正しいか」を先に固定すること。実装より先にテストがある間は、<code>ImportError</code>や失敗で落ちるのが正常。</p>
+<p>pytestのテスト関数は基本的に<strong>Arrange（準備）→ Act（実行）→ Assert（確認）</strong>の3段構成で書くらしい。</p>
+<pre><code class="lang-python">def test_identity_rotation():
+    # Arrange：入力を用意する
+    R_blender = np.eye(3)
+    t_blender = np.array([0.0, 0.0, 5.0])
+
+    # Act：テストしたい関数を呼ぶ
+    R_cv, t_cv = blender_to_opencv_rt(R_blender, t_blender)
+
+    # Assert：紙で出した期待値と一致するか確認する
+    expected_R_cv = np.array([[1.0, 0.0, 0.0],
+                              [0.0, -1.0, 0.0],
+                              [0.0, 0.0, -1.0]])
+    expected_t_cv = np.array([0.0, 0.0, -5.0])
+
+    np.testing.assert_allclose(R_cv, expected_R_cv)
+    np.testing.assert_allclose(t_cv, expected_t_cv)</code></pre>
+<ul><li><code>np.testing.assert_allclose(実際の値, 期待値)</code>は浮動小数点の配列同士を比較する専用関数。<code>==</code>だと誤差で失敗することがあるため使う。一致していれば何も起きず、違えば差分付きで失敗する。</li></ul>
+<p><strong>期待値の手計算</strong>(どうせ分かると思うし読み飛ばしても可)</p>
+<p><code>docs/conventions.md</code>にある変換式を使う。</p>
+<pre><code>C = diag(1, -1, -1)
+R_cv = C @ R_blender
+t_cv = C @ t_blender</code></pre>
+<ul><li><code>R_blender</code>は単位行列(<code>np.eye(3)</code>)。単位行列を掛けても相手は変わらない（<code>C @ I = C</code>）ので、<code>R_cv</code>はそのまま<code>C = diag(1, -1, -1)</code>、つまり<code>[[1,0,0],[0,-1,0],[0,0,-1]]</code>になる。</li><li><code>t_cv = C @ t_blender</code>は対角行列とベクトルの積なので、<strong>各成分にその対角成分を1つずつ掛けるだけ</strong>でよい。<code>t_blender = [0, 0, 5]</code>に<code>C</code>の対角成分<code>(1, -1, -1)</code>を順に掛けると<code>t_cv = [0, 0, -5]</code>。</li></ul>
+<h3 id="def-test_rotation_is_orthogonal-について">def test_rotation_is_orthogonal() について<a class="hash" href="#def-test_rotation_is_orthogonal-について" aria-label="このセクションへのリンク">#</a></h3>
+<p><code>test_identity_rotation</code>で出した<code>R_cv</code>が<strong>壊れていない回転行列であるか</strong>を確認するテスト。座標変換の符号ミスは、値そのものより<strong>回転行列としての性質が崩れる</strong>形で現れることが多いので、ここを別立てで確認する。</p>
+<pre><code class="lang-python">def test_rotation_is_orthogonal():
+    R_blender = np.eye(3)
+    t_blender = np.array([0.0, 0.0, 5.0])
+    R_cv, t_cv = blender_to_opencv_rt(R_blender, t_blender)
+
+    np.testing.assert_allclose(R_cv.T @ R_cv, np.eye(3), atol=1e-10)
+    assert np.isclose(np.linalg.det(R_cv), 1.0)</code></pre>
+<p>確認しているのは2つの性質</p>
+<ol><li><strong>直交行列であること</strong>：<code>R_cv.T @ R_cv</code>が単位行列<code>I</code>に戻るかどうか</li><li><strong>鏡映になっていないこと</strong>：<code>np.linalg.det(R_cv)</code>（行列式）が<code>+1</code>かどうか。<code>-1</code>だと鏡像になっている合図。</li></ol>
+<p>補足</p>
+<ul><li><code>atol=1e-10</code>は<code>assert_allclose</code>の<strong>絶対許容誤差</strong>。浮動小数点演算では誤差が出るため、完全に<code>0</code>でなくてもごく小さければ許容する。</li><li><code>np.isclose(a, b)</code>はスカラー同士を誤差込みで比較し<code>True</code>/<code>False</code>を返すだけの関数なので、<code>assert_allclose</code>と違い自分で<code>assert</code>を付ける必要がある。</li><li>直交行列の確認だけでは不十分（壊れた行列でも<code>det</code>だけ偶然<code>+1</code>になりうる）なので、<code>R.T @ R ≈ I</code>と<code>det(R) ≈ +1</code>の<strong>両方</strong>を確認して初めて「正しい回転行列」と言える。</li></ul>
+<h3 id="def-test_v_edges-について">def test_v_edges() について<a class="hash" href="#def-test_v_edges-について" aria-label="このセクションへのリンク">#</a></h3>
+<p>画像の縦方向（v座標）の反転が、<strong>端から端まで正しく対応しているか</strong>を確認するテスト。</p>
+<pre><code class="lang-python">def test_v_edges():
+    H = 1080 # サンプル値 
+    assert blender_v_to_opencv_v(0, H) == H - 1
+    assert blender_v_to_opencv_v(H - 1, H) == 0</code></pre>
+<p><code>docs/conventions.md</code>の変換式<code>v_cv = H - 1 - v_blender</code>を使って手計算する：</p>
+<ul><li><code>v_blender = 0</code>（Blender側で一番下の行）→ <code>v_cv = H - 1 - 0 = H - 1</code>（OpenCV側で一番上から数えて最後の行、つまり一番下）</li><li><code>v_blender = H - 1</code>（Blender側で一番上の行）→ <code>v_cv = H - 1 - (H - 1) = 0</code>（OpenCV側で一番上の行）</li></ul>
+<p>つまり「Blenderの一番下 → OpenCVの一番下」「Blenderの一番上 → OpenCVの一番上」に正しく対応しているかを、<strong>両端</strong>で確認している。中間の値だけ確認して端を見落とすと、off-by-one（<code>-1</code>の付け忘れなど）のミスに気づけないため、あえて境界値（0と<code>H-1</code>）をテストしている。</p>
+<h2 id="テスト3壊れた-camerasjson-を読んだら例外が出ること">テスト3：壊れた cameras.json を読んだら例外が出ること<a class="hash" href="#テスト3壊れた-camerasjson-を読んだら例外が出ること" aria-label="このセクションへのリンク">#</a></h2>
+<p>正常な<code>cameras.json</code>を1つ作り（<code>valid_camera_dict()</code>）、それを<strong>1か所だけ壊した</strong>バージョンを<code>load_cameras()</code>に読ませて、期待通り例外が出るかを確認する。</p>
+<pre><code class="lang-python">import json
+from recon3d.io.cameras import load_cameras</code></pre>
+<h3 id="valid_camera_dict-について">valid_camera_dict() について<a class="hash" href="#valid_camera_dict-について" aria-label="このセクションへのリンク">#</a></h3>
+<p><code>docs/plan.md</code>§5-1のJSON実例をそのままPythonの辞書として書き起こしたもの。これを土台にして、各テストで1か所だけ書き換えて壊す。</p>
+<pre><code class="lang-python">def valid_camera_dict():
+    return {
+        "schema_version": "1.0",
+        "convention": {...},
+        "image_size": {...},
+        "intrinsics": {...},
+        "views": [{...}],
+        "meta": {...},
+    }</code></pre>
+<h3 id="def-test_load_valid_cameras-について">def test_load_valid_cameras() について<a class="hash" href="#def-test_load_valid_cameras-について" aria-label="このセクションへのリンク">#</a></h3>
+<p>正常なデータなら例外を投げずに読み込めることを確認する（異常系のテストの前提として、まず正常系が通ることを確認しておく）。</p>
+<pre><code class="lang-python">def test_load_valid_cameras(tmp_path):
+    path = tmp_path / "cameras.json"
+    path.write_text(json.dumps(valid_camera_dict()))
+    cameras = load_cameras(path)
+    assert cameras.schema_version == "1.0"</code></pre>
+<ul><li><code>tmp_path</code>：引数名に書くだけでpytestが自動的に渡してくれる「テスト専用の一時フォルダ」のフィクスチャ。テスト終了後は自動で消える。</li><li><code>json.dumps(dict)</code>：Pythonの辞書をJSON形式の文字列に変換する。</li><li><code>path.write_text(...)</code>：その文字列をファイルに書き込む。</li></ul>
+<h3 id="with文とはclaude作一般的な説明">with文とは（Claude作一般的な説明）<a class="hash" href="#with文とはclaude作一般的な説明" aria-label="このセクションへのリンク">#</a></h3>
+<p><code>with</code>文は、「<strong>ブロックに入る前の準備</strong>」と「<strong>ブロックを抜けるときの後片付け</strong>」を<strong>自動でセットにして実行する</strong>ための構文。</p>
+<p><code>with</code>を使わない場合（ファイルを開く例）：</p>
+<pre><code class="lang-python">f = open("data.txt")
+data = f.read()
+f.close()          # ← 開いたら必ず閉じないといけない。書き忘れ/エラーで飛ばされるリスクがある</code></pre>
+<p><code>with</code>を使う場合：</p>
+<pre><code class="lang-python">with open("data.txt") as f:
+    data = f.read()
+# ← ここでブロックを抜けた瞬間、自動で f.close() が呼ばれる</code></pre>
+<p><code>open("data.txt")</code>が「準備（ファイルを開く）」を行い、ブロックを抜けるときに<strong>自動で</strong>「後片付け（ファイルを閉じる）」を行ってくれる。<strong>途中でエラーが起きてブロックを抜けた場合でも、後片付けは必ず実行される</strong>のが<code>with</code>を使う一番の理由。</p>
+<p><strong>構文の読み方</strong></p>
+<pre><code class="lang-python">with 何か as 変数名:
+    ここがブロック（インデントされた範囲）</code></pre>
+<ul><li><code>with</code>の右側（<code>何か</code>）が「準備・後片付けの仕組みを持ったもの」であること</li><li><code>as 変数名</code>は省略可能（<code>何か</code>が返すものを使いたいときだけ書く）</li><li>インデントされている間が「保護された範囲」で、抜けると自動で後片付けが走る</li></ul>
+<h3 id="with文が裏で呼んでいるもの__enter____exit__">with文が裏で呼んでいるもの（<code>__enter__</code>・<code>__exit__</code>）<a class="hash" href="#with文が裏で呼んでいるもの__enter____exit__" aria-label="このセクションへのリンク">#</a></h3>
+<p><code>with</code>で使える対象（コンテキストマネージャ）は、<strong><code>__enter__</code>と<code>__exit__</code>という2つの特別なメソッドを持ったオブジェクト</strong>。</p>
+<pre><code class="lang-python">with X() as v:
+    ブロックの中身</code></pre>
+<p>は、裏側ではおおよそこう動いている。</p>
+<pre><code class="lang-python">mgr = X()
+v = mgr.__enter__()          # 1. 準備。戻り値がasの変数に入る
+try:
+    ブロックの中身
+except BaseException as e:
+    # 2. ブロック内で例外が起きた場合、__exit__にその例外情報を渡す
+    handled = mgr.__exit__(type(e), e, e.__traceback__)
+    if not handled:
+        raise                # __exit__が「処理した」と言わなければ、例外はそのまま外に飛ぶ
+else:
+    # 3. 例外が起きなかった場合も、必ず__exit__が呼ばれる
+    mgr.__exit__(None, None, None)</code></pre>
+<p>ポイントは、<strong><code>__exit__</code>は「ブロックの中で何が起きたか（例外の型・中身）」を必ず知らされる</strong>こと。そして<code>__exit__</code>は「その例外を自分で処理済みにするか（<code>True</code>を返す）」「素通しして外に伝播させるか（<code>False</code>を返す）」を自分で決められる。</p>
+<p><code>open()</code>の場合の<code>__exit__</code>は、例外の中身を見ずにただファイルを閉じるだけ（<code>False</code>相当・例外はそのまま外へ）だった。</p>
+<h3 id="pytestraises-の-__exit__-が具体的にやっていること">pytest.raises の <code>__exit__</code> が具体的にやっていること<a class="hash" href="#pytestraises-の-__exit__-が具体的にやっていること" aria-label="このセクションへのリンク">#</a></h3>
+<p><code>pytest.raises(ValueError)</code>は、この<code>__exit__</code>を使って<strong>例外の型を検査する</strong>という特殊な動きをする。</p>
+<pre><code class="lang-python">with pytest.raises(ValueError):
+    load_cameras(path)</code></pre>
+<ul><li><strong>ブロック内で例外が起きなかった場合</strong>（<code>__exit__</code>が<code>exc_type=None</code>で呼ばれる）→「例外が出るはずなのに出なかった」と判断し、<strong>自分から<code>pytest.fail("DID NOT RAISE ValueError")</code>を呼んでテストを失敗させる</strong></li><li><strong>ブロック内で<code>ValueError</code>（かそのサブクラス）が起きた場合</strong>→「期待通りだ」と判断し、<code>__exit__</code>が<code>True</code>を返してその例外を<strong>回収（握りつぶす）</strong>。例外は外に伝播せず、<code>with</code>ブロックの後（このテストでは関数の終わり）にそのまま進み、<strong>テストは成功</strong>になる</li><li><strong>ブロック内で違う型の例外（例：<code>TypeError</code>）が起きた場合</strong>→<code>__exit__</code>は「期待と違う」と判断し<code>False</code>を返す→その例外はそのまま外に伝播→<strong>テストはその予期しない例外で失敗</strong>する</li></ul>
+<p>つまり<code>pytest.raises</code>は、<code>__exit__</code>という「ブロックの中で何が起きたか教えてもらえる仕組み」を使って、<strong>「期待した例外が来たかどうかの合否判定装置」として振る舞っている</strong>、ということ。</p>
+<h3 id="異常系4本の設計">異常系4本の設計<a class="hash" href="#異常系4本の設計" aria-label="このセクションへのリンク">#</a></h3>
+<p><code>docs/plan.md</code>§5-3の検証4項目に対応させ、<strong>1項目につき1か所だけ壊した</strong>JSONを用意する。型はどれも同じ：「<code>valid_camera_dict()</code>を取得 → 1か所だけ書き換える → ファイルに書き出す → <code>pytest.raises(ValueError)</code>で<code>load_cameras()</code>を囲む」。</p>
+<pre><code class="lang-python">def test_wrong_schema_version_raises(tmp_path):
+    data = valid_camera_dict()
+    data["schema_version"] = "invalid"
+
+    path = tmp_path / "cameras.json"
+    path.write_text(json.dumps(data))
+
+    with pytest.raises(ValueError):
+        load_cameras(path)
+
+
+def test_wrong_convention_raises(tmp_path):
+    data = valid_camera_dict()
+    data["convention"]["world_up"] = "invalid"
+    ...
+
+
+def test_non_orthogonal_R_raises(tmp_path):
+    data = valid_camera_dict()
+    data["views"][0]["R"] = [[1, 0, 0],
+                             [0, 1, 0],
+                             [0, 0, 0]]
+    ...
+
+
+def test_mirrored_R_raises(tmp_path):
+    data = valid_camera_dict()
+    data["views"][0]["R"] = [[1, 0, 0],
+                             [0, 1, 0],
+                             [0, 0, -1]]
+    ...</code></pre>
+<p><strong><code>test_non_orthogonal_R_raises</code>と<code>test_mirrored_R_raises</code>を分けている理由</strong>：<code>validate()</code>の検証項目は「<code>RᵀR ≈ I</code>（直交性）」と「<code>det(R) ≈ +1</code>（鏡映でないか）」の2つに分かれているので、それぞれを<strong>単独で</strong>壊すJSONを用意し、どちらの検証が効いているかを個別に確認できるようにしている。</p>
+<ul><li><code>[[1,0,0],[0,1,0],[0,0,0]]</code> → <code>RᵀR = diag(1,1,0) ≠ I</code>（直交性が崩れる）</li><li><code>[[1,0,0],[0,1,0],[0,0,-1]]</code> → <code>RᵀR = I</code>（直交性は保たれる）が<code>det = -1</code>（鏡映）</li></ul>
+  </main>
+</div>
+<footer class="foot">
+  <p>このページは <code>docs/memo/test_prog.md</code> から自動生成しています。編集は md 側で。</p>
+</footer>
+</body>
+</html>

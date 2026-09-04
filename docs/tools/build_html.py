@@ -33,7 +33,6 @@ INDEX: list[tuple[str, str, list[tuple[str, str]]]] = [
         ("docs/decisions.md", "決定記録（なぜそう決めたか）"),
         ("docs/glossary.md", "用語集"),
         ("docs/learning.md", "学びの入口（資料）"),
-        ("docs/progress.md", "進捗ログ"),
     ]),
     ("作業", "手を動かすとき", [
         ("docs/tasks/README.md", "タスク一覧"),

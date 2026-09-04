@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>座標の規約</title>
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+<header class="topbar">
+  <div class="topbar-inner">
+    <nav class="crumbs"><a href="../index.html">ドキュメント</a></nav>
+    <span class="src">docs/conventions.md</span>
+  </div>
+</header>
+<div class="layout">
+  <details class="toc"><summary class="toc-title">目次</summary><ul><li class="lv2"><a href="#opencv規約に統一">OpenCV規約に統一</a></li><li class="lv2"><a href="#blender-との変換">Blender との変換</a></li><li class="lv2"><a href="#禁止事項重要">禁止事項（重要）</a></li><li class="lv2"><a href="#違反の検出方法">違反の検出方法</a></li></ul></details>
+  <main class="page">
+<h1 id="座標の規約">座標の規約<a class="hash" href="#座標の規約" aria-label="このセクションへのリンク">#</a></h1>
+<h2 id="opencv規約に統一">OpenCV規約に統一<a class="hash" href="#opencv規約に統一" aria-label="このセクションへのリンク">#</a></h2>
+<div class="table-wrap"><table class="md"><thead><tr><th>対象</th><th>規約</th></tr></thead><tbody><tr><td>世界座標系</td><td>右手系、<strong>+Z が上</strong>（ターンテーブルの回転軸）、原点は回転台の中心</td></tr><tr><td>カメラ座標系</td><td><strong>OpenCV規約</strong>：+X 右、+Y 下、<strong>+Z が光軸の前方</strong></td></tr><tr><td>画像座標系</td><td><strong>OpenCV規約</strong>：原点は左上ピクセルの中心、+u 右、+v 下</td></tr><tr><td>外部パラメータの向き</td><td><strong>world → camera</strong>。すなわち <code>X_cam = R · X_world + t</code></td></tr></tbody></table></div>
+<p>イメージとしては、カメラから見て +X が右、+Y が下、被写体は +Z 方向にある。</p>
+<ul><li><strong>R</strong>：3×3の回転行列（rotation matrix）。世界座標系の向きからカメラ座標系の向きへの回転を表す。</li><li><strong>t</strong>：3次元の並進ベクトル（translation vector）。回転後の座標系での平行移動量を表す。</li></ul>
+<h2 id="blender-との変換">Blender との変換<a class="hash" href="#blender-との変換" aria-label="このセクションへのリンク">#</a></h2>
+<p>Blenderのカメラは <strong>−Z 方向を見て、+Y が上</strong>。OpenCVは <strong>+Z 方向を見て、+Y が下</strong>。Y軸とZ軸の符号が逆なため、python上ではこのように書く。</p>
+<pre><code class="lang-python">C = np.diag([1.0, -1.0, -1.0])
+
+R_cv = C @ R_blender
+t_cv = C @ t_blender</code></pre>
+<p>画像の縦方向もBlenderとOpenCVで異なるため、次のように記述する。</p>
+<pre><code>v_cv = H - 1 - v_blender</code></pre>
+<p>ここで``<code>H</code>``は画像の高さである総ピクセル行数を指す。</p>
+<h2 id="禁止事項重要">禁止事項（重要）<a class="hash" href="#禁止事項重要" aria-label="このセクションへのリンク">#</a></h2>
+<p>座標変換を書いてよいのは ``<code> src/recon3d/io/coords.py </code>``の中だけにする。</p>
+<p>他のファイルに ``<code>diag(1,-1,-1)</code>`<code> や</code>`<code> H - 1 - v </code>``などの座標変換を禁止とする。</p>
+<h2 id="違反の検出方法">違反の検出方法<a class="hash" href="#違反の検出方法" aria-label="このセクションへのリンク">#</a></h2>
+<p>前述した禁止事項の検出方法としてテストプログラムである``<code>tests/test_conventions.py</code>``の配置をする。</p>
+<pre><code># tests/test_conventions.py
+def test_no_stray_coordinate_conversion():
+    """io/coords.py 以外に座標変換のリテラルが現れないことを確認する。
+    src/ 全体を走査し、diag(1, -1, -1) 相当のパターンを検出したら失敗。"""</code></pre>
+  </main>
+</div>
+<footer class="foot">
+  <p>このページは <code>docs/conventions.md</code> から自動生成しています。編集は md 側で。</p>
+</footer>
+</body>
+</html>

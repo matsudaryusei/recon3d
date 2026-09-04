@@ -158,7 +158,7 @@ git switch -c docs/t04-followup
 ```
 
 2. **[HowToPush.md](../../HowToPush.md)** の `git push origin main` の記述 — 直すか、[T05](T05-git-practice.md) へのリンクを足す
-3. **[進捗ログ](../progress.md)** の今週の表に **G7 の行**を1行
+3. **詰まった点・学んだことを [`memo/`](../memo/) に1本残す**
 4. **[次にやること](../next.md)** の T04 の状態を `✅ 完了` に
 
 ```bash

@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>cameras.json 仕様</title>
+<link rel="stylesheet" href="../../assets/style.css">
+</head>
+<body>
+<header class="topbar">
+  <div class="topbar-inner">
+    <nav class="crumbs"><a href="../../index.html">ドキュメント</a><span class="sep">/</span><span>schema/</span></nav>
+    <span class="src">docs/schema/cameras.md</span>
+  </div>
+</header>
+<div class="layout">
+  <details class="toc"><summary class="toc-title">目次</summary><ul><li class="lv2"><a href="#json-の実例">JSON の実例</a></li><li class="lv2"><a href="#フィールド一覧">フィールド一覧</a></li><li class="lv3"><a href="#型の書き方">型の書き方</a></li><li class="lv3"><a href="#トップレベル">トップレベル</a></li><li class="lv3"><a href="#convention-ブロック">convention ブロック</a></li><li class="lv3"><a href="#image_size-ブロック">image_size ブロック</a></li><li class="lv3"><a href="#intrinsics-ブロック">intrinsics ブロック</a></li><li class="lv3"><a href="#views-ブロック1視点ぶん">views ブロック（1視点ぶん）</a></li><li class="lv3"><a href="#source-の3つの値">source の3つの値</a></li><li class="lv3"><a href="#meta-ブロック">meta ブロック</a></li><li class="lv2"><a href="#検証項目">検証項目</a></li><li class="lv2"><a href="#実装の方針追加依存を入れない">実装の方針：追加依存を入れない</a></li></ul></details>
+  <main class="page">
+<h1 id="camerasjson-仕様"><code>cameras.json</code> 仕様<a class="hash" href="#camerasjson-仕様" aria-label="このセクションへのリンク">#</a></h1>
+<p>G2（Blenderでのデータ生成）と G1（数理コア）の唯一の受け渡し口。
+仕様の出どころは <a href="../plan.html#s5">計画書 §5</a>、決定の理由は <a href="../decisions.html#d-12">D-12</a>・<a href="../decisions.html#d-17">D-17</a>。</p>
+<h2 id="json-の実例">JSON の実例<a class="hash" href="#json-の実例" aria-label="このセクションへのリンク">#</a></h2>
+<pre><code class="lang-json">{
+  "schema_version": "1.0",
+
+  "convention": {
+    "world_up": "+Z",
+    "handedness": "right",
+    "camera": "opencv",
+    "image_origin": "top_left",
+    "extrinsic_form": "world_to_camera"
+  },
+
+  "image_size": { "width": 1920, "height": 1080 },
+
+  "intrinsics": {
+    "fx": 1600.0, "fy": 1600.0,
+    "cx": 960.0,  "cy": 540.0,
+    "distortion": {
+      "model": "opencv_radtan",
+      "k1": 0.0, "k2": 0.0, "p1": 0.0, "p2": 0.0, "k3": 0.0
+    }
+  },
+
+  "views": [
+    {
+      "image": "images/img_000.png",
+      "mask":  "masks/img_000.png",
+      "R": [[1,0,0],[0,1,0],[0,0,1]],
+      "t": [0.0, 0.0, 0.5],
+      "source": "turntable_gt",
+      "turntable_angle_deg": 0.0,
+      "reprojection_error_px": null
+    }
+  ],
+
+  "meta": {
+    "generated_by": "tools/blender_render.py",
+    "generated_at": "2026-08-20T10:00:00+09:00",
+    "dataset": "synthetic_cup_20views"
+  }
+}</code></pre>
+<hr>
+<h2 id="フィールド一覧">フィールド一覧<a class="hash" href="#フィールド一覧" aria-label="このセクションへのリンク">#</a></h2>
+<p>ブロックごとに1枚ずつ。<code>??</code> は T01 ステップ4 でテストを書きながら埋める。</p>
+<h3 id="型の書き方">型の書き方<a class="hash" href="#型の書き方" aria-label="このセクションへのリンク">#</a></h3>
+<p>書き方は以下の記述に統一して行うこと。</p>
+<div class="table-wrap"><table class="md"><thead><tr><th>書き方</th><th>意味</th></tr></thead><tbody><tr><td><code>float[3]</code></td><td>長さ3の数値配列（<code>t</code> など）</td></tr><tr><td><code>float[3][3]</code></td><td>3×3 の数値配列（<code>R</code> など）</td></tr><tr><td><code>object</code></td><td>入れ子のブロック。中身は別表で説明</td></tr><tr><td><code>view[]</code></td><td>オブジェクトの配列。中身は別表で説明</td></tr><tr><td>`float \</td><td>null`</td><td><code>null</code> を取りうる</td></tr></tbody></table></div>
+<p>「必須か」は <strong>必須 / 任意 / 必須(null可)</strong> の3つで書く。</p>
+<h3 id="トップレベル">トップレベル<a class="hash" href="#トップレベル" aria-label="このセクションへのリンク">#</a></h3>
+<div class="table-wrap"><table class="md"><thead><tr><th>フィールド</th><th>型</th><th>必須か</th><th>意味</th></tr></thead><tbody><tr><td><code>schema_version</code></td><td><code>string</code></td><td>必須</td><td>スキーマの版。読み込み時に既知の版かを検証する（→ 検証項目 1）</td></tr><tr><td><code>convention</code></td><td><code>object</code></td><td>必須</td><td>座標系の規約。規約をデータファイル自身に埋め込み、読み込み時に検証する。中身は下表</td></tr><tr><td><code>image_size</code></td><td><code>object</code></td><td>必須</td><td>画像の幅と高さ（<code>width</code> / <code>height</code>、単位ピクセル）</td></tr><tr><td><code>intrinsics</code></td><td><code>object</code></td><td>必須</td><td>内部パラメータ（<code>fx</code> <code>fy</code> <code>cx</code> <code>cy</code> と <code>distortion</code>）</td></tr><tr><td><code>views</code></td><td><code>view[]</code></td><td>必須</td><td>1視点ぶんの画像・マスク・外部パラメータの配列</td></tr><tr><td><code>meta</code></td><td><code>object</code></td><td>必須</td><td>生成元・生成日時・データセット名。<strong>中身の値は検証しないが、ブロック自体は無いと読み込みエラーにする</strong></td></tr></tbody></table></div>
+<h3 id="convention-ブロック"><code>convention</code> ブロック<a class="hash" href="#convention-ブロック" aria-label="このセクションへのリンク">#</a></h3>
+<p><strong>値は <a href="../plan.html#s4-1">計画書 §4-1</a> の規約と一致していなければならない。</strong> 一致しなければ読み込み時に例外を投げる（→ 検証項目 2）。</p>
+<div class="table-wrap"><table class="md"><thead><tr><th>フィールド</th><th>型</th><th>必須か</th><th>期待値</th><th>意味</th></tr></thead><tbody><tr><td><code>world_up</code></td><td><code>string</code></td><td>必須</td><td><code>"+Z"</code></td><td>世界座標系の上方向でBlender と揃えてあるので世界座標の変換は不要（§4-1）</td></tr><tr><td><code>handedness</code></td><td><code>string</code></td><td>必須</td><td><code>"right"</code></td><td>世界座標系は右手系をとる</td></tr><tr><td><code>camera</code></td><td><code>string</code></td><td>必須</td><td><code>"opencv"</code></td><td>カメラ座標系をOpenCV流( +X 右・+Y 下・+Z が光軸の前方（§4-1）)</td></tr><tr><td><code>image_origin</code></td><td><code>string</code></td><td>必須</td><td><code>"top_left"</code></td><td>画像ピクセルの原点を左上に指定。+u 右、+v 下（§4-1）</td></tr><tr><td><code>extrinsic_form</code></td><td><code>string</code></td><td>必須</td><td><code>"world_to_camera"</code></td><td>外部パラメータの向き。<code>X_cam = R · X_world + t</code>。<strong><code>R</code> と <code>Rᵀ</code> の取り違えを防ぐためにファイル自身に持たせている</strong></td></tr></tbody></table></div>
+<h3 id="image_size-ブロック"><code>image_size</code> ブロック<a class="hash" href="#image_size-ブロック" aria-label="このセクションへのリンク">#</a></h3>
+<p>画像解像度についての指定。</p>
+<div class="table-wrap"><table class="md"><thead><tr><th>フィールド</th><th>型</th><th>必須か</th><th>期待値</th><th>意味</th></tr></thead><tbody><tr><td><code>width</code>, <code>height</code></td><td><code>int</code></td><td>必須</td><td>データセットごと</td><td>画像の幅・高さ（ピクセル）。<code>cx</code>, <code>cy</code> の妥当性の基準になる</td></tr></tbody></table></div>
+<h3 id="intrinsics-ブロック"><code>intrinsics</code> ブロック<a class="hash" href="#intrinsics-ブロック" aria-label="このセクションへのリンク">#</a></h3>
+<p>カメラ内部のパラメータ。</p>
+<div class="table-wrap"><table class="md"><thead><tr><th>フィールド</th><th>型</th><th>必須か</th><th>期待値</th><th>意味</th></tr></thead><tbody><tr><td><code>fx</code>, <code>fy</code></td><td><code>float</code></td><td>必須</td><td>データセットごと</td><td>焦点距離をピクセル単位で表したもの</td></tr><tr><td><code>cx</code>, <code>cy</code></td><td><code>float</code></td><td>必須</td><td>データセットごと</td><td>主点（光軸が画像平面と交わる点）の画像座標。値は画像中心（<code>image_size</code> の半分）</td></tr><tr><td><code>distortion</code></td><td><code>object</code></td><td>必須</td><td>下表</td><td>レンズ歪みの係数。中身は下表</td></tr></tbody></table></div>
+<p><code>distortion</code> について</p>
+<div class="table-wrap"><table class="md"><thead><tr><th>フィールド</th><th>型</th><th>必須か</th><th>期待値</th><th>意味</th></tr></thead><tbody><tr><td><code>model</code></td><td><code>string</code></td><td>必須</td><td><code>opencv_radtan</code></td><td>OpenCVの半径方向＋接線方向歪みモデルを使用</td></tr><tr><td><code>k1</code>, <code>k2</code>, <code>k3</code></td><td><code>float</code></td><td>必須</td><td><code>0.0</code></td><td>半径方向の歪み係数</td></tr><tr><td><code>p1</code>, <code>p2</code></td><td><code>float</code></td><td>必須</td><td><code>0.0</code></td><td>接線方向の歪み係数</td></tr></tbody></table></div>
+<p><strong>全係数が <code>0.0</code>＝歪みなしの理想ピンホールカメラ。</strong> 合成データなので歪みを入れていない。実写に移すときはここが <code>0</code> でなくなる。</p>
+<h3 id="views-ブロック1視点ぶん"><code>views</code> ブロック（1視点ぶん）<a class="hash" href="#views-ブロック1視点ぶん" aria-label="このセクションへのリンク">#</a></h3>
+<p>配列で、要素1つが1視点に対応する。値は視点ごとに変わるので期待値は持たない。</p>
+<div class="table-wrap"><table class="md"><thead><tr><th>フィールド</th><th>型</th><th>必須か</th><th>意味</th></tr></thead><tbody><tr><td><code>image</code></td><td><code>string</code></td><td>必須</td><td>RGB画像への相対パス（基準は下記）</td></tr><tr><td><code>mask</code></td><td><code>string</code></td><td>必須</td><td>対象物体のセグメンテーションマスク画像への相対パス（基準は <code>image</code> と同じ）。背景と前景を分離するために使う</td></tr><tr><td><code>R</code></td><td><code>float[3][3]</code></td><td>必須</td><td>3×3 回転行列（world→camera）。単位行列ならワールド座標軸とカメラ座標軸の向きが一致している。読み込み時に <code>RᵀR ≈ I</code> と <code>det(R) ≈ +1</code> を検証する（→ 検証項目 3・4）</td></tr><tr><td><code>t</code></td><td><code>float[3]</code></td><td>必須</td><td>並進ベクトル（world→camera）。<code>X_cam = R · X_world + t</code>。カメラ中心のワールド座標は <code>C_world = −Rᵀ t</code> で求まる</td></tr><tr><td><code>source</code></td><td><code>string</code></td><td>必須</td><td><code>"turntable_gt"</code> / <code>"dlt"</code> / <code>"bundle_adjusted"</code>。この姿勢が真値か推定値かを示す（→ 別節）</td></tr><tr><td><code>turntable_angle_deg</code></td><td><code>float</code></td><td>必須</td><td>ターンテーブルの回転角度。<code>0.0</code> は初期フレーム。<strong>撮影時の事実なので、<code>source</code> が何であっても同じ角度が入る</strong></td></tr><tr><td><code>reprojection_error_px</code></td><td>`float \</td><td>null`</td><td>必須(null可)</td><td>再投影誤差（ピクセル単位）。復元した3D点を投影し直したときのズレ。<strong><code>null</code> は「まだ測っていない」の意味</strong>（下記）</td></tr></tbody></table></div>
+<p><strong>パスの基準：<code>cameras.json</code> 自身が置かれているディレクトリからの相対とする。</strong></p>
+<h3 id="source-の3つの値"><code>source</code> の3つの値<a class="hash" href="#source-の3つの値" aria-label="このセクションへのリンク">#</a></h3>
+<p><strong>その視点のカメラ姿勢が、どこから来たのかを示す。</strong> 真値と推定値の切り替えがこの1フィールドで済み、<strong>下流のコードを変更せずに実験条件を切り替えられる</strong>（→ <a href="../decisions.html#d-12">D-12 判断③</a>）。</p>
+<div class="table-wrap"><table class="md"><thead><tr><th>値</th><th>姿勢の出どころ</th><th>使う場面</th></tr></thead><tbody><tr><td><code>"turntable_gt"</code></td><td><strong>Blender が書き出した真値</strong>設定した値なので推定値ではない</td><td>合成データ。姿勢推定を挟まずに下流だけを検証したいとき</td></tr><tr><td><code>"dlt"</code></td><td><strong>自作 DLT による推定値</strong>（SVD の同次最小二乗、<code>geometry/dlt.py</code>）</td><td>姿勢推定を通したときに使用し、真値と比べて精度を測る</td></tr><tr><td><code>"bundle_adjusted"</code></td><td><strong>バンドル調整後の推定値</strong>（<code>geometry/bundle.py</code>）。姿勢と3D点を同時に微調整して再投影誤差を最小化したもの</td><td>実験 E3で使用</td></tr></tbody></table></div>
+<blockquote><p><strong>これが撤退ラインの切り替えコストをゼロにしている。</strong> バンドル調整が収束しなくても、<code>source</code> を <code>"turntable_gt"</code> に固定するだけで <strong>L2（既知カメラ姿勢での Visual Hull）に落とせる</strong>（→ <a href="../plan.html#s12">計画書 §12</a>・<a href="../decisions.html#d-25">D-25</a>）。データ形式は同じままなので、コード変更が要らない。</p></blockquote>
+<p><strong>1つのファイルの中で <code>source</code> が混在してはならない。全 <code>views</code> で同じ値であること</strong>（→ 検証項目 5）。
+<code>source</code> は実験条件そのものなので、混ざったファイルは「どの条件で得た結果か」が言えなくなる。
+<strong>事故として起きる形</strong>：バンドル調整が20視点中15視点だけ収束し、書き戻しでその15件だけ <code>"bundle_adjusted"</code> に更新される。ファイルは正常に読めてパイプラインも通り、結果だけが静かにおかしくなる。</p>
+<h3 id="meta-ブロック"><code>meta</code> ブロック<a class="hash" href="#meta-ブロック" aria-label="このセクションへのリンク">#</a></h3>
+<p>出所をたどるための記録。<strong>中身の値は検証しない</strong>（復元計算には使わないため）が、<strong>3フィールドとも書き出すこと。</strong></p>
+<div class="table-wrap"><table class="md"><thead><tr><th>フィールド</th><th>型</th><th>必須か</th><th>意味</th></tr></thead><tbody><tr><td><code>generated_by</code></td><td><code>string</code></td><td>必須</td><td>このJSONを生成したスクリプトのパス</td></tr><tr><td><code>generated_at</code></td><td><code>string</code></td><td>任意</td><td>生成日時（ISO 8601 形式、<code>+09:00</code> は JST）</td></tr><tr><td><code>dataset</code></td><td><code>string</code></td><td>必須</td><td>データセット名。どの被写体を何視点撮ったものか分かる名前を付ける</td></tr></tbody></table></div>
+<hr>
+<h2 id="検証項目">検証項目<a class="hash" href="#検証項目" aria-label="このセクションへのリンク">#</a></h2>
+<p><code>load_cameras()</code> は読み込み時に次の5つを検証し、1つでも外れたら<strong>例外を投げる</strong>（→ <a href="../plan.html#s5-3">計画書 §5-3</a>）。</p>
+<div class="table-wrap"><table class="md"><thead><tr><th>#</th><th>検証すること</th><th>検出できる事故</th><th>テストでの壊し方</th></tr></thead><tbody><tr><td>1</td><td><code>schema_version</code> が既知の版か</td><td>仕様変更の取り違え</td><td>??</td></tr><tr><td>2</td><td><code>convention</code> の5フィールドが期待値と一致するか</td><td>規約違いのデータの混入</td><td>??</td></tr><tr><td>3</td><td><code>RᵀR ≈ I</code>（各 <code>views</code> の <code>R</code>）</td><td>回転行列の破損</td><td>??</td></tr><tr><td>4</td><td><strong><code>det(R) ≈ +1</code></strong>（各 <code>views</code> の <code>R</code>）</td><td><strong>座標変換の符号ミス。<code>−1</code> なら鏡映になっている</strong></td><td>??</td></tr><tr><td>5</td><td>全 <code>views</code> の <code>source</code> が同一か</td><td>実験条件の混在。書き戻しの取りこぼし</td><td>??</td></tr></tbody></table></div>
+<p><strong>4 が本命。</strong> <code>det(R) = −1</code> は「回転」ではなく「回転＋鏡映」で、これが通ると復元結果が左右反転したまま最後まで気づけない。</p>
+<p><strong><code>≈</code> の許容誤差</strong>：<code>np.allclose(..., atol=1e-6)</code> とする。float64 で読み書きするので、正しい回転行列なら差は 1e-12 程度に収まる。1e-6 は「丸め誤差は通すが、意味のある破損は落とす」幅として置いた。<strong>当日この値でよいか確認すること。</strong></p>
+<blockquote><p>「テストでの壊し方」は T01 ステップ4 で埋める。<strong>1か所だけ壊した JSON</strong> を作り、<code>pytest.raises</code> で例外が出ることを確認する。
+<strong>どう壊すかを考えることが、そのまま「何を守っているか」の理解になる</strong>ので、ここは空けてある。</p></blockquote>
+<hr>
+<h2 id="実装の方針追加依存を入れない">実装の方針：追加依存を入れない<a class="hash" href="#実装の方針追加依存を入れない" aria-label="このセクションへのリンク">#</a></h2>
+<p><strong>pydantic 等の追加依存は入れない。<code>dataclass</code> と <code>json</code> だけで書く</strong>（→ <a href="../decisions.html#d-17">D-17</a>・<a href="../plan.html#s5-3">計画書 §5-3</a>）。</p>
+<p>検証も手書きする。上の5項目を <code>load_cameras()</code> の中で自分で確かめて、外れたら例外を投げる。</p>
+<p><strong>理由</strong>：<code>cameras.json</code> の書き出しは Blender 側からも <code>io/cameras.py</code> を再利用して行う。
+<strong>Blender 用スクリプトは <code>bpy</code> と <code>numpy</code> にしか依存できない</strong>ため、<code>io/cameras.py</code> 自身も追加依存を持てない。
+ここで pydantic を入れると、G2（Blender）が <code>io/cameras.py</code> を呼べなくなり、<strong>書き出しと読み込みで実装が二重化する</strong>。</p>
+  </main>
+</div>
+<footer class="foot">
+  <p>このページは <code>docs/schema/cameras.md</code> から自動生成しています。編集は md 側で。</p>
+</footer>
+</body>
+</html>
