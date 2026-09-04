@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pythonでの実装プログラムについて 2026/9/5</title>
+<link rel="stylesheet" href="../../assets/style.css">
+</head>
+<body>
+<header class="topbar">
+  <div class="topbar-inner">
+    <nav class="crumbs"><a href="../../index.html">ドキュメント</a><span class="sep">/</span><span>memo/</span></nav>
+    <span class="src">docs/memo/impl_prog.md</span>
+  </div>
+</header>
+<div class="layout">
+  <details class="toc"><summary class="toc-title">目次</summary><ul><li class="lv2"><a href="#ステップ5coordspy-の実装">ステップ5：coords.py の実装</a></li><li class="lv3"><a href="#各関数の目的">各関数の目的</a></li><li class="lv3"><a href="#world_to_camera-の役割">world_to_camera の役割</a></li><li class="lv3"><a href="#ndim-とは">ndim とは</a></li><li class="lv3"><a href="#npndarray-とは">np.ndarray とは</a></li><li class="lv2"><a href="#cameraspy-の実装">cameras.py の実装</a></li><li class="lv3"><a href="#各dataclassの目的">各dataclassの目的</a></li><li class="lv3"><a href="#intrinsics-に-distortion-フィールドを追加した理由">Intrinsics に distortion フィールドを追加した理由</a></li><li class="lv3"><a href="#load_cameras-の目的と設計">load_cameras の目的と設計</a></li><li class="lv3"><a href="#save_cameras-の目的と設計">save_cameras の目的と設計</a></li><li class="lv3"><a href="#validate-の目的と設計完成">validate の目的と設計（完成）</a></li></ul></details>
+  <main class="page">
+<h1 id="pythonでの実装プログラムについて-2026-9-5">Pythonでの実装プログラムについて 2026/9/5<a class="hash" href="#pythonでの実装プログラムについて-2026-9-5" aria-label="このセクションへのリンク">#</a></h1>
+<p><code>src/</code>配下の実装コードに関するメモ。</p>
+<h2 id="ステップ5coordspy-の実装">ステップ5：coords.py の実装<a class="hash" href="#ステップ5coordspy-の実装" aria-label="このセクションへのリンク">#</a></h2>
+<p><code>src/recon3d/io/coords.py</code>に3つの関数を実装した。</p>
+<pre><code class="lang-python">C = np.diag([1.0, -1.0, -1.0])
+
+def blender_to_opencv_rt(R_blender, t_blender):
+    return C @ R_blender, C @ t_blender
+
+def blender_v_to_opencv_v(v_blender, height):
+    return height - 1 - v_blender
+
+def world_to_camera(R, t, x_world):
+    if x_world.ndim == 1:
+        return R @ x_world + t
+    elif x_world.ndim == 2:
+        return x_world @ R.T + t
+    else:
+        raise ValueError(f"x_world.ndim={x_world.ndim} は想定外")</code></pre>
+<p><strong><code>world_to_camera</code>の<code>ndim==2</code>側は、当初<code>(R @ x_world.T).T + t</code>だったが<code>x_world @ R.T + t</code>に変更した。</strong> 転置の性質<code>(A @ B).T = B.T @ A.T</code>より、<code>(R @ x_world.T).T = x_world @ R.T</code>は数学的に完全に同じ結果になる。転置が2回から1回に減り、読みやすくもなるため採用。</p>
+<h3 id="各関数の目的">各関数の目的<a class="hash" href="#各関数の目的" aria-label="このセクションへのリンク">#</a></h3>
+<ul><li><code>blender_to_opencv_rt</code>：Blender規約の<code>(R, t)</code>をOpenCV規約に変換する。テスト2で確認済みの変換式（<code>C @ R</code>, <code>C @ t</code>）をそのまま実装</li><li><code>blender_v_to_opencv_v</code>：画像の縦座標をBlender/OpenGL（左下原点）からOpenCV（左上原点）に変換する。<code>v_edges</code>テストで確認済みの<code>H - 1 - v</code>を実装</li><li><code>world_to_camera</code>：<code>X_cam = R @ X_world + t</code>の実装。<strong>1点<code>(3,)</code>でも複数点<code>(N,3)</code>でもまとめて計算できるようにする</strong>必要があり、<code>ndim</code>（後述）で分岐している</li></ul>
+<h3 id="world_to_camera-の役割">world_to_camera の役割<a class="hash" href="#world_to_camera-の役割" aria-label="このセクションへのリンク">#</a></h3>
+<p>「世界のどこかにある点」を「そのカメラから見た座標」に変換する関数。3D再構成の流れの中では</p>
+<pre><code>世界座標の点 → [world_to_camera] → カメラ座標の点 → 内部パラメータで投影 → 画像上のピクセル座標</code></pre>
+<p>の最初のステップにあたる。複数点をまとめて扱えるようにしているのは、G5（ボクセル）で大量の格子点を一度に変換する必要があるため。</p>
+<h3 id="ndim-とは">ndim とは<a class="hash" href="#ndim-とは" aria-label="このセクションへのリンク">#</a></h3>
+<p><code>np.ndarray</code>が持つ属性で、<strong>配列の軸（次元）の本数</strong>を表す整数。<code>shape</code>が「各軸の長さ」を教えるのに対し、<code>ndim</code>は「軸が何本あるか」だけを教える（<code>ndim == len(shape)</code>）。</p>
+<pre><code class="lang-python">np.array([1, 2, 3]).ndim              # 1（形は(3,)、1点のベクトル）
+np.array([[1,2,3],[4,5,6]]).ndim      # 2（形は(2,3)、複数点をまとめた行列）</code></pre>
+<p><code>world_to_camera</code>では、<code>x_world.ndim</code>を見て「1点だけ渡されたか、複数点まとめて渡されたか」を判定し、計算方法を分岐させている。</p>
+<h3 id="npndarray-とは">np.ndarray とは<a class="hash" href="#npndarray-とは" aria-label="このセクションへのリンク">#</a></h3>
+<p>NumPyが提供する配列専用のクラス（型）。<code>np.array(...)</code>や<code>np.eye(3)</code>などはすべてこの<code>ndarray</code>のオブジェクトを返す。普通の<code>list</code>と違い、<strong>全要素が同じ型でメモリ上に並んでおり、<code>@</code>（行列積）や要素ごとの<code>+</code>など、まとめて高速に計算できる演算が使える</strong>のが特徴。関数の引数に<code>R: np.ndarray</code>のように書くのは、「NumPy配列を渡してほしい」という意図を示す型ヒント。</p>
+<h2 id="cameraspy-の実装">cameras.py の実装<a class="hash" href="#cameraspy-の実装" aria-label="このセクションへのリンク">#</a></h2>
+<p><code>src/recon3d/io/cameras.py</code>に、dataclass（<code>Convention</code>・<code>Intrinsics</code>・<code>View</code>・<code>CameraSet</code>）と3つの関数（<code>load_cameras</code>・<code>save_cameras</code>・<code>validate</code>）を実装した。全体の目的は「<code>cameras.json</code>を安全に読み書きし、壊れたデータが紛れ込まないよう入口と出口の両方で検証する」こと。</p>
+<h3 id="各dataclassの目的">各dataclassの目的<a class="hash" href="#各dataclassの目的" aria-label="このセクションへのリンク">#</a></h3>
+<ul><li><code>Convention</code>：座標系の規約（<code>world_up</code>など5項目）を表す。<code>cameras.json</code>自身に規約を埋め込み、想定と違えば読み込み時に弾けるようにするため（<a href="../plan.html#s5-2">docs/plan.md:558</a>）</li><li><code>Intrinsics</code>：カメラの内部パラメータ（焦点距離・主点）を表す</li><li><code>View</code>：1台のカメラ（1枚の画像）の情報（画像パス・外部パラメータ・由来など）を表す</li><li><code>CameraSet</code>：<code>cameras.json</code>1ファイル全体に対応するトップレベルのまとまり</li></ul>
+<h3 id="intrinsics-に-distortion-フィールドを追加した理由">Intrinsics に distortion フィールドを追加した理由<a class="hash" href="#intrinsics-に-distortion-フィールドを追加した理由" aria-label="このセクションへのリンク">#</a></h3>
+<p><code>docs/plan.md</code>§5-1のJSONには<code>intrinsics.distortion</code>（<code>k1,k2,p1,p2,k3</code>などの歪み係数）があるが、<a href="../tasks/T01-pairpro1-io.html">タスク手順書</a>の骨組みには<code>Intrinsics</code>にこのフィールドが無かった（コメントで「distortionはdictのままでよい」とあるのみ）。</p>
+<p>現状すべて<code>0.0</code>固定で実際には使っていない値だが、<strong>フィールドが無いと読み込み時に情報が失われる</strong>ため、専用のdataclassは作らず<code>distortion: dict</code>という素の辞書型フィールドとして追加することにした。</p>
+<pre><code class="lang-python">@dataclass
+class Intrinsics:
+    fx: float
+    fy: float
+    cx: float
+    cy: float
+    distortion: dict</code></pre>
+<h3 id="load_cameras-の目的と設計">load_cameras の目的と設計<a class="hash" href="#load_cameras-の目的と設計" aria-label="このセクションへのリンク">#</a></h3>
+<p><strong>目的</strong>：<code>cameras.json</code>を読み込み、壊れていないことを確認した上で<code>CameraSet</code>として返す（壊れたデータを後続の処理に渡さないための入口の防波堤）。</p>
+<pre><code class="lang-python">def load_cameras(path: Path) -&gt; CameraSet:
+    text = path.read_text(encoding="utf-8")
+    data = json.loads(text)
+
+    convention = Convention(**data["convention"])
+    intrinsics = Intrinsics(
+        fx=data["intrinsics"]["fx"], fy=data["intrinsics"]["fy"],
+        cx=data["intrinsics"]["cx"], cy=data["intrinsics"]["cy"],
+        distortion=data["intrinsics"]["distortion"],
+    )
+    image_size = (data["image_size"]["width"], data["image_size"]["height"])
+    views = [View(**v) for v in data["views"]]
+
+    cameras = CameraSet(
+        schema_version=data["schema_version"], convention=convention,
+        image_size=image_size, intrinsics=intrinsics, views=views, meta=data["meta"],
+    )
+    validate(cameras)
+    return cameras</code></pre>
+<ul><li>JSON文字列→<code>dict</code>（<code>json.loads</code>）→ 各dataclassを<code>**</code>展開で組み立て（<code>Convention(**data["convention"])</code>など、キー名がdataclassのフィールド名と一致しているため使える）</li><li><code>image_size</code>（タプル）は<code>{"width":..,"height":..}</code>という辞書と相互変換が必要なので、<code>**</code>展開が使えず個別に組み立てている</li><li>最後に<code>validate()</code>を通してから返す（ここで壊れていれば<code>ValueError</code>が飛び、呼び出し元に伝わる）</li></ul>
+<h3 id="save_cameras-の目的と設計">save_cameras の目的と設計<a class="hash" href="#save_cameras-の目的と設計" aria-label="このセクションへのリンク">#</a></h3>
+<p><strong>目的</strong>：<code>CameraSet</code>を<code>cameras.json</code>として書き出す（壊れた状態のデータを誤って世に出さないための出口の防波堤）。<code>load_cameras</code>のちょうど逆方向の変換を行う。</p>
+<ul><li>先に<code>validate()</code>を通す（書き出す前に壊れていないか確認）</li><li>各dataclassを<code>.__dict__</code>で素の辞書に戻し、<code>image_size</code>はタプルから<code>{"width":..,"height":..}</code>に戻す</li><li><code>json.dumps(indent=4, ensure_ascii=False)</code>で読みやすい形に整形して書き出す</li></ul>
+<h3 id="validate-の目的と設計完成">validate の目的と設計（完成）<a class="hash" href="#validate-の目的と設計完成" aria-label="このセクションへのリンク">#</a></h3>
+<p><strong>目的</strong>：<code>CameraSet</code>が規約通りの壊れていないデータかを検証し、<a href="../plan.html#s5-3">docs/plan.md§5-3</a>の4項目のいずれかが崩れていれば<code>ValueError</code>を投げる。<code>load_cameras</code>・<code>save_cameras</code>の両方から呼ばれる、検証ロジックの本体。</p>
+<pre><code class="lang-python">def validate(cameras: CameraSet) -&gt; None:
+    if cameras.schema_version != SCHEMA_VERSION:
+        raise ValueError(f"schema_version={cameras.schema_version} は想定外")
+
+    if cameras.convention != Convention(
+        world_up="+Z", handedness="right", camera="opencv",
+        image_origin="top_left", extrinsic_form="world_to_camera",
+    ):
+        raise ValueError(f"convention={cameras.convention} は想定外")
+
+    for view in cameras.views:
+        R = np.array(view.R)
+        if not np.allclose(R.T @ R, np.eye(3), atol=1e-6):
+            raise ValueError(f"{view.image}: Rが直交行列でない")
+        if not np.isclose(np.linalg.det(R), 1.0):
+            raise ValueError(f"{view.image}: det(R)={np.linalg.det(R):.3f} は鏡映の可能性")</code></pre>
+<ul><li><strong>項目1（schema_version）</strong>：単純な文字列比較</li><li><strong>項目2（convention）</strong>：あるべき正しい<code>Convention</code>をその場で1個作り、<code>!=</code>で比較。<code>@dataclass</code>は<code>__eq__</code>を自動生成するので、<code>!=</code>だけで5フィールド全部の一致判定ができる</li><li><strong>項目3・4（R）</strong>：<code>cameras.views</code>は複数ありうるので<code>for</code>でループし、1つずつチェック。<code>view.R</code>は<code>list[list[float]]</code>のままなので<code>np.array(view.R)</code>で<code>ndarray</code>に変換してから<code>.T</code>・<code>@</code>・<code>np.linalg.det</code>を使う。<code>np.allclose</code>/<code>np.isclose</code>は<code>assert</code>せず<code>True</code>/<code>False</code>を返すので、<code>if not ...:</code>と組み合わせて使う</li><li>エラーメッセージに<code>view.image</code>を含めることで、複数視点のうちどれが壊れているか特定できるようにしている</li></ul>
+<p><code>uv run pytest tests/test_conventions.py -v</code>で9件全てpass済み。</p>
+  </main>
+</div>
+<footer class="foot">
+  <p>このページは <code>docs/memo/impl_prog.md</code> から自動生成しています。編集は md 側で。</p>
+</footer>
+</body>
+</html>

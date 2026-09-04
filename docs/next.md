@@ -5,11 +5,12 @@
 >
 > **⚠️ この表は「W01 からの持ち越し」だけです。** W02 から始まる本来の実装作業は **[§1-b](#w02)** に別で挙げてあります。
 
-**いまの状況**（このブロックは、週の記録を [進捗ログ](progress.md) に書くときに一緒に更新してください）
+**いまの状況**（このブロックは、下の表の状態を書き換えるときに一緒に更新してください）
 
-**2026-08-24 / W02 初日**
-G6（基盤）の器は 3台すべてで `uv run pytest` が通り、**完了しました**。ここから先は**中身を作る作業**です。
-→ 経緯は [README の現在地](README.md)、実績は [進捗ログ](progress.md)。
+**2026-09-05 / W03**
+**[T01](tasks/T01-pairpro1-io.md) が完了しました**（PR #4・レビュー待ち）。座標系規約（[conventions.md](conventions.md)）・`cameras.json` 仕様（[schema/cameras.md](schema/cameras.md)）・`io/coords.py`・`io/cameras.py`・`tests/test_conventions.py` が入り、`uv run pytest` は **10 passed**。
+**他ジャンルの前提が外れたので、[§1-b の W02 作業](#w02)（G1・G2・G3・G7）に着手できます。**
+→ 経緯は [README の現在地](README.md)、詰まった点と学びは [`memo/`](memo/)。
 
 ---
 
@@ -19,7 +20,7 @@ G6（基盤）の器は 3台すべてで `uv run pytest` が通り、**完了し
 
 | 優先 | # | タスク | ジャンル | 目安 | 前提 | 状態 |
 |---|---|---|---|---|---|---|
-| 🔴 **最優先** | [T01](tasks/T01-pairpro1-io.md) | **ペアプロ#1：座標系と `cameras.json` を決めて実装する** | G6 基盤・I/O | 2h（2人） | **2人そろうこと**・`uv run pytest` が通ること | ⬜ 未着手 |
+| ✅ 済 | [T01](tasks/T01-pairpro1-io.md) | **ペアプロ#1：座標系と `cameras.json` を決めて実装する** | G6 基盤・I/O | 2h（2人） | **2人そろうこと**・`uv run pytest` が通ること | ✅ 完了（2026-09-05・#4） |
 | 🔴 **最優先** | [T02](tasks/T02-oral-decisions.md) | **保留になっている5件を口頭で決める** | 全員 | 15分 | **2人そろうこと**（T01 と同じ場でやる） | ⬜ 未着手 |
 | 🟠 高 | [T03](tasks/T03-ci-workflow.md) | CI（GitHub Actions）の雛形を置く | G7 テスト・CI | 1h | なし | ⬜ 未着手 |
 | 🟠 高 | [T05](tasks/T05-git-practice.md) | Git の練習を1周する（branch → PR → merge） | 全員 | 1h | clone 済み・`uv run pytest` が通ること | ⬜ 未着手 |
@@ -42,7 +43,7 @@ G6（基盤）の器は 3台すべてで `uv run pytest` が通り、**完了し
 | **G7** | `tests/fixtures/synthetic_scene.py`（画像を使わない合成シーン生成器）を実装 | [計画書 §9-1](plan.md#s9-1) |
 
 > **これらに手順書はまだありません。** 中身が**実装そのもの**で、[手順書に書かないと決めている範囲](tasks/README.md)だからです。
-> **先に [T01](tasks/T01-pairpro1-io.md) を終わらせてください。** 座標系と `cameras.json` が決まらないと、どれも書けません。
+> **前提だった [T01](tasks/T01-pairpro1-io.md) は完了済みです**（2026-09-05・PR #4）。座標系と `cameras.json` は決まったので、着手できます。
 > 取りかかるときは [計画書 §10](plan.md#s10) と該当ジャンルの節を読み、**[学びの入口](learning.md) のそのジャンルの行**から始めてください。
 
 ---
@@ -72,7 +73,7 @@ G6（基盤）の器は 3台すべてで `uv run pytest` が通り、**完了し
 | **15分** | [T02 口頭で決める](tasks/T02-oral-decisions.md) ／ [T10 スコープを読む](tasks/T10-read-scope.md) |
 | **30分** | [T04 ブランチ保護](tasks/T04-branch-protection.md)（**T03 と T05 の後**） |
 | **45分〜1時間** | [T03 CI の雛形](tasks/T03-ci-workflow.md) ／ [T05 Git の練習](tasks/T05-git-practice.md) ／ [T06 ラベルとボード](tasks/T06-labels-and-board.md) ／ [T09 3Dモデル探し](tasks/T09-find-3d-model.md) |
-| **2時間・2人そろう** | [T01 ペアプロ#1](tasks/T01-pairpro1-io.md) ← **ここが終わらないと他が先に進めません** |
+| **2時間・2人そろう** | ~~[T01 ペアプロ#1](tasks/T01-pairpro1-io.md)~~ **完了済み（2026-09-05・#4）**。次は [§1-b の W02 作業](#w02) |
 | **1.5〜2時間・1人** | [T07 マスク方式の候補](tasks/T07-mask-options.md)（2h） ／ [T08 Blender 入口メモ](tasks/T08-blender-entry-note.md)（1.5h） |
 
 ---
@@ -95,9 +96,9 @@ git switch -c feat/<何をするか>   # 例: feat/ci-workflow
 ### 終わったとき
 
 1. **PR を出す。** 説明文は「何を」「なぜ」を1〜3段落（[計画書 §8-2](plan.md#s8-2)）
-2. **[進捗ログ](progress.md) の今週の表に1行足す**（ジャンル・実働・やったこと・PR番号）
-3. **このページの表の「状態」を `✅ 完了` に書き換える**
-4. 計画や決定を変えたときは、[進捗ログの「決定を変えた記録」](progress.md#changes)に1行残す（[D-28](decisions.md#d-28)）
+2. **このページの表の「状態」を `✅ 完了（日付・PR番号）` に書き換える**（完了日の記録はここが正）
+3. **詰まった点・学んだことを [`memo/`](memo/) に残す**
+4. 計画や決定を変えたときは、[決定記録の「計画を変えた記録」](decisions.md#changes)に1行残す（[D-28](decisions.md#d-28)）
 
 ---
 
@@ -112,7 +113,7 @@ git switch -c feat/<何をするか>   # 例: feat/ci-workflow
 | いま全体のどこにいるか | [README](README.md) |
 | 仕様・日程・決めごとの本文 | [計画書](plan.md) |
 | なぜそう決めたか | [決定記録](decisions.md) |
-| 実際に何をやったか（週次） | [進捗ログ](progress.md) |
+| 詰まった点・学んだこと | [`memo/`](memo/) |
 
 > **手順書（`tasks/*.md`）は「やり方」だけを書く場所です。** 仕様そのものは計画書に、理由は決定記録にあります。
 > **食い違ったときは計画書と決定記録が正**です。手順書のほうを直してください。

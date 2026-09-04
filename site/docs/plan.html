@@ -229,7 +229,6 @@ def test_no_stray_coordinate_conversion():
 │   ├── README.md             # ★入口。現在地と次の一手
 │   ├── plan.md               # 本書（仕様・日程）
 │   ├── decisions.md          # 決定の理由（D-01〜）
-│   ├── progress.md           # 週次の実働記録
 │   ├── conventions.md        # 座標系規約（§4）          ← 2人
 │   ├── schema/cameras.md     # cameras.json 仕様（§5）    ← 2人
 │   ├── requirements.md       # 数値目標（Phase 1で作成）  ← 2人
@@ -468,6 +467,19 @@ steps:
 <p><strong>★判定②：W15 終了時（2026-11-29）</strong></p>
 <ul><li>メッシュが出ているか？</li><li><strong>破綻している → L1へ切り替え。</strong> ①の点群生成と収束実験（E3・E4・E6）に集中する。</li></ul>
 <p>L1 と L2 は独立して成立するため、どちらに倒れても成果物になる。</p>
+<h3 id="s12-record">判定の記録<a class="hash" href="#s12-record" aria-label="このセクションへのリンク">#</a></h3>
+<p><strong>この3つは、後の判断の根拠になるので必ず埋める。</strong>（2026-09-05 に旧 <code>progress.md</code>「節目の記録」から移設）</p>
+<h4 id="phase-0-の実測値w03-終了時">Phase 0 の実測値（W03 終了時）<a class="hash" href="#phase-0-の実測値w03-終了時" aria-label="このセクションへのリンク">#</a></h4>
+<p>Phase 1 の数値目標をここから決める。</p>
+<div class="table-wrap"><table class="md"><thead><tr><th>指標</th><th>実測値</th></tr></thead><tbody><tr><td>再投影誤差</td><td></td></tr><tr><td>点群密度</td><td></td></tr><tr><td>20枚の処理時間</td><td></td></tr><tr><td>実写での特徴点数</td><td></td></tr></tbody></table></div>
+<h4 id="判定①2026-11-01-バンドル調整は収束したか">判定①（2026-11-01）— バンドル調整は収束したか<a class="hash" href="#判定①2026-11-01-バンドル調整は収束したか" aria-label="このセクションへのリンク">#</a></h4>
+<ul><li class="task"><input type="checkbox" disabled> 収束した → L3 継続</li><li class="task"><input type="checkbox" disabled> 収束しない → <strong>L2 へ切り替え</strong>（<code>source</code> を <code>turntable_gt</code> に固定）</li></ul>
+<p><strong>根拠にした数値</strong>:</p>
+<h4 id="判定②2026-11-29-メッシュは出ているか">判定②（2026-11-29）— メッシュは出ているか<a class="hash" href="#判定②2026-11-29-メッシュは出ているか" aria-label="このセクションへのリンク">#</a></h4>
+<ul><li class="task"><input type="checkbox" disabled> 出ている → L3 継続</li><li class="task"><input type="checkbox" disabled> 破綻している → <strong>L1 へ切り替え</strong></li></ul>
+<p><strong>根拠にした数値</strong>:</p>
+<h4 id="ボクセル解像度の最終決定w12-の実測">ボクセル解像度の最終決定（W12 の実測）<a class="hash" href="#ボクセル解像度の最終決定w12-の実測" aria-label="このセクションへのリンク">#</a></h4>
+<div class="table-wrap"><table class="md"><thead><tr><th>項目</th><th>実測値</th></tr></thead><tbody><tr><td>採用した解像度</td><td></td></tr><tr><td>チャンクサイズ</td><td></td></tr><tr><td>ピークメモリ（各開発機）</td><td></td></tr><tr><td>彫刻の処理時間</td><td></td></tr></tbody></table></div>
 <hr>
 <h2 id="s13">13. 着工前チェックリスト（W01 初日）<a class="hash" href="#s13" aria-label="このセクションへのリンク">#</a></h2>
 <p><strong>担当者名は書かない。</strong> 着手する場面で決める（§3-2）。<strong>ただし ① は他の全てをブロックするので、最初に誰かが取ること。</strong></p>
@@ -511,7 +523,7 @@ steps:
 <blockquote><p>バンドル調整の縮小系をCG法で解く部分を自作し、前処理による反復回数の変化と、視差角が小さいときの条件数悪化を測定しました。Levenberg–Marquardt の減衰項はTikhonov正則化と形式的に同一なので、λ の選び方が収束性と精度に与える影響も実験項目に含めています。ボクセル空間から Marching Cubes でメッシュを起こしたあとの平滑化では、離散ラプラシアンの重み（一様 vs cotan）で形状の歪み方がどう変わるかを、真値メッシュとの Hausdorff 距離で定量比較しました。評価用データセットは Blender で自作し、カメラ行列と真値形状を既知としたうえで、どこで誤差が入ったかを切り分けられるようにしています。</p></blockquote>
 <hr>
 <h2 id="s16">16. 未決定として残る項目<a class="hash" href="#s16" aria-label="このセクションへのリンク">#</a></h2>
-<blockquote><p><strong>決着済みの項目はこの表から外した</strong>（2026-08-24）。<strong>Python 3.11.13 の確定・メモリ 16GB とボクセル 256³ の維持・リポジトリの用途確定・<code>doc/</code>→<code>docs/</code> の改名・ファイル名の短縮・remote URL の更新</strong>は完了しており、経緯は <a href="decisions.html">決定記録</a>（<a href="decisions.html#d-27">D-27</a>・<a href="decisions.html#d-32">D-32</a>）と <a href="progress.html">進捗ログ</a> にある。</p></blockquote>
+<blockquote><p><strong>決着済みの項目はこの表から外した</strong>（2026-08-24）。<strong>Python 3.11.13 の確定・メモリ 16GB とボクセル 256³ の維持・リポジトリの用途確定・<code>doc/</code>→<code>docs/</code> の改名・ファイル名の短縮・remote URL の更新</strong>は完了しており、経緯は <a href="decisions.html">決定記録</a>（<a href="decisions.html#d-27">D-27</a>・<a href="decisions.html#d-32">D-32</a>・<a href="decisions.html#changes">計画を変えた記録</a>）にある。</p></blockquote>
 <div class="table-wrap"><table class="md"><thead><tr><th>項目</th><th>決定時期</th><th>備考</th><th>手順</th></tr></thead><tbody><tr><td>リポジトリ名（改名の要否と新名称）</td><td><strong>public 化の直前</strong></td><td>既存 <code>4bitcom_HandM</code> をそのまま使うと決定したため、<strong>着工をブロックしない</strong>。→ <a href="decisions.html#d-27">D-27</a></td><td>—</td></tr><tr><td>合成データの元モデルの具体</td><td><strong>W02</strong>（W01 から持ち越し）</td><td>凹み形状必須。<strong>配布モデルの調達で進める</strong>（§7-7）。<strong>ライセンス確認が必要</strong></td><td><a href="tasks/T09-find-3d-model.html">T09</a></td></tr><tr><td>マスク画像の生成方法（アルファ / クリプトマット等）</td><td>W02</td><td>View Transform は Standard 固定（§7-6）。<strong>経験者がいないため、候補を1枚にまとめてから2人で決める</strong>（<a href="decisions.html#d-35">D-35</a>）</td><td><a href="tasks/T07-mask-options.html">T07</a></td></tr><tr><td><strong>E8（レンダリング条件 vs 復元精度）の採否</strong></td><td><strong>W04</strong></td><td>G2 と G8 にまたがる追加実験。<strong>W02 の実装負荷を見てから決める</strong>（§11・<a href="decisions.html#d-31">D-31</a>）</td><td>—</td></tr><tr><td>数値目標の具体値</td><td>W04</td><td>Phase 0 の実測値待ち</td><td>—</td></tr><tr><td>実写機材の調達</td><td>W03 まで</td><td>資料3 Q14。<strong>未所持は三脚・回転台・背景布・照明。予算は2人で相談</strong>（§14-14）</td><td>—</td></tr><tr><td>実写の被写体の確定</td><td>W03</td><td>候補はフィギュア・ぬいぐるみ・風景。<strong>凹み・無地面・非鏡面の条件で絞る</strong>（§14-15）</td><td>—</td></tr><tr><td>ボクセル解像度の確定（<strong>256³ で維持</strong>）</td><td>W12</td><td>処理時間の実測後。<strong>メモリ側の懸念は 16GB 確定で解消</strong>。<strong>チャンク分割実装は解像度に依らず採用</strong>（§7-6）</td><td>—</td></tr><tr><td>ボクセル投影のチャンクサイズ</td><td>W12</td><td>ペアプロ#2 で外部パラメータ化。E7 の独立変数候補</td><td>—</td></tr><tr><td>ビューア/GUI の要否と形式（L4項目）</td><td>W15</td><td>Phase 3 完了時の余力次第。<strong>内蔵GPU前提で控えめに見積もる</strong>（§7-6）</td><td>—</td></tr><tr><td>最終成果物の形式・撤退ラインの合意・週の進め方・メッシュ自作範囲</td><td><strong>W02 の対面</strong>（W01 から持ち越し）</td><td>2026-08-16 に保留となった分（§14-10〜13）</td><td><a href="tasks/T02-oral-decisions.html">T02</a></td></tr><tr><td>public 化のタイミング</td><td>Phase 4 完了後</td><td>資料3 Q8。<strong>「完成後に public 化」までは合意済み</strong>（2026-08-16）</td><td>—</td></tr><tr><td><strong>メンバーを増やすか</strong>（増やすなら誰に・どのジャンルを渡すか）</td><td>随時</td><td><strong>3人なら1人あたり週5.8h</strong>（§3-1）。新しく入る人の入口は <a href="README.html">README</a> → <a href="next.html">next.md</a> → <a href="learning.html">learning.md</a></td><td>—</td></tr></tbody></table></div>
 <hr>
 <h2 id="s-appendix">付録A：本計画で参照した引き継ぎ資料の節<a class="hash" href="#s-appendix" aria-label="このセクションへのリンク">#</a></h2>

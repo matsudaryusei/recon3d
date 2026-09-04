@@ -59,14 +59,14 @@
 |---|---|
 | **計画・確認事項** | ✅ **決着済み。** 着工をブロックするものは残っていない（回答は [計画書 §14](plan.md#s14)、判断は [D-30〜D-37](decisions.md)） |
 | **G6 基盤の「器」** | ✅ **完了（8/20 push・8/24 に3台で確認）。** 環境・骨格・`import recon3d` まで。→ [計画書 §6-2 の完了判定](plan.md#s6-2)を満たした |
-| **G6 の「中身」** | ⬜ **これから。** 座標変換と `cameras.json` の実装（→ [T01](tasks/T01-pairpro1-io.md)） |
+| **G6 の「中身」** | ✅ **完了（2026-09-05・PR #4）。** 座標変換と `cameras.json` の実装（→ [T01](tasks/T01-pairpro1-io.md)）。`uv run pytest` は 10 passed |
 | **G7・G9 運用の器** | ⬜ **未着手。** CI・ブランチ保護・ラベル（→ [T03](tasks/T03-ci-workflow.md)・[T04](tasks/T04-branch-protection.md)・[T06](tasks/T06-labels-and-board.md)） |
 | **G2・G3 の下ごしらえ** | ⬜ **未着手。** マスク方式の候補（→ [T07](tasks/T07-mask-options.md)。**W02 中に決める**）・Blender の入口メモ（→ [T08](tasks/T08-blender-entry-note.md)）・3Dモデル探し（→ [T09](tasks/T09-find-3d-model.md)） |
 | **G1〜G5・G8 の本体** | ⬜ **W02 から。** [計画書 §10](plan.md#s10) の Phase 0（OpenCV で一直線に通す／Blender で合成データ）。**手順書はありません** → [next.md §1-b](next.md#w02) |
 
 > ⚠️ **他の端末は `git pull` のあと `uv sync` を1回流してください。** `pyproject.toml` に `[build-system]` が入ったので、プロジェクト自身が editable install されます（→ [計画書 §6-3](plan.md#s6-3)）。
 
-**日付ごとに何があったかは [進捗ログ](progress.md) にあります。**
+**完了したタスクと完了日は [next.md](next.md) の状態列にあります。**
 **なぜそう決めたかは [決定記録](decisions.md)** に D 番号で入っています。ここには**現在地だけ**を置きます。
 
 ---
@@ -115,7 +115,7 @@
 | **まだ決まっていないことを確認する** | [計画書 §16](plan.md#s16) |
 | **「なんでこう決めたんだっけ？」** | [決定記録](decisions.md) |
 | 「この決定、変えたい」 | [決定記録](decisions.md) で理由を読んでから相談 |
-| 今週の作業が終わった | [進捗ログ](progress.md) に記録 → **書けたらAIに見せる**（抜けを指摘してもらう） |
+| タスクが終わった | [next.md](next.md) の状態を `✅ 完了（日付・PR番号）` に。詰まった点は [`memo/`](memo/) へ |
 | 新しくAIに相談する | [`internal/ai-session-context.md`](internal/ai-session-context.md) を渡す |
 
 ### ファイルの一覧
@@ -132,9 +132,9 @@
 | **[`notes/`](notes/)** | **詰まったこと・調べたことの置き場**（テンプレ付き） | **詰まったとき・抜けたとき** |
 | [計画書](plan.md) | **仕様と日程**（何を作るか。18週の予定） | 引くとき |
 | [決定記録](decisions.md) | **なぜそう決めたか**（D-01〜D-39） | 引くとき |
-| [進捗ログ](progress.md) | **実際どう進んだか**（テンプレをコピーして5分） | 毎週 |
+| [`memo/`](memo/) | **実装・テストを書きながら学んだことの記録** | 書いたとき |
 
-> **役割分担**：**README = どこにいるか** ／ **next.md + tasks/ = 次に何をどうやるか** ／ **glossary + learning = 分からないときの逃げ場** ／ **notes/ = 詰まった記録** ／ **plan.md = 何を作るか** ／ **decisions.md = なぜそうするか** ／ **progress.md = 何をやったか**
+> **役割分担**：**README = どこにいるか** ／ **next.md + tasks/ = 次に何をどうやるか** ／ **glossary + learning = 分からないときの逃げ場** ／ **notes/ = 詰まった記録** ／ **plan.md = 何を作るか** ／ **decisions.md = なぜそうするか** ／ **memo/ = 書きながら学んだこと**
 
 **リポジトリのルート直下（`docs/` の外）**
 
@@ -150,7 +150,6 @@
 | ファイル | 中身 |
 |---|---|
 | `internal/ai-session-context.md` | AIに文脈を渡すための資料 |
-| `internal/progress-log-review.md` | **進捗ログをAIにレビューさせる手順**（判定基準・週ごとの観測ポイント） |
 | `internal/project-handoff.md` | テーマを選んだときの検討経緯（8/14時点） |
 | `internal/partner-questions-v1.md` | 確認シート第1版。回答済みの記録（**用語集は [glossary.md](glossary.md) に移しました**） |
 
