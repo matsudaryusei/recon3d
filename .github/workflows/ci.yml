@@ -1,0 +1,32 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    name: pytest (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: uv をインストール
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+
+      - name: 依存をインストール
+        run: uv sync
+
+      - name: Python のバージョンを表示（3.11.13 のはず）
+        run: uv run python -V
+
+      - name: テストを実行
+        run: uv run pytest -v
