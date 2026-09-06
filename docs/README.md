@@ -60,7 +60,7 @@
 | **計画・確認事項** | ✅ **決着済み。** 着工をブロックするものは残っていない（回答は [計画書 §14](plan.md#s14)、判断は [D-30〜D-40](decisions.md)）。**保留5件も 2026-09-07 に確定**（[T02](tasks/T02-oral-decisions.md)／[D-40](decisions.md#d-40)）。残るは public 化の時期のみ（[T10](tasks/T10-read-scope.md) 完了後） |
 | **G6 基盤の「器」** | ✅ **完了（8/20 push・8/24 に3台で確認）。** 環境・骨格・`import recon3d` まで。→ [計画書 §6-2 の完了判定](plan.md#s6-2)を満たした |
 | **G6 の「中身」** | ✅ **完了（2026-09-05・PR #4）。** 座標変換と `cameras.json` の実装（→ [T01](tasks/T01-pairpro1-io.md)）。`uv run pytest` は 10 passed |
-| **G7・G9 運用の器** | ⬜ **未着手。** CI・ブランチ保護・ラベル（→ [T03](tasks/T03-ci-workflow.md)・[T04](tasks/T04-branch-protection.md)・[T06](tasks/T06-labels-and-board.md)） |
+| **G7・G9 運用の器** | 🔄 **CI は完了（2026-09-06・PR #6）。** PR と `main` への push で Ubuntu + Windows の `pytest` が回る（→ [T03](tasks/T03-ci-workflow.md)）。ブランチ保護・ラベルは未着手（→ [T04](tasks/T04-branch-protection.md)・[T06](tasks/T06-labels-and-board.md)） |
 | **G2・G3 の下ごしらえ** | ⬜ **未着手。** マスク方式の候補（→ [T07](tasks/T07-mask-options.md)。**W02 中に決める**）・Blender の入口メモ（→ [T08](tasks/T08-blender-entry-note.md)）・3Dモデル探し（→ [T09](tasks/T09-find-3d-model.md)） |
 | **G1〜G5・G8 の本体** | ⬜ **W02 から。** [計画書 §10](plan.md#s10) の Phase 0（OpenCV で一直線に通す／Blender で合成データ）。**手順書はありません** → [next.md §1-b](next.md#w02) |
 
@@ -80,13 +80,14 @@
 
 **担当者は書きません。** 取れる人が取ってください（[計画書 §3-2](plan.md#s3-2)）。
 
-### いま優先度が高い3つ
+### いま優先度が高いタスク
+
+> [T03](tasks/T03-ci-workflow.md)（CI の雛形）は **2026-09-06・PR #6 で完了**しました。
 
 | # | やること | ジャンル | 目安 |
 |---|---|---|---|
-| 🟠 [T03](tasks/T03-ci-workflow.md) | CI（GitHub Actions）の雛形を置く | G7 テスト・CI | 1h |
 | 🟠 [T05](tasks/T05-git-practice.md) | Git の練習を1周する（branch → PR → merge） | 全員 | 1h |
-| 🟠 [T04](tasks/T04-branch-protection.md) | `main` ブランチを保護する（**T03・T05 の後**） | G7 テスト・CI | 30分 |
+| 🟠 [T04](tasks/T04-branch-protection.md) | `main` ブランチを保護する（**T05 の後**。T03 は済） | G7 テスト・CI | 30分 |
 
 **[T01](tasks/T01-pairpro1-io.md)（ペアプロ#1）と [T02](tasks/T02-oral-decisions.md)（保留5件の口頭確認）は完了済み**（2026-09-05・2026-09-07）。座標系・データ形式・最終成果物（`.blend`）・撤退ラインが決まったので、W02 の実装作業に着手できます（→ [next.md §1-b](next.md#w02)）。
 
