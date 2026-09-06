@@ -204,16 +204,17 @@ def main() -> int:
                 title=html.escape(title),
                 up="../" * depth,
                 crumbs=breadcrumb(rel, depth),
-                src=html.escape(str(rel)),
+                src=html.escape(rel.as_posix()),
                 toc=toc(doc.headings),
                 body=doc.html,
             ),
             encoding="utf-8",
+            newline="\n",
         )
-        pages[str(rel)] = str(rel.with_suffix(".html"))
+        pages[rel.as_posix()] = rel.with_suffix(".html").as_posix()
 
     (OUT / "index.html").write_text(
-        INDEX_PAGE.format(sections=build_index(pages)), encoding="utf-8"
+        INDEX_PAGE.format(sections=build_index(pages)), encoding="utf-8", newline="\n"
     )
     print(f"{len(pages)} 件を {OUT.relative_to(REPO)}/ に出力しました。")
     print(f"開く: file://{OUT}/index.html")

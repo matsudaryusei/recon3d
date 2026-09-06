@@ -8,10 +8,11 @@
 **いまの状況**（このブロックは、下の表の状態を書き換えるときに一緒に更新してください）
 
 **2026-09-07 / W03**
+**[T04](tasks/T04-branch-protection.md) が完了しました**（2026-09-07）。GitHub の Ruleset `protect-main` で `main` への直 push を禁止し、PR 必須・`pytest (ubuntu-latest)` / `pytest (windows-latest)` のステータスチェック必須にしました。マージ方式も `Squash and merge` のみに統一済み。push が拒否されることの実地確認も完了（[D-22](decisions.md#d-22)）。振り返りは [`notes/2026-09-07-branch-protection.md`](notes/2026-09-07-branch-protection.md)。
 **[T03](tasks/T03-ci-workflow.md) が完了しました**（2026-09-06・PR #6）。`.github/workflows/ci.yml` を追加し、**PR と `main` への push で Ubuntu と Windows の2環境の `uv run pytest`** が自動で回るようになりました。手順書どおり `astral-sh/setup-uv@v5` で通り、`@v3` への降格は不要。両環境とも緑・ログの `uv run python -V` は `Python 3.11.13`・`10 passed` を確認（[D-24](decisions.md#d-24)）。振り返りは [`notes/2026-09-06-ci-workflow.md`](notes/2026-09-06-ci-workflow.md)。
 **[T02](tasks/T02-oral-decisions.md) が完了しました**（保留5件を確定）。最終成果物は `.blend`／撤退ラインは目標 L3 で認識合わせ済み／週の進め方は縛らず各自の空き時間で／メッシュ自作範囲は現行どおり／public 化の時期は [T10](tasks/T10-read-scope.md) 完了後に決める。詳細は [決定記録 D-40](decisions.md#d-40)。
 **[T01](tasks/T01-pairpro1-io.md) も完了済み**（2026-09-05・PR #4）。座標系規約・`cameras.json` 仕様・`io/coords.py`・`io/cameras.py`・`tests/test_conventions.py` が入り、`uv run pytest` は **10 passed**。
-**残る W01 の持ち越しは [T05 Git 練習](tasks/T05-git-practice.md) → [T04 ブランチ保護](tasks/T04-branch-protection.md) です。** T04 の前提は「T03・T05 の両方」でしたが、**T03 が済んだので T05 待ちのみ**になりました。
+**残る W01 の持ち越しは [T05 Git 練習](tasks/T05-git-practice.md) のみです。**
 **他ジャンルの前提も外れているので、[§1-b の W02 作業](#w02)（G1・G2・G3・G7）に着手できます。**
 → 経緯は [README の現在地](README.md)、詰まった点と学びは [`memo/`](memo/) と [`notes/`](notes/)。
 
@@ -27,7 +28,7 @@
 | ✅ 済 | [T02](tasks/T02-oral-decisions.md) | **保留になっている5件を口頭で決める** | 全員 | 15分 | **2人そろうこと**（T01 と同じ場でやる） | ✅ 完了（2026-09-07・[D-40](decisions.md#d-40)） |
 | ✅ 済 | [T03](tasks/T03-ci-workflow.md) | CI（GitHub Actions）の雛形を置く | G7 テスト・CI | 1h | なし | ✅ 完了（2026-09-06・#6） |
 | 🟠 高 | [T05](tasks/T05-git-practice.md) | Git の練習を1周する（branch → PR → merge） | 全員 | 1h | clone 済み・`uv run pytest` が通ること | ⬜ 未着手 |
-| 🟠 高 | [T04](tasks/T04-branch-protection.md) | `main` ブランチを保護する | G7 テスト・CI | 30分 | **T05** が済んでいること（T03 は 2026-09-06 完了） | ⬜ 未着手 |
+| ✅ 済 | [T04](tasks/T04-branch-protection.md) | `main` ブランチを保護する | G7 テスト・CI | 30分 | **T05** が済んでいること（T03 は 2026-09-06 完了） | ✅ 完了（2026-09-07） |
 | 🟡 中 | [T06](tasks/T06-labels-and-board.md) | ラベルを登録して Projects ボードを1枚作る | G9 ドキュメント・運用 | 45分 | **リポジトリ設定の変更権限**（取得済み） | ⬜ 未着手 |
 | 🟠 高 | [T07](tasks/T07-mask-options.md) | マスク生成方式の候補を1枚にまとめる（**W02 中に決める**） | G3 画像処理 | 2h | なし（Blender 不要） | ⬜ 未着手 |
 | 🟡 中 | [T08](tasks/T08-blender-entry-note.md) | Blender スクリプトの入口メモを1本書く | G2 3DCG | 1.5h | Blender が入っている端末 | ⬜ 未着手 |
@@ -74,7 +75,7 @@
 | 空いている時間 | おすすめ |
 |---|---|
 | **15分** | [T10 スコープを読む](tasks/T10-read-scope.md)（**public 化の時期はこれが終わり次第に決める** → [D-40](decisions.md#d-40)⑤） |
-| **30分** | [T04 ブランチ保護](tasks/T04-branch-protection.md)（**T05 の後**。T03 は済） |
+| **30分** | ~~[T04 ブランチ保護](tasks/T04-branch-protection.md)~~ **完了済み（2026-09-07）** |
 | **45分〜1時間** | ~~[T03 CI の雛形](tasks/T03-ci-workflow.md)~~ **完了済み（2026-09-06・#6）** ／ [T05 Git の練習](tasks/T05-git-practice.md) ／ [T06 ラベルとボード](tasks/T06-labels-and-board.md) ／ [T09 3Dモデル探し](tasks/T09-find-3d-model.md) |
 | **2時間・2人そろう** | ~~[T01 ペアプロ#1](tasks/T01-pairpro1-io.md)~~ **完了済み（2026-09-05・#4）**。次は [§1-b の W02 作業](#w02) |
 | **1.5〜2時間・1人** | [T07 マスク方式の候補](tasks/T07-mask-options.md)（2h） ／ [T08 Blender 入口メモ](tasks/T08-blender-entry-note.md)（1.5h） |
@@ -141,3 +142,4 @@ git switch -c feat/<何をするか>   # 例: feat/ci-workflow
 | [T01](tasks/T01-pairpro1-io.md) | ペアプロ#1：座標系と `cameras.json` を決めて実装 | ✅ 2026-09-05（#4） |
 | [T03](tasks/T03-ci-workflow.md) | CI（GitHub Actions）の雛形を置く（`.github/workflows/ci.yml`。Ubuntu + Windows で `pytest`） | ✅ 2026-09-06（#6） |
 | [T02](tasks/T02-oral-decisions.md) | 保留5件を口頭で決める（→ [D-40](decisions.md#d-40)） | ✅ 2026-09-07 |
+| [T04](tasks/T04-branch-protection.md) | `main` ブランチを保護する（Ruleset `protect-main`。PR 必須・ステータスチェック必須・squash merge のみ） | ✅ 2026-09-07 |
