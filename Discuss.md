@@ -72,3 +72,13 @@ from 関口 to 全員
 反映先：[決定記録 D-40](docs/decisions.md#d-40)、[計画書 §14](docs/plan.md#s14)（10〜13 の消し込み）・[§16](docs/plan.md#s16)、[next.md](docs/next.md)（T02 を完了に）。
 
 ---
+
+### 09/07
+
+from 松田 to 全員
+
+**[T04](docs/tasks/T04-branch-protection.md)（`main` ブランチの保護）が完了しました。** `main` への直 push を禁止しました（Ruleset `protect-main`・PR 必須・`pytest` の2チェック必須）。**今後はブランチ → PR です。** やり方は [`docs/tasks/T05-git-practice.md`](docs/tasks/T05-git-practice.md) を見てください。
+
+振り返りは [`docs/notes/2026-09-07-branch-protection.md`](docs/notes/2026-09-07-branch-protection.md)。
+
+---

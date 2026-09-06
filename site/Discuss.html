@@ -14,7 +14,7 @@
   </div>
 </header>
 <div class="layout">
-  <details class="toc"><summary class="toc-title">目次</summary><ul><li class="lv2"><a href="#動機">動機</a></li><li class="lv2"><a href="#書き方">書き方</a></li><li class="lv3"><a href="#08-17">08/17</a></li><li class="lv3"><a href="#08-20">08/20</a></li><li class="lv3"><a href="#09-07">09/07</a></li></ul></details>
+  <details class="toc"><summary class="toc-title">目次</summary><ul><li class="lv2"><a href="#動機">動機</a></li><li class="lv2"><a href="#書き方">書き方</a></li><li class="lv3"><a href="#08-17">08/17</a></li><li class="lv3"><a href="#08-20">08/20</a></li><li class="lv3"><a href="#09-07">09/07</a></li><li class="lv3"><a href="#09-07-2">09/07</a></li></ul></details>
   <main class="page">
 <h1 id="連絡場所">連絡場所<a class="hash" href="#連絡場所" aria-label="このセクションへのリンク">#</a></h1>
 <blockquote><p><strong>対面でないときの連絡場所です。</strong> 書き方は下の「動機」を読んでください。</p>
@@ -50,6 +50,11 @@ logファイルを清書するときは詰まった点や工夫した点など�
 <p><strong>T02（保留5件の口頭確認）を実施しました。</strong> 決めたこと:</p>
 <ul><li><strong>① 最終成果物</strong>：<code>.blend</code> ファイル（単一）。glTF・<code>.obj</code>・<code>.ply</code> の書き出しコードは作らない。デモ動画・可視化動画は L4 の余力次第</li><li><strong>② 撤退ライン</strong>：目標は L3。11/1 にバンドル調整が未収束なら L2、11/29 にメッシュが破綻していれば L1。<a href="docs/plan.html#s12">計画書 §12</a> を2人で読み合わせ、切り替え条件に合意（異議なし）</li><li><strong>③ 週の進め方</strong>：特に急がない。お互いの空いている時間に進める（非同席でよい）。連絡手段・返信速度の期待値・週次「Issue を切る会」の固定時刻は、いまは縛らない。詰まったらここに書く</li><li><strong>④ メッシュ自作範囲</strong>：現行案どおり（<a href="docs/plan.html#s3-3">計画書 §3-3</a>）。Marching Cubes・QEM・ラプラシアン平滑化・テクスチャ投影は自作、UV展開のみ Blender の Smart UV Project</li><li><strong>⑤ public 化の時期</strong>：<a href="docs/tasks/T10-read-scope.html">T10</a>（スコープ・撤退ラインの通読）が終わり次第に決める。「完成後に public 化」自体は <a href="docs/decisions.html#d-27">D-27</a> で合意済み</li><li><strong>13番（計画への異議・追加でやりたいこと）</strong>：特になし</li></ul>
 <p>反映先：<a href="docs/decisions.html#d-40">決定記録 D-40</a>、<a href="docs/plan.html#s14">計画書 §14</a>（10〜13 の消し込み）・<a href="docs/plan.html#s16">§16</a>、<a href="docs/next.html">next.md</a>（T02 を完了に）。</p>
+<hr>
+<h3 id="09-07-2">09/07<a class="hash" href="#09-07-2" aria-label="このセクションへのリンク">#</a></h3>
+<p>from 松田 to 全員</p>
+<p><strong><a href="docs/tasks/T04-branch-protection.html">T04</a>（<code>main</code> ブランチの保護）が完了しました。</strong> <code>main</code> への直 push を禁止しました（Ruleset <code>protect-main</code>・PR 必須・<code>pytest</code> の2チェック必須）。<strong>今後はブランチ → PR です。</strong> やり方は <a href="docs/tasks/T05-git-practice.html"><code>docs/tasks/T05-git-practice.md</code></a> を見てください。</p>
+<p>振り返りは <a href="docs/notes/2026-09-07-branch-protection.html"><code>docs/notes/2026-09-07-branch-protection.md</code></a>。</p>
 <hr>
   </main>
 </div>

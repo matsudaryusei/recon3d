@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CI（GitHub Actions）の雛形を置いた（2026-09-06・PR #6）</title>
+<link rel="stylesheet" href="../../assets/style.css">
+</head>
+<body>
+<header class="topbar">
+  <div class="topbar-inner">
+    <nav class="crumbs"><a href="../../index.html">ドキュメント</a><span class="sep">/</span><a href="README.html">notes/</a></nav>
+    <span class="src">docs/notes/2026-09-06-ci-workflow.md</span>
+  </div>
+</header>
+<div class="layout">
+  <details class="toc"><summary class="toc-title">目次</summary><ul><li class="lv2"><a href="#やったこと">やったこと</a></li><li class="lv2"><a href="#分かったこと">分かったこと</a></li><li class="lv2"><a href="#つまずいた点">つまずいた点</a></li><li class="lv2"><a href="#次に活かすこと">次に活かすこと</a></li><li class="lv2"><a href="#参考">参考</a></li></ul></details>
+  <main class="page">
+<h1 id="cigithub-actionsの雛形を置いた2026-09-06pr-6">CI（GitHub Actions）の雛形を置いた（2026-09-06・PR #6）<a class="hash" href="#cigithub-actionsの雛形を置いた2026-09-06pr-6" aria-label="このセクションへのリンク">#</a></h1>
+<p><strong>きっかけ</strong>: <a href="../tasks/T03-ci-workflow.html">T03 手順書</a>。3台（mac / Windows / Ubuntu）で手動で <code>uv run pytest</code> を回していたのを、GitHub Actions に肩代わりさせる。</p>
+<h2 id="やったこと">やったこと<a class="hash" href="#やったこと" aria-label="このセクションへのリンク">#</a></h2>
+<ul><li><code>feat/ci-workflow</code> を切って <code>.github/workflows/ci.yml</code> を1本追加しただけ。中身は手順書のコピペそのまま。</li><li>PR を出す → PR ページ下部に <code>pytest (ubuntu-latest)</code> と <code>pytest (windows-latest)</code> の2チェックが出る → 2〜3分で両方緑 → <code>Squash and merge</code> でマージ。</li></ul>
+<h2 id="分かったこと">分かったこと<a class="hash" href="#分かったこと" aria-label="このセクションへのリンク">#</a></h2>
+<ul><li><strong><code>astral-sh/setup-uv@v5</code> はそのまま通った。</strong> 手順書が警告していた「見つからなければ <code>@v3</code> に下げる」は不要だった。降格していないので PR への理由書きも不要。</li><li><strong><code>setup-uv</code> は Python を入れない。</strong> 次の <code>uv sync</code> が <code>.python-version</code>（3.11.13）を見て自動で用意する。ログの <code>uv run python -V</code> で <code>Python 3.11.13</code> が出ることを確認した。</li><li><strong><code>fail-fast: false</code> が効いて、片方が落ちてももう片方は最後まで回る。</strong> どっちの OS で落ちたか分かるので必須。今回は両方緑だったが、その挙動は PR の実行結果で確認できた。</li><li><strong><code>enable-cache: true</code> で2回目以降が速い。</strong> 初回 PR は約32秒、マージ後の main への push は約36秒（キャッシュヒット）。Windows ランナーは消費が2倍で数えられるが、この規模なら Free 枠で問題にならない。</li><li>テスト数は現状 <code>10 passed</code>（<a href="../tasks/T01-pairpro1-io.html">T01</a> の <code>tests/test_conventions.py</code> が入っているため）。手順書の「1 passed」は T01 前の想定。</li><li><strong>Blender 依存テスト（<code>tools/blender_*.py</code>）は CI から外している。</strong> GitHub の実行環境に Blender が無いため。手元確認とする（<a href="../decisions.html#d-24">D-24</a>）。</li></ul>
+<h2 id="つまずいた点">つまずいた点<a class="hash" href="#つまずいた点" aria-label="このセクションへのリンク">#</a></h2>
+<p>特になし。手順書どおりで一発で通った。改行コード（<code>.gitattributes</code>）まわりの Windows 差分も出なかった。</p>
+<h2 id="次に活かすこと">次に活かすこと<a class="hash" href="#次に活かすこと" aria-label="このセクションへのリンク">#</a></h2>
+<ul><li><strong>これで <a href="../tasks/T04-branch-protection.html">T04 ブランチ保護</a> の前提の片方が済んだ。</strong> 残りは <a href="../tasks/T05-git-practice.html">T05 Git 練習</a> を全員が1周すること。T04 で <code>main</code> を保護すると <code>git push origin main</code> が使えなくなるので、PR 手順を知らないまま保護しないこと。</li><li>今後テストが増えたら CI の実行時間も伸びる。遅くなってきたら <code>uv sync</code> のキャッシュキーや対象 OS を見直す。</li><li><strong>CI バッジはまだ付けていない。</strong> <a href="../decisions.html#d-24">D-24</a> は「バッジ付きリポジトリは印象が違う」としているが、貼り先のトップ README がまだ無い。public 化（<a href="../tasks/T10-read-scope.html">T10</a> 後）にあわせて README を用意するときに一緒に貼る。</li></ul>
+<h2 id="参考">参考<a class="hash" href="#参考" aria-label="このセクションへのリンク">#</a></h2>
+<ul><li><a href="../tasks/T03-ci-workflow.html">T03 手順書</a> ／ <a href="../plan.html#s9-2">計画書 §9-2</a> ／ <a href="../decisions.html#d-24">D-24</a></li><li>実行結果: リポジトリの Actions タブ（<code>CI</code> ワークフロー、run #34047751329 が初回 PR、#34048303042 が main への push）</li></ul>
+  </main>
+</div>
+<footer class="foot">
+  <p>このページは <code>docs/notes/2026-09-06-ci-workflow.md</code> から自動生成しています。編集は md 側で。</p>
+</footer>
+</body>
+</html>

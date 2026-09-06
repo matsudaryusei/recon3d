@@ -18,19 +18,28 @@
 | なぜそう決めたか | [docs/decisions.md](docs/decisions.md) |
 
 
-> ⚠️ **この手順は、[T04（`main` ブランチの保護）](docs/tasks/T04-branch-protection.md) を入れた時点で使えなくなります。**
-> 以降は **ブランチ → PR → レビュー → merge** に変わります。手順は **[T05 Git の練習](docs/tasks/T05-git-practice.md)** にあります。
+> ⚠️ **[T04（`main` ブランチの保護）](docs/tasks/T04-branch-protection.md) により、`main` への直接 `git push` は 2026-09-07 から禁止されています。**
+> 以降は **ブランチ → PR → レビュー → merge** です。手順は **[T05 Git の練習](docs/tasks/T05-git-practice.md)** にあります。
 > **用語（ブランチ・PR・squash merge・conflict）は [用語集](docs/glossary.md) に1行ずつ。**
 
 ## gitへの反映方法
-もし自分が編集する場合は、
-```
+`main` は保護されているため、直接 `git push origin main` はできません。自分が編集する場合は、ブランチを切って PR を出してください。
+
+```bash
+git switch main
+git pull origin main
+git switch -c feat/<何をするか>
+
+# 編集する
+
 git add .
 git commit -m "更新内容(変更者の名前)"
-git push origin main
+git push -u origin feat/<何をするか>
 ```
 
-リアルタイム同期ではないの、誰かが編集したら最新版を取得する必要がある
+GitHub で PR を作成し、レビュー後に **`Squash and merge`** でマージしてください。詳しい手順は [T05 Git の練習](docs/tasks/T05-git-practice.md) を参照。
+
+リアルタイム同期ではないので、誰かが編集したら最新版を取得する必要がある
 ```
 git pull origin main
 ```
