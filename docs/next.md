@@ -7,8 +7,9 @@
 
 **いまの状況**（このブロックは、下の表の状態を書き換えるときに一緒に更新してください）
 
-**2026-09-05 / W03**
-**[T01](tasks/T01-pairpro1-io.md) が完了しました**（PR #4・レビュー待ち）。座標系規約（[conventions.md](conventions.md)）・`cameras.json` 仕様（[schema/cameras.md](schema/cameras.md)）・`io/coords.py`・`io/cameras.py`・`tests/test_conventions.py` が入り、`uv run pytest` は **10 passed**。
+**2026-09-07 / W03**
+**[T02](tasks/T02-oral-decisions.md) が完了しました**（保留5件を確定）。最終成果物は `.blend`／撤退ラインは目標 L3 で認識合わせ済み／週の進め方は縛らず各自の空き時間で／メッシュ自作範囲は現行どおり／public 化の時期は [T10](tasks/T10-read-scope.md) 完了後に決める。詳細は [決定記録 D-40](decisions.md#d-40)。
+**[T01](tasks/T01-pairpro1-io.md) も完了済み**（2026-09-05・PR #4）。座標系規約・`cameras.json` 仕様・`io/coords.py`・`io/cameras.py`・`tests/test_conventions.py` が入り、`uv run pytest` は **10 passed**。
 **他ジャンルの前提が外れたので、[§1-b の W02 作業](#w02)（G1・G2・G3・G7）に着手できます。**
 → 経緯は [README の現在地](README.md)、詰まった点と学びは [`memo/`](memo/)。
 
@@ -21,7 +22,7 @@
 | 優先 | # | タスク | ジャンル | 目安 | 前提 | 状態 |
 |---|---|---|---|---|---|---|
 | ✅ 済 | [T01](tasks/T01-pairpro1-io.md) | **ペアプロ#1：座標系と `cameras.json` を決めて実装する** | G6 基盤・I/O | 2h（2人） | **2人そろうこと**・`uv run pytest` が通ること | ✅ 完了（2026-09-05・#4） |
-| 🔴 **最優先** | [T02](tasks/T02-oral-decisions.md) | **保留になっている5件を口頭で決める** | 全員 | 15分 | **2人そろうこと**（T01 と同じ場でやる） | ⬜ 未着手 |
+| ✅ 済 | [T02](tasks/T02-oral-decisions.md) | **保留になっている5件を口頭で決める** | 全員 | 15分 | **2人そろうこと**（T01 と同じ場でやる） | ✅ 完了（2026-09-07・[D-40](decisions.md#d-40)） |
 | 🟠 高 | [T03](tasks/T03-ci-workflow.md) | CI（GitHub Actions）の雛形を置く | G7 テスト・CI | 1h | なし | ⬜ 未着手 |
 | 🟠 高 | [T05](tasks/T05-git-practice.md) | Git の練習を1周する（branch → PR → merge） | 全員 | 1h | clone 済み・`uv run pytest` が通ること | ⬜ 未着手 |
 | 🟠 高 | [T04](tasks/T04-branch-protection.md) | `main` ブランチを保護する | G7 テスト・CI | 30分 | **T03 と T05 の両方**が済んでいること | ⬜ 未着手 |
@@ -70,7 +71,7 @@
 
 | 空いている時間 | おすすめ |
 |---|---|
-| **15分** | [T02 口頭で決める](tasks/T02-oral-decisions.md) ／ [T10 スコープを読む](tasks/T10-read-scope.md) |
+| **15分** | [T10 スコープを読む](tasks/T10-read-scope.md)（**public 化の時期はこれが終わり次第に決める** → [D-40](decisions.md#d-40)⑤） |
 | **30分** | [T04 ブランチ保護](tasks/T04-branch-protection.md)（**T03 と T05 の後**） |
 | **45分〜1時間** | [T03 CI の雛形](tasks/T03-ci-workflow.md) ／ [T05 Git の練習](tasks/T05-git-practice.md) ／ [T06 ラベルとボード](tasks/T06-labels-and-board.md) ／ [T09 3Dモデル探し](tasks/T09-find-3d-model.md) |
 | **2時間・2人そろう** | ~~[T01 ペアプロ#1](tasks/T01-pairpro1-io.md)~~ **完了済み（2026-09-05・#4）**。次は [§1-b の W02 作業](#w02) |
@@ -135,3 +136,5 @@ git switch -c feat/<何をするか>   # 例: feat/ci-workflow
 | — | G6：`.gitattributes` / `.gitignore` / `pyproject.toml` / `.python-version` / pytest 導入 | ✅ 2026-08-17〜08-20 |
 | — | G6：ディレクトリ骨格（[計画書 §6-2](plan.md#s6-2) の範囲）と `import recon3d` の疎通 | ✅ 2026-08-20（push 済み） |
 | — | 全員：3台（mac / Windows / Ubuntu）で `uv sync` + `uv run pytest` が `1 passed` | ✅ 2026-08-24 |
+| [T01](tasks/T01-pairpro1-io.md) | ペアプロ#1：座標系と `cameras.json` を決めて実装 | ✅ 2026-09-05（#4） |
+| [T02](tasks/T02-oral-decisions.md) | 保留5件を口頭で決める（→ [D-40](decisions.md#d-40)） | ✅ 2026-09-07 |

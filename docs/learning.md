@@ -91,7 +91,7 @@
 | [Open3D のメッシュ操作](https://www.open3d.org/docs/release/tutorial/geometry/mesh.html) | メッシュのデータ構造（頂点配列と面配列）の実物。**自作の答え合わせ用** | 30分 |
 | （自前）[用語集の §4](glossary.md) | Marching Cubes・QEM・cotan重みが**何であるか**の1行定義 | 5分 |
 
-> **自作の範囲は [T02](tasks/T02-oral-decisions.md) の④で決めます。** UV展開は Blender に任せる想定です。
+> **自作の範囲は 2026-09-07（[T02](tasks/T02-oral-decisions.md)④）で現行どおり確定しました**（→ [D-40](decisions.md#d-40)）。Marching Cubes・QEM・ラプラシアン平滑化・テクスチャ投影は自作、**UV展開だけ Blender の Smart UV Project** に任せます。
 
 ### G5 ボクセル・統合 〔W12–W13〕
 

@@ -108,7 +108,7 @@
 | **ビューア** | 結果を見るためだけの画面。**本プロジェクトでは L4（余力があれば）の項目** |
 | **EEVEE / Cycles** | Blender のレンダリング方式。前者は速い、後者は物理的に正確 |
 | **`bpy`** | Blender を Python から操作するためのモジュール |
-| **`.blend` / `.obj` / `.ply` / glTF** | 3Dデータのファイル形式。**何で出すかは [T02](tasks/T02-oral-decisions.md) で決めます** |
+| **`.blend` / `.obj` / `.ply` / glTF** | 3Dデータのファイル形式。**最終成果物は `.blend`（単一）に決定**（2026-09-07・[T02](tasks/T02-oral-decisions.md)／[D-40](decisions.md#d-40)）。他形式の書き出しコードは作りません |
 
 ## 6. 開発まわり
 
