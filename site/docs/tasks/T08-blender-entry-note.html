@@ -30,7 +30,7 @@
 <p><strong>この2つが通れば、あとは中身を書くだけになります。</strong> 詰まるのは毎回「入口」なので、<strong>入口だけ先に1本メモにして、次に見るときと、他の人が見るときに再現できるようにします。</strong></p>
 <blockquote><p><strong>重要な制約</strong>：<a href="../plan.html#s7-4">計画書 §7-4</a> は <strong>「<code>tools/blender_*.py</code> は <code>bpy</code> と <code>numpy</code> のみに依存させる」</strong>と決めています。
 <strong>これは「他に何も入っていない」という意味ではありません。</strong> Blender には <code>mathutils</code>・<code>bmesh</code>・<code>bpy_extras</code>・<code>gpu</code> などが同梱されています。
-<strong>『同梱されているものを使ってよいか』は決まっていません。</strong> 使いたくなったら、勝手に決めずに <a href="../../Discuss.html">Discuss.md</a> に出して2人で決め、<a href="../decisions.html">決定記録</a> に1行残してください（<strong><code>mathutils</code> はカメラ行列を扱うときに真っ先に欲しくなるので、実際に起きます</strong>）。
+<strong>『同梱されているものを使ってよいか』は決まっていません。</strong> 使いたくなったら、勝手に決めずに <a href="../../Notice.html">Notice.md</a> に出して2人で決め、<a href="../decisions.html">決定記録</a> に1行残してください（<strong><code>mathutils</code> はカメラ行列を扱うときに真っ先に欲しくなるので、実際に起きます</strong>）。
 <strong>確実に駄目なのは、<code>uv</code> 側で入れたもの</strong>（<code>scipy</code> など）と <strong><code>pip install</code> が要るもの</strong>です。<strong>メモにもこれを書いてください。</strong></p></blockquote>
 <hr>
 <h2 id="ステップ1ブランチとファイル">ステップ1：ブランチとファイル<a class="hash" href="#ステップ1ブランチとファイル" aria-label="このセクションへのリンク">#</a></h2>
@@ -126,20 +126,20 @@ alias blender="/Applications/Blender.app/Contents/MacOS/Blender"</code></pre></b
 ## 4. 詰まった点
 
 （ここが一番価値がある。素直に書く）</code></pre>
-<blockquote><p><strong>4 が本体です。</strong> 「詰まった点」を書き残すのは <a href="../../Discuss.html">Discuss.md 8/17 の関口の依頼</a>そのものです。<strong>冗長でかまいません。</strong></p></blockquote>
+<blockquote><p><strong>4 が本体です。</strong> 「詰まった点」を書き残すのは <a href="../../Notice.html">Notice.md 8/17 の関口の依頼</a>そのものです。<strong>冗長でかまいません。</strong></p></blockquote>
 <hr>
 <h2 id="完了判定">完了判定<a class="hash" href="#完了判定" aria-label="このセクションへのリンク">#</a></h2>
-<ul><li class="task"><input type="checkbox" disabled> <strong><code>blender --background --python tools/hello_bpy.py</code> が実際に動き、バージョンが3つとも表示された</strong></li><li class="task"><input type="checkbox" disabled> 表示された値が <strong>Blender 5.0.1 / Python 3.11.13 / numpy 1.26.4</strong> と一致する（違ったら <a href="../../Discuss.html">Discuss.md</a> に書く。<strong>計画の前提が崩れます</strong>）</li><li class="task"><input type="checkbox" disabled> <code>docs/notes/blender-entry.md</code> の 0〜4 が埋まっている</li><li class="task"><input type="checkbox" disabled> <strong>「Run Script の出力がどこに出るか」が書いてある</strong></li><li class="task"><input type="checkbox" disabled> <strong>自分の環境の blender 実行ファイルのフルパスが書いてある</strong>（次に見たとき探さずに済む）</li></ul>
+<ul><li class="task"><input type="checkbox" disabled> <strong><code>blender --background --python tools/hello_bpy.py</code> が実際に動き、バージョンが3つとも表示された</strong></li><li class="task"><input type="checkbox" disabled> 表示された値が <strong>Blender 5.0.1 / Python 3.11.13 / numpy 1.26.4</strong> と一致する（違ったら <a href="../../Notice.html">Notice.md</a> に書く。<strong>計画の前提が崩れます</strong>）</li><li class="task"><input type="checkbox" disabled> <code>docs/notes/blender-entry.md</code> の 0〜4 が埋まっている</li><li class="task"><input type="checkbox" disabled> <strong>「Run Script の出力がどこに出るか」が書いてある</strong></li><li class="task"><input type="checkbox" disabled> <strong>自分の環境の blender 実行ファイルのフルパスが書いてある</strong>（次に見たとき探さずに済む）</li></ul>
 <p>PR：</p>
 <pre><code class="lang-bash">git add tools/hello_bpy.py docs/notes/blender-entry.md
 git commit -m "docs(G2): Blender スクリプトの入口メモと動作確認スクリプトを追加"
 git push -u origin docs/blender-entry</code></pre>
 <hr>
 <h2 id="つまずいたら">つまずいたら<a class="hash" href="#つまずいたら" aria-label="このセクションへのリンク">#</a></h2>
-<div class="table-wrap"><table class="md"><thead><tr><th>症状</th><th>対処</th></tr></thead><tbody><tr><td><code>blender: command not found</code></td><td>フルパスで打つ。パスは Blender の <code>About</code> か、アプリの場所から確認</td></tr><tr><td><code>ModuleNotFoundError: No module named 'numpy'</code></td><td><strong>前提が崩れています。</strong> 8/16 に numpy 1.26.4 を確認しているので、環境が変わった可能性。<a href="../../Discuss.html">Discuss.md</a> に書いて相談</td></tr><tr><td>Windows で print が見えない</td><td><code>Window → Toggle System Console</code></td></tr><tr><td><code>--python</code> に相対パスを渡して見つからない</td><td><strong>リポジトリのルートで実行しているか確認。</strong> 迷ったら絶対パスで渡す</td></tr></tbody></table></div>
+<div class="table-wrap"><table class="md"><thead><tr><th>症状</th><th>対処</th></tr></thead><tbody><tr><td><code>blender: command not found</code></td><td>フルパスで打つ。パスは Blender の <code>About</code> か、アプリの場所から確認</td></tr><tr><td><code>ModuleNotFoundError: No module named 'numpy'</code></td><td><strong>前提が崩れています。</strong> 8/16 に numpy 1.26.4 を確認しているので、環境が変わった可能性。<a href="../../Notice.html">Notice.md</a> に書いて相談</td></tr><tr><td>Windows で print が見えない</td><td><code>Window → Toggle System Console</code></td></tr><tr><td><code>--python</code> に相対パスを渡して見つからない</td><td><strong>リポジトリのルートで実行しているか確認。</strong> 迷ったら絶対パスで渡す</td></tr></tbody></table></div>
 <hr>
 <h2 id="終わったら">終わったら<a class="hash" href="#終わったら" aria-label="このセクションへのリンク">#</a></h2>
-<ol><li><strong>詰まった点・学んだことを <a href="../memo/README.html"><code>memo/</code></a> に1本残す</strong></li><li><a href="../next.html">次にやること</a> の T08 の状態を <code>✅ 完了</code> に書き換える</li><li><strong>続けて <a href="T09-find-3d-model.html">T09 3Dモデル探し</a> をやると、W02 の合成データ作りにそのまま入れます</strong></li></ol>
+<ol><li><strong>詰まった点・学んだことを <code>docs/notes/</code> に1本残す</strong></li><li><a href="../next.html">次にやること</a> の T08 の状態を <code>✅ 完了</code> に書き換える</li><li><strong>続けて <a href="T09-find-3d-model.html">T09 3Dモデル探し</a> をやると、W02 の合成データ作りにそのまま入れます</strong></li></ol>
   </main>
 </div>
 <footer class="foot">
