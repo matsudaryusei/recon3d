@@ -218,12 +218,12 @@ git branch                                        # main だけになってい�
 | **間違えて `main` で作業してしまった（まだ commit していない）** | `git switch -c <新しい枝名>` と打つだけで、**変更を持ったまま枝に移れます。** その後 commit すれば OK |
 | **間違えて `main` に commit してしまった** | **枝に移るだけでは `main` に commit が残ります**（あとで `git pull` したときに履歴が枝分かれします）。`git switch -c <新しい枝名>` で枝を作ってから、**`git switch main && git reset --hard origin/main` で `main` を戻す**。⚠️ **`reset --hard` は未コミットの変更を消す**ので、`git status` が clean であることを確認してから |
 | commit を1個取り消したい | `git reset --soft HEAD~1`（変更は手元に残る）。`--hard` は変更ごと消えるので注意 |
-| **何が起きているか分からなくなった** | `git status` と `git log --oneline -5` を貼って [Discuss.md](../../Discuss.md) で聞く。**自力で `--force` を試さないこと** |
+| **何が起きているか分からなくなった** | `git status` と `git log --oneline -5` を貼って [Notice.md](../../Notice.md) で聞く。**自力で `--force` を試さないこと** |
 
 ---
 
 ## 終わったら
 
-1. **詰まった点・学んだことを [`memo/`](../memo/) に1本残す**
+1. **詰まった点・学んだことを `docs/notes/` に1本残す**
 2. [次にやること](../next.md) の T05 の状態を `✅ 完了（名前・日付）` に書き換える
 3. **練習メモに「分からなかったこと」を書いて残してください。** 次に入る人向けの資料になります（[計画書 §3-7](../plan.md#s3-7)）
