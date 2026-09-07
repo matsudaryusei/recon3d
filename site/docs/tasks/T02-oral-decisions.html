@@ -40,7 +40,7 @@
 <ol><li><strong>目標は L3</strong>（統合パイプライン＋比較実験）で合っているか</li><li><strong>11/1 にバンドル調整が収束していなければ L2 に落とす</strong>ことに納得できるか</li><li><strong>11/29 にメッシュが破綻していれば L1 に落とす</strong>ことに納得できるか</li></ol>
 <blockquote><p><strong>「頑張ればいける」で先延ばしにしないための線です。</strong> L1 でも L2 でも成果物にはなるように組んであります。</p></blockquote>
 <h3 id="③-週の進め方">③ 週の進め方<a class="hash" href="#③-週の進め方" aria-label="このセクションへのリンク">#</a></h3>
-<ul><li>作業しやすい曜日・時間帯</li><li><strong>連絡手段</strong>（<a href="../../Discuss.html">Discuss.md</a> を使う頻度。返信までどのくらいを期待するか）</li><li>週1回15分の「次週の Issue を切る会」をいつやるか（<a href="../plan.html#s8-3">計画書 §8-3</a>）</li></ul>
+<ul><li>作業しやすい曜日・時間帯</li><li><strong>連絡手段</strong>（<a href="../../Notice.html">Notice.md</a> を使う頻度。返信までどのくらいを期待するか）</li><li>週1回15分の「次週の Issue を切る会」をいつやるか（<a href="../plan.html#s8-3">計画書 §8-3</a>）</li></ul>
 <h3 id="④-メッシュ処理をどこまで自作するか">④ メッシュ処理をどこまで自作するか<a class="hash" href="#④-メッシュ処理をどこまで自作するか" aria-label="このセクションへのリンク">#</a></h3>
 <p><strong>現在の想定</strong>（<a href="../plan.html#s3-3">計画書 §3-3</a>）:</p>
 <div class="table-wrap"><table class="md"><thead><tr><th>項目</th><th>想定</th></tr></thead><tbody><tr><td>Marching Cubes</td><td><strong>自作</strong></td></tr><tr><td>メッシュ簡略化（QEM）</td><td><strong>自作</strong></td></tr><tr><td>ラプラシアン平滑化</td><td><strong>自作</strong>（<code>solvers/cg.py</code> を呼ぶ）</td></tr><tr><td>テクスチャ投影</td><td><strong>自作</strong></td></tr><tr><td><strong>UV展開</strong></td><td><strong>Blender の Smart UV Project を使う</strong>（自作しない）</td></tr></tbody></table></div>
@@ -54,15 +54,15 @@
 <h2 id="ついでに聞くこと1分">ついでに聞くこと（1分）<a class="hash" href="#ついでに聞くこと1分" aria-label="このセクションへのリンク">#</a></h2>
 <p><strong><a href="../plan.html#s14">計画書 §14</a> の 13 番。</strong> 最後に必ず聞いてください：</p>
 <blockquote><p><strong>「計画で納得できない点・無理そうな点・追加でやりたいことはありますか」</strong></p></blockquote>
-<p><strong>保留のまま流れやすい項目です。</strong> ここで出た話は、その場で <a href="../../Discuss.html">Discuss.md</a> か Issue に1〜2行残してください。</p>
+<p><strong>保留のまま流れやすい項目です。</strong> ここで出た話は、その場で <a href="../../Notice.html">Notice.md</a> か Issue に1〜2行残してください。</p>
 <hr>
 <h2 id="完了判定">完了判定<a class="hash" href="#完了判定" aria-label="このセクションへのリンク">#</a></h2>
-<ul><li class="task"><input type="checkbox" disabled checked> ①〜⑤ の<strong>それぞれについて、決まったか「いつ決めるか」が決まった</strong>（⑤は「T10 完了後に決める」）</li><li class="task"><input type="checkbox" disabled checked> 決まった内容を <a href="../../Discuss.html">Discuss.md</a> に<strong>箇条書きで残した</strong>（09/07 のエントリ）</li><li class="task"><input type="checkbox" disabled checked> <a href="../plan.html#s14">計画書 §14</a> を更新した — <strong>11・13 を消し込み、10 は後半（最終成果物）を、12 は全体を消し込んだ</strong><ul><li><strong>10</strong> = 元モデルは <a href="T09-find-3d-model.html">T09</a> 側に残し、最終成果物（<code>.blend</code>）のみここで確定</li><li><strong>12</strong> = ③④⑤ で全部そろった（⑤は時期の確定を T10 完了後に持ち越し）</li></ul></li><li class="task"><input type="checkbox" disabled checked> <strong><a href="../decisions.html#d-40">決定記録 D-40</a> を新設し、<a href="../decisions.html#changes">「計画を変えた記録」</a>に1行足した</strong></li></ul>
+<ul><li class="task"><input type="checkbox" disabled checked> ①〜⑤ の<strong>それぞれについて、決まったか「いつ決めるか」が決まった</strong>（⑤は「T10 完了後に決める」）</li><li class="task"><input type="checkbox" disabled checked> 決まった内容を <a href="../../Notice.html">Notice.md</a> に<strong>箇条書きで残した</strong>（09/07 のエントリ）</li><li class="task"><input type="checkbox" disabled checked> <a href="../plan.html#s14">計画書 §14</a> を更新した — <strong>11・13 を消し込み、10 は後半（最終成果物）を、12 は全体を消し込んだ</strong><ul><li><strong>10</strong> = 元モデルは <a href="T09-find-3d-model.html">T09</a> 側に残し、最終成果物（<code>.blend</code>）のみここで確定</li><li><strong>12</strong> = ③④⑤ で全部そろった（⑤は時期の確定を T10 完了後に持ち越し）</li></ul></li><li class="task"><input type="checkbox" disabled checked> <strong><a href="../decisions.html#d-40">決定記録 D-40</a> を新設し、<a href="../decisions.html#changes">「計画を変えた記録」</a>に1行足した</strong></li></ul>
 <hr>
 <h2 id="つまずいたら">つまずいたら<a class="hash" href="#つまずいたら" aria-label="このセクションへのリンク">#</a></h2>
 <div class="table-wrap"><table class="md"><thead><tr><th>症状</th><th>対処</th></tr></thead><tbody><tr><td><strong>決まらない／どちらでもよさそう</strong></td><td><strong>「いつ決めるか」だけ決めて次へ行く。</strong> 15分の枠を守るほうが大事です。決めた期日は <a href="../plan.html#s16">計画書 §16</a> に書く</td></tr><tr><td><strong>話が脱線して1件目で15分使う</strong></td><td>①〜⑤ に<strong>3分ずつ</strong>割り当てる（⑤は1分で済みます）。<strong>②（撤退ライン）だけは削らない</strong>。ここがこの15分の本題です</td></tr><tr><td><strong>相手が「特にない」で終わる</strong></td><td>選択肢を出して選んでもらう形にする。例：「成果物は動画？ メッシュファイル？ 両方？」。<strong>白紙から聞くと答えにくい</strong></td></tr><tr><td><strong>その場で意見が割れた</strong></td><td><strong>どちらが正しいかを決めようとしない。</strong> 「どういう条件ならどちらを選ぶか」を書き出して持ち帰る。判断材料が足りないだけのことが多いです</td></tr><tr><td><strong>④（メッシュの自作範囲）が判断できない</strong></td><td><strong>W10 まで先送りしてよい</strong>項目です。「W10 に決める」と書いて次へ</td></tr></tbody></table></div>
 <h2 id="終わったら">終わったら<a class="hash" href="#終わったら" aria-label="このセクションへのリンク">#</a></h2>
-<ol><li><strong>詰まった点・学んだことを <a href="../memo/README.html"><code>memo/</code></a> に1本残す</strong></li><li><a href="../next.html">次にやること</a> の T02 の状態を <code>✅ 完了（日付）</code> に書き換える</li><li><strong>②（撤退ライン）で認識がズレていた場合は、それ自体が重要な記録です。</strong> 何がズレていたかまで書いてください</li></ol>
+<ol><li><strong>詰まった点・学んだことを <code>docs/notes/</code> に1本残す</strong></li><li><a href="../next.html">次にやること</a> の T02 の状態を <code>✅ 完了（日付）</code> に書き換える</li><li><strong>②（撤退ライン）で認識がズレていた場合は、それ自体が重要な記録です。</strong> 何がズレていたかまで書いてください</li></ol>
   </main>
 </div>
 <footer class="foot">

@@ -24,7 +24,7 @@
 1. **レビューなしで壊れたコードが入るのを防ぐ**
 2. **PR の履歴が残る。** 就活で見せるときに「どう議論して決めたか」が読める形で残ります（[計画書 §8-3](../plan.md#s8-3)）
 
-> ⚠️ **設定した瞬間から `git push origin main` は失敗します。** これは正常です。**全員に事前に伝えてください**（[Discuss.md](../../Discuss.md) に1行）。以後は必ずブランチ → PR です。やり方は [T05 Git の練習](T05-git-practice.md) にあります。
+> ⚠️ **設定した瞬間から `git push origin main` は失敗します。** これは正常です。**全員に事前に伝えてください**（[Notice.md](../../Notice.md) に1行）。以後は必ずブランチ → PR です。やり方は [T05 Git の練習](T05-git-practice.md) にあります。
 
 ---
 
@@ -147,7 +147,7 @@ git status
 
 **まず告知します**（これだけは急ぎなので、先に）。
 
-1. **[Discuss.md](../../Discuss.md) に1行**：「`main` への直 push を禁止しました。**今後はブランチ → PR です。** やり方は `docs/tasks/T05-git-practice.md`」
+1. **[Notice.md](../../Notice.md) に1行**：「`main` への直 push を禁止しました。**今後はブランチ → PR です。** やり方は `docs/tasks/T05-git-practice.md`」
 
 **次に、古くなる記述を PR で直します。**
 
@@ -158,7 +158,7 @@ git switch -c docs/t04-followup
 ```
 
 2. **[HowToPush.md](../../HowToPush.md)** の `git push origin main` の記述 — 直すか、[T05](T05-git-practice.md) へのリンクを足す
-3. **詰まった点・学んだことを [`memo/`](../memo/) に1本残す**
+3. **詰まった点・学んだことを `docs/notes/` に1本残す**
 4. **[次にやること](../next.md)** の T04 の状態を `✅ 完了` に
 
 ```bash
@@ -169,4 +169,4 @@ git push -u origin docs/t04-followup
 
 **GitHub で PR を作り、`Squash and merge` でマージ。** これが**保護後の最初の PR** になります。
 
-> 💡 **1・2 を Discuss.md でやるのも PR になります。** 告知が遅れて困るようなら、**先に口頭かチャットで伝えてから** PR を出してください。
+> 💡 **1・2 を Notice.md でやるのも PR になります。** 告知が遅れて困るようなら、**先に口頭かチャットで伝えてから** PR を出してください。

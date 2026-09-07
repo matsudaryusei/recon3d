@@ -26,7 +26,7 @@
 <p><strong>いま <code>main</code> に直接 push できてしまいます。</strong> <a href="../../HowToPush.html">HowToPush.md</a> に書いてある <code>git push origin main</code> がそのまま通る状態です。</p>
 <p>これを止める理由は2つ：</p>
 <ol><li><strong>レビューなしで壊れたコードが入るのを防ぐ</strong></li><li><strong>PR の履歴が残る。</strong> 就活で見せるときに「どう議論して決めたか」が読める形で残ります（<a href="../plan.html#s8-3">計画書 §8-3</a>）</li></ol>
-<blockquote><p>⚠️ <strong>設定した瞬間から <code>git push origin main</code> は失敗します。</strong> これは正常です。<strong>全員に事前に伝えてください</strong>（<a href="../../Discuss.html">Discuss.md</a> に1行）。以後は必ずブランチ → PR です。やり方は <a href="T05-git-practice.html">T05 Git の練習</a> にあります。</p></blockquote>
+<blockquote><p>⚠️ <strong>設定した瞬間から <code>git push origin main</code> は失敗します。</strong> これは正常です。<strong>全員に事前に伝えてください</strong>（<a href="../../Notice.html">Notice.md</a> に1行）。以後は必ずブランチ → PR です。やり方は <a href="T05-git-practice.html">T05 Git の練習</a> にあります。</p></blockquote>
 <hr>
 <h2 id="ステップ1設定画面を開く">ステップ1：設定画面を開く<a class="hash" href="#ステップ1設定画面を開く" aria-label="このセクションへのリンク">#</a></h2>
 <ol><li>GitHub でリポジトリを開く</li><li>上部の <strong><code>Settings</code></strong>（歯車）</li><li>左メニューの <strong><code>Rules</code> → <code>Rulesets</code></strong>（古い画面では <strong><code>Branches</code></strong>）</li><li><strong><code>New ruleset</code> → <code>New branch ruleset</code></strong>（古い画面では <code>Add branch protection rule</code>）</li></ol>
@@ -78,17 +78,17 @@ git status</code></pre>
 <blockquote><p>⚠️ <strong>ここから先は <code>git push origin main</code> が使えません。</strong> いま自分で禁止したところです。
 <strong>下の文書の修正は、必ずブランチを切って PR で入れてください。</strong> 手順が不安なら <a href="T05-git-practice.html">T05</a> を見ながらで構いません。</p></blockquote>
 <p><strong>まず告知します</strong>（これだけは急ぎなので、先に）。</p>
-<ol><li><strong><a href="../../Discuss.html">Discuss.md</a> に1行</strong>：「<code>main</code> への直 push を禁止しました。<strong>今後はブランチ → PR です。</strong> やり方は <code>docs/tasks/T05-git-practice.md</code>」</li></ol>
+<ol><li><strong><a href="../../Notice.html">Notice.md</a> に1行</strong>：「<code>main</code> への直 push を禁止しました。<strong>今後はブランチ → PR です。</strong> やり方は <code>docs/tasks/T05-git-practice.md</code>」</li></ol>
 <p><strong>次に、古くなる記述を PR で直します。</strong></p>
 <pre><code class="lang-bash">git switch main
 git pull origin main
 git switch -c docs/t04-followup</code></pre>
-<ol><li><strong><a href="../../HowToPush.html">HowToPush.md</a></strong> の <code>git push origin main</code> の記述 — 直すか、<a href="T05-git-practice.html">T05</a> へのリンクを足す</li><li><strong>詰まった点・学んだことを <a href="../memo/README.html"><code>memo/</code></a> に1本残す</strong></li><li><strong><a href="../next.html">次にやること</a></strong> の T04 の状態を <code>✅ 完了</code> に</li></ol>
+<ol><li><strong><a href="../../HowToPush.html">HowToPush.md</a></strong> の <code>git push origin main</code> の記述 — 直すか、<a href="T05-git-practice.html">T05</a> へのリンクを足す</li><li><strong>詰まった点・学んだことを <code>docs/notes/</code> に1本残す</strong></li><li><strong><a href="../next.html">次にやること</a></strong> の T04 の状態を <code>✅ 完了</code> に</li></ol>
 <pre><code class="lang-bash">git add -A
 git commit -m "docs: main のブランチ保護に伴う記述の更新"
 git push -u origin docs/t04-followup</code></pre>
 <p><strong>GitHub で PR を作り、<code>Squash and merge</code> でマージ。</strong> これが<strong>保護後の最初の PR</strong> になります。</p>
-<blockquote><p>💡 <strong>1・2 を Discuss.md でやるのも PR になります。</strong> 告知が遅れて困るようなら、<strong>先に口頭かチャットで伝えてから</strong> PR を出してください。</p></blockquote>
+<blockquote><p>💡 <strong>1・2 を Notice.md でやるのも PR になります。</strong> 告知が遅れて困るようなら、<strong>先に口頭かチャットで伝えてから</strong> PR を出してください。</p></blockquote>
   </main>
 </div>
 <footer class="foot">

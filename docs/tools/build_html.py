@@ -20,7 +20,7 @@ from mdparse import Renderer  # noqa: E402
 
 REPO = Path(__file__).resolve().parents[2]
 OUT = REPO / "site"
-ROOT_MD = ["Discuss.md", "HowToPush.md"]
+ROOT_MD = ["Notice.md", "HowToPush.md"]
 
 # トップページの並び順と説明。ここに無い md は「その他」に自動で入る。
 INDEX: list[tuple[str, str, list[tuple[str, str]]]] = [
@@ -36,9 +36,8 @@ INDEX: list[tuple[str, str, list[tuple[str, str]]]] = [
     ]),
     ("作業", "手を動かすとき", [
         ("docs/tasks/README.md", "タスク一覧"),
-        ("docs/notes/README.md", "調べたこと・詰まったことのメモ"),
         ("HowToPush.md", "push の手順"),
-        ("Discuss.md", "議論メモ"),
+        ("Notice.md", "連絡メモ（非同期の連絡場所）"),
     ]),
 ]
 

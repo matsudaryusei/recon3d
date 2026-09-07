@@ -5,7 +5,7 @@
 > | | |
 > |---|---|
 > | **次にやることを知りたい** | → [docs/next.md](docs/next.md) |
-> | **詰まったことを詳しく残したい** | → [docs/notes/](docs/notes/)（ここは連絡用。長い記録はあちらへ） |
+> | **詰まったことを詳しく残したい** | → `docs/notes/`（ここは連絡用。長い記録はあちらへ） |
 > | **言葉が分からない** | → [docs/glossary.md](docs/glossary.md) |
 
 ---
@@ -35,7 +35,7 @@ from <自分の名前> to <相手／全員>
 
 - **宛先を書く。** 「全員」でも構いませんが、**空にしない**（誰が読むべきか分からなくなります）
 - **決まったことは [決定記録](docs/decisions.md) にも1行残す。** ここは流れていく場所で、記録の本体ではありません
-- **長い記録（詰まった経緯・調べた結果）は [docs/notes/](docs/notes/) へ。** ここには「あれを書きました」の1行だけ置く
+- **長い記録（詰まった経緯・調べた結果）は `docs/notes/` へ。** ここには「あれを書きました」の1行だけ置く
 - Claude が不備を書き込むときも同じ形式です
 
 ---
@@ -78,7 +78,5 @@ from 関口 to 全員
 from 松田 to 全員
 
 **[T04](docs/tasks/T04-branch-protection.md)（`main` ブランチの保護）が完了しました。** `main` への直 push を禁止しました（Ruleset `protect-main`・PR 必須・`pytest` の2チェック必須）。**今後はブランチ → PR です。** やり方は [`docs/tasks/T05-git-practice.md`](docs/tasks/T05-git-practice.md) を見てください。
-
-振り返りは [`docs/notes/2026-09-07-branch-protection.md`](docs/notes/2026-09-07-branch-protection.md)。
 
 ---
