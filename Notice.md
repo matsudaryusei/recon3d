@@ -80,3 +80,19 @@ from 松田 to 全員
 **[T04](docs/tasks/T04-branch-protection.md)（`main` ブランチの保護）が完了しました。** `main` への直 push を禁止しました（Ruleset `protect-main`・PR 必須・`pytest` の2チェック必須）。**今後はブランチ → PR です。** やり方は [`docs/tasks/T05-git-practice.md`](docs/tasks/T05-git-practice.md) を見てください。
 
 ---
+
+### 09/16
+
+from 松田 to 関口
+
+**[T07](docs/tasks/T07-mask-options.md)（マスク生成方式の候補まとめ）が完了しました。読んでほしいです。**
+
+[docs/notes/mask-options.md](docs/notes/mask-options.md) に比較表・推す案・実機確認結果をまとめました。結論だけ書くと：
+
+- **④ ID Mask（Object Index）方式を推します。** GUIでの手動確認、CLI（`blender --background`）からの自動確認、被写体が2物体ある場合の分離確認、すべて実機で成功しました
+- ただし **EEVEEでの対応状況は未確認**（今回はCyclesのみで確認）。この点だけはW02で相談したいです
+- 詰まった経緯（Blender 5.0でのAPI変更など）は [docs/notes/T07-blender5-cli-troubleshooting.md](docs/notes/T07-blender5-cli-troubleshooting.md) に残しました
+
+**W02中に2人で15分、この方式で決定して[決定記録](docs/decisions.md)に残したいです。**
+
+---

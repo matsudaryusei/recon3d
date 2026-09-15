@@ -32,7 +32,7 @@
 | ✅ 済 | [T05](tasks/T05-git-practice.md) | Git の練習を1周する（branch → PR → merge） | 全員 | 1h | clone 済み・`uv run pytest` が通ること | ✅ 完了（2026-09-07・#8 ほか） |
 | ✅ 済 | [T04](tasks/T04-branch-protection.md) | `main` ブランチを保護する | G7 テスト・CI | 30分 | **T05** が済んでいること（T03 は 2026-09-06 完了） | ✅ 完了（2026-09-07） |
 | ✅ 済 | [T06](tasks/T06-labels-and-board.md) | ラベルを登録して Projects ボードを1枚作る | G9 ドキュメント・運用 | 45分 | **リポジトリ設定の変更権限**（取得済み） | ✅ 完了（2026-09-07） |
-| 🟠 高 | [T07](tasks/T07-mask-options.md) | マスク生成方式の候補を1枚にまとめる（**W02 中に決める**） | G3 画像処理 | 2h | なし（Blender 不要） | ⬜ 未着手 |
+| 🟠 高 | [T07](tasks/T07-mask-options.md) | マスク生成方式の候補を1枚にまとめる（**W02 中に決める**） | G3 画像処理 | 2h | なし（Blender 不要） | ✅ 完了（2026-09-16・実機確認込み） |
 | 🟡 中 | [T08](tasks/T08-blender-entry-note.md) | Blender スクリプトの入口メモを1本書く | G2 3DCG | 1.5h | Blender が入っている端末 | ⬜ 未着手 |
 | 🟢 低 | [T09](tasks/T09-find-3d-model.md) | 合成データ用の3Dモデルを探す（**凹み形状が必須**） | G2 3DCG | 1h | なし | ⬜ 未着手 |
 | 🟢 低 | [T10](tasks/T10-read-scope.md) | スコープと撤退ラインに目を通す | 全員 | 15分 | なし | ⬜ 未着手 |
@@ -82,7 +82,7 @@
 | **30分** | ~~[T04 ブランチ保護](tasks/T04-branch-protection.md)~~ **完了済み（2026-09-07）** |
 | **45分〜1時間** | ~~[T03 CI の雛形](tasks/T03-ci-workflow.md)~~ **完了済み（2026-09-06・#6）** ／ ~~[T05 Git の練習](tasks/T05-git-practice.md)~~ **完了済み（2026-09-07）** ／ ~~[T06 ラベルとボード](tasks/T06-labels-and-board.md)~~ **完了済み（2026-09-07）** ／ [T09 3Dモデル探し](tasks/T09-find-3d-model.md) |
 | **2時間・2人そろう** | ~~[T01 ペアプロ#1](tasks/T01-pairpro1-io.md)~~ **完了済み（2026-09-05・#4）**。次は [§1-b の W02 作業](#w02) |
-| **1.5〜2時間・1人** | [T07 マスク方式の候補](tasks/T07-mask-options.md)（2h） ／ [T08 Blender 入口メモ](tasks/T08-blender-entry-note.md)（1.5h） |
+| **1.5〜2時間・1人** | ~~[T07 マスク方式の候補](tasks/T07-mask-options.md)~~ **完了済み（2026-09-16）** ／ [T08 Blender 入口メモ](tasks/T08-blender-entry-note.md)（1.5h） |
 
 ---
 
