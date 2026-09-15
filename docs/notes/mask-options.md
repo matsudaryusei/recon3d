@@ -14,7 +14,7 @@
 
 | | 1 アルファ | 2 Holdout | 3 Cryptomatte | 4 ID Mask |
 |---|---|---|---|---|
-| 仕組み（1〜2行） | | | | |
+| 仕組み（1〜2行） | レンダリング時に背景を透過（`film_transparent`）にして、出力PNGのRGBAのうちAlphaだけを取り出し、しきい値で0/255に二値化する https://docs.blender.org/manual/ja/5.0/render/freestyle/view_layer/line_style/alpha.html | 対象外のオブジェクトのマテリアル/オブジェクト設定を「Holdout」にすると、そのオブジェクトの領域だけAlpha=0として「穴」扱いになり、残った被写体だけが不透明で描画される https://docs.blender.org/manual/ja/5.0/render/shader_nodes/shader/holdout.html | オブジェクトごとにハッシュ化されたIDを持つ専用パス（Cryptomatteパス）をレンダー時に出力し、コンポジタのCryptomatteノードで目的のオブジェクトIDだけを指定して抽出する https://docs.blender.org/manual/ja/5.0/compositing/types/mask/cryptomatte.html | 各オブジェクトに`pass_index`という番号を割り振ってレンダリングし、コンポジタのID Maskノードで「この番号と一致する画素だけ残す」処理をする https://docs.blender.org/manual/ja/5.0/compositing/types/mask/id_mask.html |
 | **スクリプトから自動化できるか** | | | | |
 | **出力が二値になるか**（中間値が出ないか） | | | | |
 | 半透明・毛・髪への強さ | | | | |
