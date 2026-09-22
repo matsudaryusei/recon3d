@@ -7,6 +7,9 @@
 
 **いまの状況**（このブロックは、下の表の状態を書き換えるときに一緒に更新してください）
 
+**2026-09-23**
+**[T10](tasks/T10-read-scope.md) が完了しました**（2026-09-23）。関口・松田の2人でスコープ（§3-8）と撤退ライン（§12）を読み合わせ、完了判定3問に回答（詳細は [決定記録 D-41](decisions.md#d-41)）。**public 化の時期を「今すぐ」に決定**（[D-27](decisions.md#d-27)・[D-40](decisions.md#d-40)⑤の「完成後」から前倒し）。[計画書 §16](plan.md#s16) の該当行は削除済み。**リポジトリの改名（[D-27](decisions.md#d-27)）と実際の公開設定はまだ未実施。**
+
 **2026-09-22**
 **[T08](tasks/T08-blender-entry-note.md) が完了しました**（2026-09-22）。動作確認用の `tools/hello_bpy.py` と、入口メモ `docs/notes/blender-entry.md` を追加。`blender -b -P tools/hello_bpy.py` で Blender 5.0.1 / Python 3.11.13 / numpy 1.26.4（計画書の前提と一致）を確認済み。PowerShellのエイリアス化（プロファイルへの追記・実行ポリシー `RemoteSigned` への変更が必要だった点）、相対パスがカレントディレクトリ基準で解決される点などを詰まった点として記録した。
 
@@ -38,7 +41,7 @@
 | 🟠 高 | [T07](tasks/T07-mask-options.md) | マスク生成方式の候補を1枚にまとめる（**W02 中に決める**） | G3 画像処理 | 2h | なし（Blender 不要） | ✅ 完了（2026-09-16・実機確認込み） |
 | 🟡 中 | [T08](tasks/T08-blender-entry-note.md) | Blender スクリプトの入口メモを1本書く | G2 3DCG | 1.5h | Blender が入っている端末 | ✅ 完了（2026-09-22） |
 | 🟢 低 | [T09](tasks/T09-find-3d-model.md) | 合成データ用の3Dモデルを探す（**凹み形状が必須**） | G2 3DCG | 1h | なし | ⬜ 未着手 |
-| 🟢 低 | [T10](tasks/T10-read-scope.md) | スコープと撤退ラインに目を通す | 全員 | 15分 | なし | ⬜ 未着手 |
+| 🟢 低 | [T10](tasks/T10-read-scope.md) | スコープと撤退ラインに目を通す | 全員 | 15分 | なし | ✅ 完了（2026-09-23） |
 
 <a id="w02"></a>
 ### 1-b. W02 から始まる作業（手順書はまだありません）
@@ -152,3 +155,4 @@ git switch -c feat/<何をするか>   # 例: feat/ci-workflow
 | [T05](tasks/T05-git-practice.md) | Git の練習を1周する（branch → PR → レビュー → squash merge。練習メモを `notes/` に追加） | ✅ 2026-09-07（#8 ほか） |
 | [T06](tasks/T06-labels-and-board.md) | ラベル17個の登録と Projects ボード `3D復元 開発ボード` の作成（T01〜T10 を Issue 化） | ✅ 2026-09-07 |
 | [T08](tasks/T08-blender-entry-note.md) | Blenderスクリプトの入口メモ（`tools/hello_bpy.py`・`docs/notes/blender-entry.md`）を作成し、CLI実行を実機確認 | ✅ 2026-09-22 |
+| [T10](tasks/T10-read-scope.md) | スコープ（§3-8）・撤退ライン（§12）を2人で通読。完了判定3問に回答し、public 化の時期を「今すぐ」に決定（→ [D-41](decisions.md#d-41)） | ✅ 2026-09-23 |
