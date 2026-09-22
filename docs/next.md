@@ -7,6 +7,9 @@
 
 **いまの状況**（このブロックは、下の表の状態を書き換えるときに一緒に更新してください）
 
+**2026-09-22**
+**[T08](tasks/T08-blender-entry-note.md) が完了しました**（2026-09-22）。動作確認用の `tools/hello_bpy.py` と、入口メモ `docs/notes/blender-entry.md` を追加。`blender -b -P tools/hello_bpy.py` で Blender 5.0.1 / Python 3.11.13 / numpy 1.26.4（計画書の前提と一致）を確認済み。PowerShellのエイリアス化（プロファイルへの追記・実行ポリシー `RemoteSigned` への変更が必要だった点）、相対パスがカレントディレクトリ基準で解決される点などを詰まった点として記録した。
+
 **2026-09-07 / W03**
 **[T06](tasks/T06-labels-and-board.md) が完了しました**（2026-09-07）。GitHub のラベル17個（`G1`〜`G9` ジャンル／`phase:0`〜`phase:4`／`pair`・`blocked`・`good-first-issue`）を登録し、既定ラベル（`duplicate` など）を整理。Projects ボード **`3D復元 開発ボード`**（`Todo` / `In Progress` / `In Review` / `Done` の4列）を作成しました。**T01〜T10 を Issue 10件**にしてジャンルのラベルを付与し、ボードの `Todo` に配置（完了済みの T01〜T05 は `Done` へ移動）。**これ以降、「誰が何を作業中か」の管理は GitHub Issue（Assignee＋`In Progress` 列）に移ります。この表は完了時に `✅` を付けるだけです**（下の「この表と GitHub Issue の使い分け」）。
 **[T05](tasks/T05-git-practice.md) が完了しました**（2026-09-07）。関口・松田とも branch → PR → レビュー → squash merge を1周（練習PR #8 ほか）。以降の本番作業は全員 PR 経由です。
@@ -33,7 +36,7 @@
 | ✅ 済 | [T04](tasks/T04-branch-protection.md) | `main` ブランチを保護する | G7 テスト・CI | 30分 | **T05** が済んでいること（T03 は 2026-09-06 完了） | ✅ 完了（2026-09-07） |
 | ✅ 済 | [T06](tasks/T06-labels-and-board.md) | ラベルを登録して Projects ボードを1枚作る | G9 ドキュメント・運用 | 45分 | **リポジトリ設定の変更権限**（取得済み） | ✅ 完了（2026-09-07） |
 | 🟠 高 | [T07](tasks/T07-mask-options.md) | マスク生成方式の候補を1枚にまとめる（**W02 中に決める**） | G3 画像処理 | 2h | なし（Blender 不要） | ✅ 完了（2026-09-16・実機確認込み） |
-| 🟡 中 | [T08](tasks/T08-blender-entry-note.md) | Blender スクリプトの入口メモを1本書く | G2 3DCG | 1.5h | Blender が入っている端末 | ⬜ 未着手 |
+| 🟡 中 | [T08](tasks/T08-blender-entry-note.md) | Blender スクリプトの入口メモを1本書く | G2 3DCG | 1.5h | Blender が入っている端末 | ✅ 完了（2026-09-22） |
 | 🟢 低 | [T09](tasks/T09-find-3d-model.md) | 合成データ用の3Dモデルを探す（**凹み形状が必須**） | G2 3DCG | 1h | なし | ⬜ 未着手 |
 | 🟢 低 | [T10](tasks/T10-read-scope.md) | スコープと撤退ラインに目を通す | 全員 | 15分 | なし | ⬜ 未着手 |
 
@@ -82,7 +85,7 @@
 | **30分** | ~~[T04 ブランチ保護](tasks/T04-branch-protection.md)~~ **完了済み（2026-09-07）** |
 | **45分〜1時間** | ~~[T03 CI の雛形](tasks/T03-ci-workflow.md)~~ **完了済み（2026-09-06・#6）** ／ ~~[T05 Git の練習](tasks/T05-git-practice.md)~~ **完了済み（2026-09-07）** ／ ~~[T06 ラベルとボード](tasks/T06-labels-and-board.md)~~ **完了済み（2026-09-07）** ／ [T09 3Dモデル探し](tasks/T09-find-3d-model.md) |
 | **2時間・2人そろう** | ~~[T01 ペアプロ#1](tasks/T01-pairpro1-io.md)~~ **完了済み（2026-09-05・#4）**。次は [§1-b の W02 作業](#w02) |
-| **1.5〜2時間・1人** | ~~[T07 マスク方式の候補](tasks/T07-mask-options.md)~~ **完了済み（2026-09-16）** ／ [T08 Blender 入口メモ](tasks/T08-blender-entry-note.md)（1.5h） |
+| **1.5〜2時間・1人** | ~~[T07 マスク方式の候補](tasks/T07-mask-options.md)~~ **完了済み（2026-09-16）** ／ ~~[T08 Blender 入口メモ](tasks/T08-blender-entry-note.md)~~ **完了済み（2026-09-22）** |
 
 ---
 
@@ -148,3 +151,4 @@ git switch -c feat/<何をするか>   # 例: feat/ci-workflow
 | [T04](tasks/T04-branch-protection.md) | `main` ブランチを保護する（Ruleset `protect-main`。PR 必須・ステータスチェック必須・squash merge のみ） | ✅ 2026-09-07 |
 | [T05](tasks/T05-git-practice.md) | Git の練習を1周する（branch → PR → レビュー → squash merge。練習メモを `notes/` に追加） | ✅ 2026-09-07（#8 ほか） |
 | [T06](tasks/T06-labels-and-board.md) | ラベル17個の登録と Projects ボード `3D復元 開発ボード` の作成（T01〜T10 を Issue 化） | ✅ 2026-09-07 |
+| [T08](tasks/T08-blender-entry-note.md) | Blenderスクリプトの入口メモ（`tools/hello_bpy.py`・`docs/notes/blender-entry.md`）を作成し、CLI実行を実機確認 | ✅ 2026-09-22 |
