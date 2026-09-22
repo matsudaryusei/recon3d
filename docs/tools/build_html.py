@@ -20,11 +20,12 @@ from mdparse import Renderer  # noqa: E402
 
 REPO = Path(__file__).resolve().parents[2]
 OUT = REPO / "site"
-ROOT_MD = ["Notice.md", "HowToPush.md"]
+ROOT_MD = ["README.md", "HowToPush.md"]
 
 # トップページの並び順と説明。ここに無い md は「その他」に自動で入る。
 INDEX: list[tuple[str, str, list[tuple[str, str]]]] = [
     ("入口", "まずここから", [
+        ("README.md", "プロジェクトの概要（公開用）"),
         ("docs/README.md", "道順・現在地・各文書の役割"),
         ("docs/next.md", "次にやること（タスク表）"),
     ]),
@@ -37,7 +38,6 @@ INDEX: list[tuple[str, str, list[tuple[str, str]]]] = [
     ("作業", "手を動かすとき", [
         ("docs/tasks/README.md", "タスク一覧"),
         ("HowToPush.md", "push の手順"),
-        ("Notice.md", "連絡メモ（非同期の連絡場所）"),
     ]),
 ]
 
@@ -48,7 +48,7 @@ def sources() -> list[Path]:
     return [f for f in files if ".venv" not in f.parts]
 
 
-def rewrite_link(url: str, src: Path) -> str:
+def rewrite_link(url: str, src: Path) -> str | None:
     """md 間リンクを html 間リンクに読み替える。外部 URL とアンカーは触らない。"""
     if url.startswith(("http://", "https://", "mailto:", "#")):
         return url
@@ -57,6 +57,8 @@ def rewrite_link(url: str, src: Path) -> str:
         path += "README.md"
     if path.endswith(".md"):
         path = path[:-3] + ".html"
+    elif path:  # `.py` など site/ に出ないファイルはリンクにしない
+        return None
     return path + (f"#{frag}" if frag else "")
 
 

@@ -34,7 +34,7 @@
 
 > **重要な制約**：[計画書 §7-4](../plan.md#s7-4) は **「`tools/blender_*.py` は `bpy` と `numpy` のみに依存させる」**と決めています。
 > **これは「他に何も入っていない」という意味ではありません。** Blender には `mathutils`・`bmesh`・`bpy_extras`・`gpu` などが同梱されています。
-> **『同梱されているものを使ってよいか』は決まっていません。** 使いたくなったら、勝手に決めずに [Notice.md](../../Notice.md) に出して2人で決め、[決定記録](../decisions.md) に1行残してください（**`mathutils` はカメラ行列を扱うときに真っ先に欲しくなるので、実際に起きます**）。
+> **『同梱されているものを使ってよいか』は決まっていません。** 使いたくなったら、勝手に決めずに Issue に出して2人で決め、[決定記録](../decisions.md) に1行残してください（**`mathutils` はカメラ行列を扱うときに真っ先に欲しくなるので、実際に起きます**）。
 > **確実に駄目なのは、`uv` 側で入れたもの**（`scipy` など）と **`pip install` が要るもの**です。**メモにもこれを書いてください。**
 
 ---
@@ -175,14 +175,14 @@ blender --background --python tools/hello_bpy.py
 （ここが一番価値がある。素直に書く）
 ```
 
-> **4 が本体です。** 「詰まった点」を書き残すのは [Notice.md 8/17 の関口の依頼](../../Notice.md)そのものです。**冗長でかまいません。**
+> **4 が本体です。** 「詰まった点」を書き残すのは 2026-08-17 の関口の依頼そのものです。**冗長でかまいません。**
 
 ---
 
 ## 完了判定
 
 - [ ] **`blender --background --python tools/hello_bpy.py` が実際に動き、バージョンが3つとも表示された**
-- [ ] 表示された値が **Blender 5.0.1 / Python 3.11.13 / numpy 1.26.4** と一致する（違ったら [Notice.md](../../Notice.md) に書く。**計画の前提が崩れます**）
+- [ ] 表示された値が **Blender 5.0.1 / Python 3.11.13 / numpy 1.26.4** と一致する（違ったら 連絡帳（`Notice.md`・public 化で廃止） に書く。**計画の前提が崩れます**）
 - [ ] `docs/notes/blender-entry.md` の 0〜4 が埋まっている
 - [ ] **「Run Script の出力がどこに出るか」が書いてある**
 - [ ] **自分の環境の blender 実行ファイルのフルパスが書いてある**（次に見たとき探さずに済む）
@@ -202,7 +202,7 @@ git push -u origin docs/blender-entry
 | 症状 | 対処 |
 |---|---|
 | `blender: command not found` | フルパスで打つ。パスは Blender の `About` か、アプリの場所から確認 |
-| `ModuleNotFoundError: No module named 'numpy'` | **前提が崩れています。** 8/16 に numpy 1.26.4 を確認しているので、環境が変わった可能性。[Notice.md](../../Notice.md) に書いて相談 |
+| `ModuleNotFoundError: No module named 'numpy'` | **前提が崩れています。** 8/16 に numpy 1.26.4 を確認しているので、環境が変わった可能性。連絡帳（`Notice.md`・public 化で廃止） に書いて相談 |
 | Windows で print が見えない | `Window → Toggle System Console` |
 | `--python` に相対パスを渡して見つからない | **リポジトリのルートで実行しているか確認。** 迷ったら絶対パスで渡す |
 

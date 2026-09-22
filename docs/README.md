@@ -3,7 +3,7 @@
 **迷ったらこのファイルに戻ってくれば大丈夫です。**
 他の文書は全部「必要になったときに引くもの」なので、頭から読む必要はありません。
 
-**最終更新**: 2026-09-07 — **現在地は [§1](#here)、次にやることは [next.md](next.md)。**
+**最終更新**: 2026-09-23 — **現在地は [§1](#here)、次にやることは [next.md](next.md)。**
 
 > ## それぞれのmdファイル役割
 >
@@ -52,16 +52,16 @@
 ```
 着工  ●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━  完成
        ↑
-   W03（2026-09-07 時点）／全18週
+   2026-09-23 時点／全18週
 ```
 
 | | 状態 |
 |---|---|
-| **計画・確認事項** | ✅ **決着済み。** 着工をブロックするものは残っていない（回答は [計画書 §14](plan.md#s14)、判断は [D-30〜D-40](decisions.md)）。**保留5件も 2026-09-07 に確定**（[T02](tasks/T02-oral-decisions.md)／[D-40](decisions.md#d-40)）。残るは public 化の時期のみ（[T10](tasks/T10-read-scope.md) 完了後） |
+| **計画・確認事項** | ✅ **決着済み。** 着工をブロックするものは残っていない（回答は [計画書 §14](plan.md#s14)、判断は [D-30〜D-40](decisions.md)）。**保留5件も 2026-09-07 に確定**（[T02](tasks/T02-oral-decisions.md)／[D-40](decisions.md#d-40)）。**public 化の時期は 2026-09-23 に「今すぐ」と決定**（[T10](tasks/T10-read-scope.md)／[D-41](decisions.md#d-41)） |
 | **G6 基盤の「器」** | ✅ **完了（8/20 push・8/24 に3台で確認）。** 環境・骨格・`import recon3d` まで。→ [計画書 §6-2 の完了判定](plan.md#s6-2)を満たした |
 | **G6 の「中身」** | ✅ **完了（2026-09-05・PR #4）。** 座標変換と `cameras.json` の実装（→ [T01](tasks/T01-pairpro1-io.md)）。`uv run pytest` は 10 passed |
 | **G7・G9 運用の器** | ✅ **完了（2026-09-06〜09-07）。** CI（→ [T03](tasks/T03-ci-workflow.md)・PR #6）／`main` の保護（→ [T04](tasks/T04-branch-protection.md)・Ruleset `protect-main`）／Git 練習1周（→ [T05](tasks/T05-git-practice.md)・PR #8 ほか）／ラベル17個と Projects ボード（→ [T06](tasks/T06-labels-and-board.md)）。**以降、着手の記録は GitHub Issue 側です** |
-| **G2・G3 の下ごしらえ** | ⬜ **未着手。** マスク方式の候補（→ [T07](tasks/T07-mask-options.md)。**W02 中に決める**）・Blender の入口メモ（→ [T08](tasks/T08-blender-entry-note.md)）・3Dモデル探し（→ [T09](tasks/T09-find-3d-model.md)） |
+| **G2・G3 の下ごしらえ** | ✅ **完了（2026-09-16〜09-23）。** マスク方式の候補（→ [T07](tasks/T07-mask-options.md)・PR #20。**方式の決定は [計画書 §16](plan.md#s16) で継続**）／Blender の入口メモ（→ [T08](tasks/T08-blender-entry-note.md)・PR #21）／3Dモデルの候補（→ [T09](tasks/T09-find-3d-model.md)。主 Ceramic Pot・副 Food Lychee 01） |
 | **G1〜G5・G8 の本体** | ⬜ **W02 から。** [計画書 §10](plan.md#s10) の Phase 0（OpenCV で一直線に通す／Blender で合成データ）。**手順書はありません** → [next.md §1-b](next.md#w02) |
 
 > ⚠️ **他の端末は `git pull` のあと `uv sync` を1回流してください。** `pyproject.toml` に `[build-system]` が入ったので、プロジェクト自身が editable install されます（→ [計画書 §6-3](plan.md#s6-3)）。
@@ -82,15 +82,10 @@
 
 ### いま優先度が高いタスク
 
-> **W01 からの持ち越し（[T01](tasks/T01-pairpro1-io.md)〜[T06](tasks/T06-labels-and-board.md)）は 2026-09-07 にすべて完了しました。**
+> **手順書のあるタスク（[T01](tasks/T01-pairpro1-io.md)〜[T10](tasks/T10-read-scope.md)）は 2026-09-23 にすべて完了しました。**
 > 以降、**「誰が何を作業中か」は GitHub Issue（Assignee と `In Progress` 列）が正**です（→ [next.md](next.md#w02) の「この表と GitHub Issue の使い分け」）。
 
-| # | やること | ジャンル | 目安 |
-|---|---|---|---|
-| 🟠 [T07](tasks/T07-mask-options.md) | マスク生成方式の候補を1枚にまとめる（**W02 中に決める**） | G3 画像処理 | 2h |
-| 🟡 [T08](tasks/T08-blender-entry-note.md) | Blender スクリプトの入口メモを1本書く | G2 3DCG | 1.5h |
-| 🟢 [T09](tasks/T09-find-3d-model.md) | 合成データ用の3Dモデルを探す（**凹み形状が必須**） | G2 3DCG | 1h |
-| 🟢 [T10](tasks/T10-read-scope.md) | スコープと撤退ラインに目を通す（**public 化の時期はこの後に決める**） | 全員 | 15分 |
+**次は [next.md §1-b の W02 作業](next.md#w02)（G1・G2・G3・G7 の実装）です。** 手順書はありません。
 
 **座標系・データ形式・最終成果物（`.blend`）・撤退ラインは決まり、CI とブランチ保護も入りました。** [§1-b の W02 作業](next.md#w02)（G1・G2・G3・G7 の実装）に着手できます。
 
@@ -118,7 +113,6 @@
 | **「なんでこう決めたんだっけ？」** | [決定記録](decisions.md) |
 | 「この決定、変えたい」 | [決定記録](decisions.md) で理由を読んでから相談 |
 | タスクが終わった | [next.md](next.md) の状態を `✅ 完了（日付・PR番号）` に。詰まった点は `docs/notes/` へ |
-| 新しくAIに相談する | [`internal/ai-session-context.md`](internal/ai-session-context.md) を渡す |
 
 ### ファイルの一覧
 
@@ -133,7 +127,7 @@
 | **[learning.md](learning.md)** | **学びの入口。** ジャンル別の資料3本まで | **書けそうにないとき** |
 | **`docs/notes/`** | **詰まったこと・調べたこと・書きながら学んだことの置き場** | **詰まったとき・抜けたとき・書いたとき** |
 | [計画書](plan.md) | **仕様と日程**（何を作るか。18週の予定） | 引くとき |
-| [決定記録](decisions.md) | **なぜそう決めたか**（D-01〜D-39） | 引くとき |
+| [決定記録](decisions.md) | **なぜそう決めたか**（D-01〜D-42） | 引くとき |
 
 > **役割分担**：**README = どこにいるか** ／ **next.md + tasks/ = 次に何をどうやるか** ／ **glossary + learning = 分からないときの逃げ場** ／ **notes/ = 詰まった記録と、書きながら学んだこと** ／ **plan.md = 何を作るか** ／ **decisions.md = なぜそうするか**
 
@@ -141,18 +135,11 @@
 
 | ファイル | 何が書いてあるか | いつ |
 |---|---|---|
-| [Notice.md](../Notice.md) | **非同期の連絡場所。** 対面でないときの連絡と、完了報告への指摘 | **定期的に確認** |
+| [README.md](../README.md) | **公開用の入口。** プロジェクトの概要・セットアップ・ライセンス | 外部の人に見せるとき |
+| LICENSE | ライセンス（MIT） | — |
 | [HowToPush.md](../HowToPush.md) | Git の操作手順（旧 ルート `README.md`） | Git で詰まったとき |
 
-**読まなくていいもの（`internal/`）**
-
-手続き用・履歴用です。中身が要るときだけ開けば十分です。
-
-| ファイル | 中身 |
-|---|---|
-| `internal/ai-session-context.md` | AIに文脈を渡すための資料 |
-| `internal/project-handoff.md` | テーマを選んだときの検討経緯（8/14時点） |
-| `internal/partner-questions-v1.md` | 確認シート第1版。回答済みの記録（**用語集は [glossary.md](glossary.md) に移しました**） |
+> **連絡について**：対面でないときの連絡は **GitHub の Issue** で行います。以前の連絡帳 `Notice.md` と、手続き用の `internal/`（引き継ぎ資料・確認シート・AI 用の文脈）は、**public 化にあたって個人情報を含むためリポジトリから外しました**（→ [D-42](decisions.md#d-42)）。
 
 ---
 
@@ -162,8 +149,8 @@
 
 | 時期 | やること | 開く文書 |
 |---|---|---|
-| **W02–W03**（いまここ） | ~~ペアプロ#1~~・~~保留分の口頭確認~~・~~CI・運用の器（CI／ブランチ保護／Git練習／ラベルとボード）~~ は完了。残るは T07〜T10 | **[next.md](next.md) の T07〜T10** ／ 計画書 [§4](plan.md#s4)・[§5](plan.md#s5)・[§13](plan.md#s13) |
-| **W02–W03** | G2：Blenderで合成データ作成<br>G1・G3：OpenCVで一直線に通してみる | [計画書 §10 Phase 0](plan.md#s10) |
+| **W02–W03** | ~~ペアプロ#1~~・~~保留分の口頭確認~~・~~CI・運用の器（CI／ブランチ保護／Git練習／ラベルとボード）~~・~~T07〜T10~~ は完了（2026-09-23） | **[next.md](next.md) の §1-b** ／ 計画書 [§4](plan.md#s4)・[§5](plan.md#s5)・[§13](plan.md#s13) |
+| **W02–W03**（いまここ） | G2：Blenderで合成データ作成<br>G1・G3：OpenCVで一直線に通してみる | [計画書 §10 Phase 0](plan.md#s10) |
 | **W04–W05** | 実測値を根拠に「何ができたら合格か」を決める | [計画書 §10 Phase 1](plan.md#s10) |
 | **W06–W11** | 数理コアの自作（一番重い6週間） | [計画書 §10 Phase 2](plan.md#s10) ／ **資料は [学びの入口 G1](learning.md)** |
 | **★11/1** | **1回目の判定。**うまくいってなければ規模を縮小 | [計画書 §12](plan.md#s12) |
@@ -181,7 +168,7 @@
 
 **「知識が足りなくて書けない」** → **[学びの入口（learning.md）](learning.md)。** ジャンルごとに資料を3本まで絞ってあります。**[D-33](decisions.md#d-33) で生成AIを使わない方針にしているぶん、ここが唯一の代わり**です。
 
-**「詰まった／調べたことを残したい」** → **`docs/notes/`。** 症状 / 試したこと / 原因 / 解決 / 分かったこと、が入っていれば形は自由です。**冗長でかまいません**（[Notice.md 8/17](../Notice.md)）。
+**「詰まった／調べたことを残したい」** → **`docs/notes/`。** 症状 / 試したこと / 原因 / 解決 / 分かったこと、が入っていれば形は自由です。**冗長でかまいません**（2026-08-17 の取り決め）。
 
 **「勝手に決めていいのか分からない」** → 決めていいです。ただし**決めたことは必ずIssueかPRのコメントに1〜2行残してください。** 毎日会えるぶん口頭で済みがちですが、それだとGitHubに何も残らず、就活で見せる材料が減ります。
 
@@ -193,11 +180,11 @@
 
 **一覧は [計画書 §16](plan.md#s16) にあります**（項目・決定時期・手順書へのリンク）。ここには置きません。**2か所に書くと必ず食い違うためです。**
 
-**そのうち、いま動かせるものはこの3つです。**
+**そのうち、いま動かせるものはこれです。**
 
 | 決めること | いつ | 手順 |
 |---|---|---|
 | ~~成果物の形・撤退ライン・週の進め方・メッシュ自作範囲~~ | **✅ 2026-09-07 決定** | [T02](tasks/T02-oral-decisions.md)（→ [D-40](decisions.md#d-40)） |
-| public 化の時期 | **[T10](tasks/T10-read-scope.md) 完了後** | [T10](tasks/T10-read-scope.md)（「完成後に public 化」自体は合意済み） |
-| マスクの作り方 | W02 | [T07](tasks/T07-mask-options.md) |
-| 合成データに使う3Dモデル（**凹みのある形が必須**） | W02 | [T09](tasks/T09-find-3d-model.md) |
+| ~~public 化の時期~~ | **✅ 2026-09-23 決定（今すぐ）** | [T10](tasks/T10-read-scope.md)（→ [D-41](decisions.md#d-41)） |
+| マスクの作り方 | W02（候補は 2026-09-16 にまとめ済み） | [T07](tasks/T07-mask-options.md)（→ `docs/notes/mask-options.md`） |
+| ~~合成データに使う3Dモデル~~ | **✅ 2026-09-23 決定**（主 Ceramic Pot・副 Food Lychee 01） | [T09](tasks/T09-find-3d-model.md)（→ `docs/notes/model-candidates.md`） |

@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>T07：Blender 5.0 でのマスク生成CLI自動化、詰まった点 2026/09/16</title>
+<link rel="stylesheet" href="../../assets/style.css">
+</head>
+<body>
+<header class="topbar">
+  <div class="topbar-inner">
+    <nav class="crumbs"><a href="../../index.html">ドキュメント</a><span class="sep">/</span><span>notes/</span></nav>
+    <span class="src">docs/notes/T07-blender5-cli-troubleshooting.md</span>
+  </div>
+</header>
+<div class="layout">
+  <details class="toc"><summary class="toc-title">目次</summary><ul><li class="lv2"><a href="#前提として分かったこと">前提として分かったこと</a></li><li class="lv2"><a href="#つまずいた順番">つまずいた順番</a></li><li class="lv2"><a href="#学んだこと次に活かせること">学んだこと・次に活かせること</a></li><li class="lv2"><a href="#関連ファイル">関連ファイル</a></li></ul></details>
+  <main class="page">
+<h1 id="t07blender-50-でのマスク生成cli自動化詰まった点-2026-09-16">T07：Blender 5.0 でのマスク生成CLI自動化、詰まった点 2026/09/16<a class="hash" href="#t07blender-50-でのマスク生成cli自動化詰まった点-2026-09-16" aria-label="このセクションへのリンク">#</a></h1>
+<p><a href="mask-options.html">docs/notes/mask-options.md</a>（T07本体の判断材料）を作る過程で、GUIでの手動確認は問題なく通ったが、<strong>同じ内容をCLI（<code>blender --background --python</code>）から自動実行しようとすると6段階でエラーが出た。</strong> 内容自体は mask-options.md の比較表・実機確認結果にも反映済みだが、他の人が同じ壁にぶつからないよう経緯として残す。</p>
+<h2 id="前提として分かったこと">前提として分かったこと<a class="hash" href="#前提として分かったこと" aria-label="このセクションへのリンク">#</a></h2>
+<p><strong>ネット上のBlender Python API解説記事は、ほとんどが Blender 4.5 以前（コンポジター刷新前）の書き方。</strong> そのままコピペすると動かない。Blender 5.0 の変更点は公式の <a href="https://developer.blender.org/docs/release_notes/5.0/migration/compositor_migration/" class="ext" target="_blank" rel="noopener">Compositor Migration</a> が一次情報として一番信頼できる。</p>
+<h2 id="つまずいた順番">つまずいた順番<a class="hash" href="#つまずいた順番" aria-label="このセクションへのリンク">#</a></h2>
+<ol><li><strong><code>scene.node_tree</code> が無い</strong> → コンポジットノードツリーが <code>scene.compositing_node_group</code> という独立したデータブロックに変わった。<code>Composite</code> ノードも廃止されて <code>Group Output</code> ノードに置き換わっている</li><li><strong><code>id_mask.index</code> が無い</strong> → 「多くのノードのオプションが入力ソケット化された」という5.0の方針変更で、<code>id_mask.inputs["Index"].default_value</code> のようにソケット経由で設定する形になった</li><li><strong><code>IndexOB</code> ソケットが無い</strong>（<code>KeyError</code>） → Render Layers ノードの出力ソケット一覧は、スクリプトでパスを有効化しても<strong>即座には更新されない既知の不具合</strong>（<a href="https://developer.blender.org/T48760" class="ext" target="_blank" rel="noopener">T48760</a>）。<code>render_layers.scene = scene</code> と自分自身に再代入すると更新される、という回避策が知られている</li><li><strong>ソケット名が違う</strong> → <code>IndexOB</code> ではなく <code>Object Index</code> という人間可読な名前に変わっていた（③のエラーメッセージで利用可能なソケット名一覧を出力させたことで発見できた）</li><li><strong>二値のはずが中間値</strong>（<code>[0. 0.004 0.804 0.808 0.812]</code>） → デフォルトの <strong>View Transform（AgX）</strong> が写真的なトーンマッピングをかけていて、0/1のマスク値を歪めて保存していた。<code>scene.view_settings.view_transform = "Standard"</code> で解消</li><li><strong>上記対処後も僅かなズレ</strong>（<code>[0. 0.004 0.996 1.]</code>） → デフォルトで有効な<strong>ディザリング</strong>（8bit変換時のバンディング防止ノイズ）が原因。<code>scene.render.dither_intensity = 0.0</code> で解消</li></ol>
+<h2 id="学んだこと次に活かせること">学んだこと・次に活かせること<a class="hash" href="#学んだこと次に活かせること" aria-label="このセクションへのリンク">#</a></h2>
+<ul><li><strong>エラーメッセージに「利用可能な選択肢一覧」を出させるとデバッグが速い。</strong> ③・④はどちらも <code>KeyError</code> だったが、例外メッセージに <code>[o.name for o in render_layers.outputs]</code> を含めるようにしたことで、正しいソケット名 <code>Object Index</code> がすぐ分かった。以後もこのパターン（存在チェック→失敗したら候補一覧を出す）を使う</li><li><strong>「二値になっているはず」を過信しない。</strong> コンポジタのノード計算自体は正しく0/1を出していても、<strong>保存パイプライン（色管理・ディザリング）側で値が変わる</strong>ことがある。マスクのように「データ」として使う画像は、必ずレンダリング後に実際のPNGを読み込んで画素値を検証するところまでやる（今回は <code>numpy</code> でユニークな画素値を出力するようにした）</li><li><strong>GUIで動いた手順を、そのままCLIスクリプトに翻訳しても動くとは限らない。</strong> GUI操作は裏で「再描画のたびに内部状態を同期する」処理が挟まるが、スクリプト一発実行ではその同期が起きないケースがある（③がまさにこれ）</li></ul>
+<h2 id="関連ファイル">関連ファイル<a class="hash" href="#関連ファイル" aria-label="このセクションへのリンク">#</a></h2>
+<ul><li>判断材料本体：<a href="mask-options.html">docs/notes/mask-options.md</a></li><li>単体オブジェクトの自動検証スクリプト：tools/blender_id_mask_check.py</li><li>2オブジェクト分離の自動検証スクリプト：tools/blender_id_mask_check_multiobj.py</li></ul>
+  </main>
+</div>
+<footer class="foot">
+  <p>このページは <code>docs/notes/T07-blender5-cli-troubleshooting.md</code> から自動生成しています。編集は md 側で。</p>
+</footer>
+</body>
+</html>

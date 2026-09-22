@@ -1,7 +1,7 @@
 # Blender スクリプトの入口
 
 **対象**: Blender 5.0.1 / 内蔵 Python 3.11.13 / numpy 1.26.4
-**前提**: `pip install` はしない。`tools/blender_*.py` は `bpy` と `numpy` のみに依存させる（[計画書 §7-4](../plan.md#s7-4)）。同梱の `mathutils` 等を使ってよいかは未決定（使いたくなったら [Notice.md](../../Notice.md) に出して相談する）。
+**前提**: `pip install` はしない。`tools/blender_*.py` は `bpy` と `numpy` のみに依存させる（[計画書 §7-4](../plan.md#s7-4)）。同梱の `mathutils` 等を使ってよいかは未決定（使いたくなったら Issue に出して相談する）。
 
 ## 0. まず動くことを確かめる
 
@@ -73,6 +73,6 @@ numpy version   : 1.26.4
 - **アドオンのログがまじる**：`--background` 実行時、`Rokoko Studio Live for Blender` というアドオンが自動でロード／アンロードされ、`### Loading Rokoko Studio Live...` のようなログが自分の `print()` 出力の前後に混ざって出る。想定していなかった出力なので、初見だと自分のスクリプトが何かおかしいのかと勘違いしかける。実害はない（アドオンの標準出力なだけ）
 - **パスにスペースが入る**：`C:\Program Files\Blender Foundation\Blender 5.0\blender.exe` はスペースを含むため、PowerShell では `&` 呼び出し演算子と `""` の両方が必要（`&`無しだとパス文字列がただのコマンドとして解釈されずエラーになる）
 - **`--python`/`-P` は相対パスで通った**：リポジトリのルートで実行していれば `tools\hello_bpy.py` のような相対パスで問題なく見つかった
-- **実際にルート以外で実行してハマった**：`blender` 関数（エイリアス）を作った直後、ホームディレクトリ（`C:\Users\<ユーザー名>`）にいたまま `blender -b -P tools\hello_bpy.py` を叩いたところ `OSError: Python file "C:\Users\<ユーザー名>\tools\hello_bpy.py" could not be opened` になった。**相対パスは「blenderのインストール場所」ではなく「PowerShellの現在地（カレントディレクトリ）」基準で解決される。** `cd` でリポジトリルート（`C:\4bitcom\4bitcom_HandM`）に移動してから実行したら解消した
+- **実際にルート以外で実行してハマった**：`blender` 関数（エイリアス）を作った直後、ホームディレクトリ（`C:\Users\<ユーザー名>`）にいたまま `blender -b -P tools\hello_bpy.py` を叩いたところ `OSError: Python file "C:\Users\<ユーザー名>\tools\hello_bpy.py" could not be opened` になった。**相対パスは「blenderのインストール場所」ではなく「PowerShellの現在地（カレントディレクトリ）」基準で解決される。** `cd` でリポジトリルート（`C:\4bitcom\recon3d`）に移動してから実行したら解消した
 
 > GUIでの Method A（Python Console）・Method B（Text Editor で Run Script）は、実際に手元で1回ずつ触ってから、気づいた点をこの節に追記してください。特に「Run Script を押したのに何も起きない」体験は、実際に踏んでみないと実感が湧きません。

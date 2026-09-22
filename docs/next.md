@@ -7,6 +7,11 @@
 
 **いまの状況**（このブロックは、下の表の状態を書き換えるときに一緒に更新してください）
 
+**2026-09-23**
+**public 化の準備をしました**（[D-42](decisions.md#d-42)）。個人情報を含む `docs/internal/`・`blender_system/`・`Notice.md` を外し、ルートに公開用の `README.md` と `LICENSE`（MIT）を置きました。**対面でないときの連絡は、今後は GitHub の Issue で行います。**
+**[T09](tasks/T09-find-3d-model.md) が完了しました**（2026-09-23）。候補は [docs/notes/model-candidates.md](notes/model-candidates.md) に、主データ3件・副データ2件をまとめました（どれも CC0 か自作）。**推す案は、主データ（`synthetic_cup`）が Ceramic Pot、副データ（`synthetic_bunny`）が Food Lychee 01** です（どちらも Poly Haven・CC0）。副データはテクスチャが焼き込み済みなので、貼り足す必要はありません。[計画書 §14](plan.md#s14) の 8 番と [§16](plan.md#s16) の該当行は消し込み済みです。**これで [T01](tasks/T01-pairpro1-io.md)〜[T10](tasks/T10-read-scope.md) はすべて完了しました。**
+**[T10](tasks/T10-read-scope.md) が完了しました**（2026-09-23）。関口・松田の2人でスコープ（§3-8）と撤退ライン（§12）を読み合わせ、完了判定3問に回答（詳細は [決定記録 D-41](decisions.md#d-41)）。**public 化の時期を「今すぐ」に決定**（[D-27](decisions.md#d-27)・[D-40](decisions.md#d-40)⑤の「完成後」から前倒し）。[計画書 §16](plan.md#s16) の該当行は削除済み。**リポジトリの改名（[D-27](decisions.md#d-27)）と実際の公開設定はまだ未実施。**
+
 **2026-09-22**
 **[T08](tasks/T08-blender-entry-note.md) が完了しました**（2026-09-22）。動作確認用の `tools/hello_bpy.py` と、入口メモ `docs/notes/blender-entry.md` を追加。`blender -b -P tools/hello_bpy.py` で Blender 5.0.1 / Python 3.11.13 / numpy 1.26.4（計画書の前提と一致）を確認済み。PowerShellのエイリアス化（プロファイルへの追記・実行ポリシー `RemoteSigned` への変更が必要だった点）、相対パスがカレントディレクトリ基準で解決される点などを詰まった点として記録した。
 
@@ -35,10 +40,10 @@
 | ✅ 済 | [T05](tasks/T05-git-practice.md) | Git の練習を1周する（branch → PR → merge） | 全員 | 1h | clone 済み・`uv run pytest` が通ること | ✅ 完了（2026-09-07・#8 ほか） |
 | ✅ 済 | [T04](tasks/T04-branch-protection.md) | `main` ブランチを保護する | G7 テスト・CI | 30分 | **T05** が済んでいること（T03 は 2026-09-06 完了） | ✅ 完了（2026-09-07） |
 | ✅ 済 | [T06](tasks/T06-labels-and-board.md) | ラベルを登録して Projects ボードを1枚作る | G9 ドキュメント・運用 | 45分 | **リポジトリ設定の変更権限**（取得済み） | ✅ 完了（2026-09-07） |
-| 🟠 高 | [T07](tasks/T07-mask-options.md) | マスク生成方式の候補を1枚にまとめる（**W02 中に決める**） | G3 画像処理 | 2h | なし（Blender 不要） | ✅ 完了（2026-09-16・実機確認込み） |
-| 🟡 中 | [T08](tasks/T08-blender-entry-note.md) | Blender スクリプトの入口メモを1本書く | G2 3DCG | 1.5h | Blender が入っている端末 | ✅ 完了（2026-09-22） |
-| 🟢 低 | [T09](tasks/T09-find-3d-model.md) | 合成データ用の3Dモデルを探す（**凹み形状が必須**） | G2 3DCG | 1h | なし | ⬜ 未着手 |
-| 🟢 低 | [T10](tasks/T10-read-scope.md) | スコープと撤退ラインに目を通す | 全員 | 15分 | なし | ⬜ 未着手 |
+| ✅ 済 | [T07](tasks/T07-mask-options.md) | マスク生成方式の候補を1枚にまとめる（**W02 中に決める**） | G3 画像処理 | 2h | なし（Blender 不要） | ✅ 完了（2026-09-16・実機確認込み） |
+| ✅ 済 | [T08](tasks/T08-blender-entry-note.md) | Blender スクリプトの入口メモを1本書く | G2 3DCG | 1.5h | Blender が入っている端末 | ✅ 完了（2026-09-22） |
+| ✅ 済 | [T09](tasks/T09-find-3d-model.md) | 合成データ用の3Dモデルを探す（**凹み形状が必須**） | G2 3DCG | 1h | なし | ✅ 完了（2026-09-23） |
+| ✅ 済 | [T10](tasks/T10-read-scope.md) | スコープと撤退ラインに目を通す | 全員 | 15分 | なし | ✅ 完了（2026-09-23） |
 
 <a id="w02"></a>
 ### 1-b. W02 から始まる作業（手順書はまだありません）
@@ -81,9 +86,9 @@
 
 | 空いている時間 | おすすめ |
 |---|---|
-| **15分** | [T10 スコープを読む](tasks/T10-read-scope.md)（**public 化の時期はこれが終わり次第に決める** → [D-40](decisions.md#d-40)⑤） |
+| **15分** | ~~[T10 スコープを読む](tasks/T10-read-scope.md)~~ **完了済み（2026-09-23・public 化の時期は [D-41](decisions.md#d-41) で決定）** |
 | **30分** | ~~[T04 ブランチ保護](tasks/T04-branch-protection.md)~~ **完了済み（2026-09-07）** |
-| **45分〜1時間** | ~~[T03 CI の雛形](tasks/T03-ci-workflow.md)~~ **完了済み（2026-09-06・#6）** ／ ~~[T05 Git の練習](tasks/T05-git-practice.md)~~ **完了済み（2026-09-07）** ／ ~~[T06 ラベルとボード](tasks/T06-labels-and-board.md)~~ **完了済み（2026-09-07）** ／ [T09 3Dモデル探し](tasks/T09-find-3d-model.md) |
+| **45分〜1時間** | ~~[T03 CI の雛形](tasks/T03-ci-workflow.md)~~ **完了済み（2026-09-06・#6）** ／ ~~[T05 Git の練習](tasks/T05-git-practice.md)~~ **完了済み（2026-09-07）** ／ ~~[T06 ラベルとボード](tasks/T06-labels-and-board.md)~~ **完了済み（2026-09-07）** ／ ~~[T09 3Dモデル探し](tasks/T09-find-3d-model.md)~~ **完了済み（2026-09-23）** |
 | **2時間・2人そろう** | ~~[T01 ペアプロ#1](tasks/T01-pairpro1-io.md)~~ **完了済み（2026-09-05・#4）**。次は [§1-b の W02 作業](#w02) |
 | **1.5〜2時間・1人** | ~~[T07 マスク方式の候補](tasks/T07-mask-options.md)~~ **完了済み（2026-09-16）** ／ ~~[T08 Blender 入口メモ](tasks/T08-blender-entry-note.md)~~ **完了済み（2026-09-22）** |
 
@@ -151,4 +156,7 @@ git switch -c feat/<何をするか>   # 例: feat/ci-workflow
 | [T04](tasks/T04-branch-protection.md) | `main` ブランチを保護する（Ruleset `protect-main`。PR 必須・ステータスチェック必須・squash merge のみ） | ✅ 2026-09-07 |
 | [T05](tasks/T05-git-practice.md) | Git の練習を1周する（branch → PR → レビュー → squash merge。練習メモを `notes/` に追加） | ✅ 2026-09-07（#8 ほか） |
 | [T06](tasks/T06-labels-and-board.md) | ラベル17個の登録と Projects ボード `3D復元 開発ボード` の作成（T01〜T10 を Issue 化） | ✅ 2026-09-07 |
-| [T08](tasks/T08-blender-entry-note.md) | Blenderスクリプトの入口メモ（`tools/hello_bpy.py`・`docs/notes/blender-entry.md`）を作成し、CLI実行を実機確認 | ✅ 2026-09-22 |
+| [T07](tasks/T07-mask-options.md) | マスク生成方式の候補を1枚にまとめる（`docs/notes/mask-options.md`。ID Mask 方式を推す案として実機確認。決定は [計画書 §16](plan.md#s16) で継続） | ✅ 2026-09-16（#20） |
+| [T08](tasks/T08-blender-entry-note.md) | Blenderスクリプトの入口メモ（`tools/hello_bpy.py`・`docs/notes/blender-entry.md`）を作成し、CLI実行を実機確認 | ✅ 2026-09-22（#21） |
+| [T09](tasks/T09-find-3d-model.md) | 合成データ用3Dモデルの候補（`docs/notes/model-candidates.md`。主データ3件・副データ2件、すべて CC0 か自作）。推す案は主 Ceramic Pot・副 Food Lychee 01 | ✅ 2026-09-23 |
+| [T10](tasks/T10-read-scope.md) | スコープ（§3-8）・撤退ライン（§12）を2人で通読。完了判定3問に回答し、public 化の時期を「今すぐ」に決定（→ [D-41](decisions.md#d-41)） | ✅ 2026-09-23 |

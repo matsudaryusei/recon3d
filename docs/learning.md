@@ -35,7 +35,7 @@
 | 3 | [`pathlib`](https://docs.python.org/ja/3/library/pathlib.html) | ファイルパスの扱い。**`os.path` ではなくこちらを使います**（Windows と mac の差を吸収してくれる） | 30分 |
 
 **環境まわり（`uv`・仮想環境）で詰まったら** → [uv 公式ドキュメント](https://docs.astral.sh/uv/)。
-ただし**基本的に手順書に書いてあるコマンドをそのまま打てば通ります。** 詰まったら [Notice.md](../Notice.md) へ。
+ただし**基本的に手順書に書いてあるコマンドをそのまま打てば通ります。** 詰まったら GitHub の Issue で聞いてください。
 
 ---
 

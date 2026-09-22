@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>合成データ用 3Dモデルの候補</title>
+<link rel="stylesheet" href="../../assets/style.css">
+</head>
+<body>
+<header class="topbar">
+  <div class="topbar-inner">
+    <nav class="crumbs"><a href="../../index.html">ドキュメント</a><span class="sep">/</span><span>notes/</span></nav>
+    <span class="src">docs/notes/model-candidates.md</span>
+  </div>
+</header>
+<div class="layout">
+  <details class="toc"><summary class="toc-title">目次</summary><ul><li class="lv2"><a href="#主データ候補synthetic_cup-相当凹みあり">主データ候補（synthetic_cup 相当・凹みあり）</a></li><li class="lv3"><a href="#候補1推す案">候補1（推す案）</a></li><li class="lv3"><a href="#候補2">候補2</a></li><li class="lv3"><a href="#候補3自作要加工">候補3（自作・要加工）</a></li><li class="lv2"><a href="#副データ候補synthetic_bunnyテクスチャが豊富凹みが少ない">副データ候補（synthetic_bunny・テクスチャが豊富・凹みが少ない）</a></li><li class="lv3"><a href="#候補1推す案-2">候補1（推す案）</a></li><li class="lv3"><a href="#候補2-2">候補2</a></li><li class="lv2"><a href="#推す案">推す案</a></li><li class="lv2"><a href="#表記が必要な場合の記載文">表記が必要な場合の記載文</a></li></ul></details>
+  <main class="page">
+<h1 id="合成データ用-3dモデルの候補">合成データ用 3Dモデルの候補<a class="hash" href="#合成データ用-3dモデルの候補" aria-label="このセクションへのリンク">#</a></h1>
+<p><strong>条件</strong>: 凹み形状が必須（計画書 §2・D-02）。無地の面があること。閉じたメッシュであること。</p>
+<h2 id="主データ候補synthetic_cup-相当凹みあり">主データ候補（<code>synthetic_cup</code> 相当・凹みあり）<a class="hash" href="#主データ候補synthetic_cup-相当凹みあり" aria-label="このセクションへのリンク">#</a></h2>
+<h3 id="候補1推す案">候補1（推す案）<a class="hash" href="#候補1推す案" aria-label="このセクションへのリンク">#</a></h3>
+<ul><li>名前 / URL: Ceramic Pot / https://polyhaven.com/a/ceramic_pot</li><li>ライセンス: CC0</li><li>作者: Aron Łyczek（Poly Haven）</li><li>ファイル形式（.blend / .obj / .fbx など）: Poly Haven配布形式（.blend / .fbx / .gltf など選択可）</li><li>ポリゴン数: 4K tris</li><li><strong>凹みの確認</strong>: 蓋は本体と一体で分離できないが、蓋部分の面をBlender上で非表示にして内部を確認したところ、お椀状の深い内壁が実際にモデリングされていた。両側面の取っ手もループ状で凹みとして機能する</li><li><strong>無地の面の確認</strong>: 全面が経年劣化（weathered）による色ムラのみで、柄・模様の類は一切無い</li><li>良い点 / 気になる点: 良い点＝Non Manifoldチェックで穴が検出されず閉じたメッシュを確認済み、3候補中最も軽量（4K tris）。気になる点＝蓋が本体と一体のため、実験で「蓋を開けた状態」が必要な場合は編集作業が発生する</li></ul>
+<h3 id="候補2">候補2<a class="hash" href="#候補2" aria-label="このセクションへのリンク">#</a></h3>
+<ul><li>名前 / URL: Pot Enamel 01 / https://polyhaven.com/a/pot_enamel_01</li><li>ライセンス: CC0</li><li>作者: Kuutti Siitonen（Poly Haven）</li><li>ファイル形式（.blend / .obj / .fbx など）: Poly Haven配布形式（.blend / .fbx / .gltf など選択可）</li><li>ポリゴン数: 11K tris</li><li><strong>凹みの確認</strong>: 蓋が分離できる構造になっており、外すと内部の凹みを直接確認できる</li><li><strong>無地の面の確認</strong>: 上部〜中央は無地の濃茶色エナメル。底部のみ炎柄の装飾が入る</li><li>良い点 / 気になる点: 良い点＝無地の面と模様のある面がバランス良く同居しており、多視点復元・シルエット復元どちらの弱点も作りやすい。気になる点＝持ち手の付け根がNon Manifold（非閉塞）。使用前に<code>メッシュ</code> → <code>クリーンアップ</code> → <code>穴を埋める</code>等での修正が必要</li></ul>
+<h3 id="候補3自作要加工">候補3（自作・要加工）<a class="hash" href="#候補3自作要加工" aria-label="このセクションへのリンク">#</a></h3>
+<ul><li>名前 / URL: マグカップ.blend（自作、<code>data/myself/マグカップ.blend</code>）</li><li>ライセンス: 自作（オリジナル、表記不要）</li><li>作者: 本人（自作）</li><li>ファイル形式（.blend / .obj / .fbx など）: .blend</li><li>ポリゴン数: 円柱（本体）1,660 tris + トーラス（持ち手）1,152 tris ＝ 合計約2,812 tris</li><li><strong>凹みの確認</strong>: 現状は本体（円柱オブジェクト）が中身の詰まった状態で凹みは未作成。採用時に上面の面を選択→インセット→下方向に押し出し、という手順で面を削除せずに凹みを作る予定（削除方式だと非閉塞になるため回避）</li><li><strong>無地の面の確認</strong>: マテリアルは「白」「茶色」の2色のみで模様は無い</li><li>良い点 / 気になる点: 良い点＝自作のためライセンス確認が不要、本体・持ち手ともNon Manifold 0件で閉じたメッシュは既に達成済み。気になる点＝①現状サイズが2m×2m×2mと非現実的なため縮小が必要、②凹み自体は未加工で採用決定後に作業が発生する</li></ul>
+<h2 id="副データ候補synthetic_bunnyテクスチャが豊富凹みが少ない">副データ候補（<code>synthetic_bunny</code>・<strong>テクスチャが豊富・凹みが少ない</strong>）<a class="hash" href="#副データ候補synthetic_bunnyテクスチャが豊富凹みが少ない" aria-label="このセクションへのリンク">#</a></h2>
+<blockquote><p><strong>名前に引きずられず、目的（①多視点復元が最も上手くいく条件での性能測定）で選んだ。</strong> Stanford Bunny は無彩色でテクスチャを持たず凹部もあるため不採用とし、<strong>最初からテクスチャが焼き込まれている果物のスキャンモデル</strong>を選んでいる。そのため「テクスチャを別途貼る」作業は不要。</p></blockquote>
+<h3 id="候補1推す案-2">候補1（推す案）<a class="hash" href="#候補1推す案-2" aria-label="このセクションへのリンク">#</a></h3>
+<ul><li>名前 / URL: Food Lychee 01 / https://polyhaven.com/a/food_lychee_01</li><li>ライセンス: CC0</li><li>作者: Oliver Harries（Poly Haven）</li><li>ファイル形式（.blend / .obj / .fbx など）: Poly Haven配布形式（.blend / .fbx / .gltf など選択可）</li><li>ポリゴン数: 7K tris ／ 実寸 0.1m</li><li><strong>テクスチャの確認</strong>: <strong>あり（貼り足す必要なし）。</strong> ウロコ状の突起が全面を覆い、今回比較した中で最も情報量が多い。特徴点が大量に取れる</li><li><strong>凹みの確認</strong>: ほぼ球形で<strong>凹みなし</strong>。副データの条件（凹みが少ない）を満たす</li><li>良い点 / 気になる点: 良い点＝テクスチャ量が突出しており、①（多視点復元）が本来の性能を出せる条件を作りやすい。ポリゴン数も7Kと軽量。実機で確認し問題なし（2026-09-23）</li></ul>
+<h3 id="候補2-2">候補2<a class="hash" href="#候補2-2" aria-label="このセクションへのリンク">#</a></h3>
+<ul><li>名前 / URL: Food Pomegranate 01 / https://polyhaven.com/a/food_pomegranate_01</li><li>ライセンス: CC0</li><li>作者: Oliver Harries（Poly Haven）</li><li>ファイル形式（.blend / .obj / .fbx など）: Poly Haven配布形式（.blend / .fbx / .gltf など選択可）</li><li>ポリゴン数: 8K tris ／ 実寸 0.1m</li><li><strong>テクスチャの確認</strong>: <strong>あり（貼り足す必要なし）。</strong> 赤〜茶のグラデーションに加え、表面のシミ・傷による色の変化が豊富</li><li><strong>凹みの確認</strong>: ほぼ球形。ヘタ（王冠部分）に小さな窪みがあるのみで、<strong>実質的に凹みなし</strong></li><li>良い点 / 気になる点: 良い点＝候補1とテクスチャの種類が異なる（突起の陰影ではなく色の濃淡が主）ため、比較条件を変えたいときの差し替え先になる。実機で確認し問題なし（2026-09-23）</li></ul>
+<h2 id="推す案">推す案<a class="hash" href="#推す案" aria-label="このセクションへのリンク">#</a></h2>
+<p><strong>主データは Ceramic Pot（候補1）を推す。</strong> 理由は、Non Manifoldチェックで閉じたメッシュであることが確認済みで追加の修復作業が不要な点、内部の凹みが実在することを目視で確認できている点、模様が一切無く条件を明確に満たしている点、そして3候補中最も軽量（4K tris）な点。Pot Enamel 01は無地と模様の混在が実験的に面白いが持ち手の修復が必要、自作マグカップは加工の自由度が高く将来的な有力候補だが現時点では凹みが未作成のため、まずはCeramic Potで進めるのが最も手戻りが少ない。</p>
+<p><strong>副データは Food Lychee 01（候補1）を推す。</strong> 主データ（無地・凹みあり）と正反対の条件を最もはっきり満たすためで、ウロコ状の突起による特徴点の豊富さと、凹みの無い球形という2点が揃っている。Food Pomegranate 01 は同等の条件を満たしつつテクスチャの性質が異なる（突起の陰影ではなく色の濃淡）ので、E5 の条件を振りたいときの差し替え先として残す。</p>
+<h2 id="表記が必要な場合の記載文">表記が必要な場合の記載文<a class="hash" href="#表記が必要な場合の記載文" aria-label="このセクションへのリンク">#</a></h2>
+<p>5候補とも CC0 または自作のため表記は任意だが、念のため用意しておく。</p>
+<ul><li>"Ceramic Pot model by Aron Łyczek (https://polyhaven.com/a/ceramic_pot), CC0."</li><li>"Pot Enamel 01 model by Kuutti Siitonen (https://polyhaven.com/a/pot_enamel_01), CC0."</li><li>"Food Lychee 01 model by Oliver Harries (https://polyhaven.com/a/food_lychee_01), CC0."</li><li>"Food Pomegranate 01 model by Oliver Harries (https://polyhaven.com/a/food_pomegranate_01), CC0."</li></ul>
+  </main>
+</div>
+<footer class="foot">
+  <p>このページは <code>docs/notes/model-candidates.md</code> から自動生成しています。編集は md 側で。</p>
+</footer>
+</body>
+</html>

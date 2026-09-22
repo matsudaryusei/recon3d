@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>recon3d — 多視点画像とシルエットを統合した3D形状復元</title>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<header class="topbar">
+  <div class="topbar-inner">
+    <nav class="crumbs"><a href="index.html">ドキュメント</a></nav>
+    <span class="src">README.md</span>
+  </div>
+</header>
+<div class="layout">
+  <details class="toc"><summary class="toc-title">目次</summary><ul><li class="lv2"><a href="#現在の状態">現在の状態</a></li><li class="lv2"><a href="#セットアップ">セットアップ</a></li><li class="lv2"><a href="#ディレクトリ">ディレクトリ</a></li><li class="lv2"><a href="#ドキュメント">ドキュメント</a></li><li class="lv2"><a href="#使用している3dモデル">使用している3Dモデル</a></li><li class="lv2"><a href="#作者">作者</a></li><li class="lv2"><a href="#ライセンス">ライセンス</a></li></ul></details>
+  <main class="page">
+<h1 id="recon3d--多視点画像とシルエットを統合した3d形状復元">recon3d — 多視点画像とシルエットを統合した3D形状復元<a class="hash" href="#recon3d--多視点画像とシルエットを統合した3d形状復元" aria-label="このセクションへのリンク">#</a></h1>
+<p>[!<a href="https://github.com/matsudaryusei/recon3d/actions/workflows/ci.yml/badge.svg" class="ext" target="_blank" rel="noopener">CI</a>](https://github.com/matsudaryusei/recon3d/actions/workflows/ci.yml)
+[!<a href="https://img.shields.io/badge/License-MIT-blue.svg" class="ext" target="_blank" rel="noopener">License: MIT</a>](LICENSE)</p>
+<p>静止画20枚から物体の3D形状を復元し、<strong>その精度を数値で測る</strong>2人の共同開発プロジェクトです。</p>
+<p>2つの復元手法を組み合わせて、片方の弱点をもう片方で埋めます。</p>
+<div class="table-wrap"><table class="md"><thead><tr><th>手法</th><th>苦手な条件</th></tr></thead><tbody><tr><td>① 多視点復元（特徴点 → 三角測量 → バンドル調整）</td><td><strong>無地でテクスチャのない面</strong>。特徴点が取れず、点群に穴が空く</td></tr><tr><td>④ シルエット復元（Visual Hull・ボクセル彫刻）</td><td><strong>凹んだ形状</strong>。外から見えない窪みは削れない</td></tr></tbody></table></div>
+<p><strong>反復解法・最適化・幾何アルゴリズムは自作します</strong>（ここがプロジェクトの芯です）。行列積・I/O・画像前処理はライブラリに任せます。リアルタイム描画やゲームエンジンとの連携は扱いません（→ <a href="docs/plan.html#s3-8">計画書 §3-8</a>）。</p>
+<h2 id="現在の状態">現在の状態<a class="hash" href="#現在の状態" aria-label="このセクションへのリンク">#</a></h2>
+<p><strong>開発中です（全18週・2026-08 着工）。</strong> 着工前の準備（座標系・<code>cameras.json</code> の仕様・CI・運用ルール・合成データの元モデルの選定）が終わり、Phase 0（OpenCV で一直線に通す／Blender で合成データを作る）に入ったところです。</p>
+<ul><li>何ができたら完成とするか：<a href="docs/plan.html#s12">計画書 §12 撤退ライン</a>（目標は L3：統合パイプラインと比較実験 E1〜E7）</li><li>評価実験の設計：<a href="docs/plan.html#s11">計画書 §11</a></li></ul>
+<h2 id="セットアップ">セットアップ<a class="hash" href="#セットアップ" aria-label="このセクションへのリンク">#</a></h2>
+<p><a href="https://docs.astral.sh/uv/" class="ext" target="_blank" rel="noopener">uv</a> を使います。Python は 3.11 に固定しています（→ <a href="docs/plan.html#s7-2">計画書 §7-2</a>）。</p>
+<pre><code class="lang-bash">git clone https://github.com/matsudaryusei/recon3d.git
+cd recon3d
+uv sync
+uv run pytest</code></pre>
+<p>Blender 側のスクリプト（<code>tools/blender_*.py</code>）は Blender 5.0.x に同梱の Python で動かし、<code>bpy</code> と <code>numpy</code> だけに依存させています（→ <a href="docs/plan.html#s7-4">計画書 §7-4</a>）。</p>
+<pre><code class="lang-bash">blender -b -P tools/hello_bpy.py</code></pre>
+<h2 id="ディレクトリ">ディレクトリ<a class="hash" href="#ディレクトリ" aria-label="このセクションへのリンク">#</a></h2>
+<pre><code>src/recon3d/      本体（io / geometry / solvers / vision / fusion / mesh / viz）
+tests/            pytest（Ubuntu と Windows の CI で実行）
+tools/            Blender スクリプトなどの補助ツール
+docs/             計画書・決定記録・手順書・メモ
+site/             docs の HTML 版（docs/tools/build_html.py で生成）</code></pre>
+<h2 id="ドキュメント">ドキュメント<a class="hash" href="#ドキュメント" aria-label="このセクションへのリンク">#</a></h2>
+<div class="table-wrap"><table class="md"><thead><tr><th>知りたいこと</th><th>開くもの</th></tr></thead><tbody><tr><td>全体の現在地と道順</td><td><a href="docs/README.html">docs/README.md</a></td></tr><tr><td>仕様・日程</td><td><a href="docs/plan.html">docs/plan.md</a>（計画書）</td></tr><tr><td>なぜそう決めたか</td><td><a href="docs/decisions.html">docs/decisions.md</a>（決定記録）</td></tr><tr><td>次にやること</td><td><a href="docs/next.html">docs/next.md</a></td></tr><tr><td>用語</td><td><a href="docs/glossary.html">docs/glossary.md</a></td></tr><tr><td>開発への参加手順（ブランチ → PR）</td><td><a href="HowToPush.html">HowToPush.md</a></td></tr></tbody></table></div>
+<h2 id="使用している3dモデル">使用している3Dモデル<a class="hash" href="#使用している3dモデル" aria-label="このセクションへのリンク">#</a></h2>
+<p>合成データの元モデルは、どれも <a href="https://polyhaven.com/" class="ext" target="_blank" rel="noopener">Poly Haven</a> の CC0 モデルです（選定の経緯は <a href="docs/notes/model-candidates.html">docs/notes/model-candidates.md</a>）。モデル本体はリポジトリに含めません。</p>
+<ul><li>主データ：<a href="https://polyhaven.com/a/ceramic_pot" class="ext" target="_blank" rel="noopener">Ceramic Pot</a>（Aron Łyczek, CC0）</li><li>副データ：<a href="https://polyhaven.com/a/food_lychee_01" class="ext" target="_blank" rel="noopener">Food Lychee 01</a>（Oliver Harries, CC0）</li></ul>
+<h2 id="作者">作者<a class="hash" href="#作者" aria-label="このセクションへのリンク">#</a></h2>
+<p><a href="https://github.com/Hinatori8" class="ext" target="_blank" rel="noopener">@Hinatori8</a> ・ <a href="https://github.com/matsudaryusei" class="ext" target="_blank" rel="noopener">@matsudaryusei</a></p>
+<h2 id="ライセンス">ライセンス<a class="hash" href="#ライセンス" aria-label="このセクションへのリンク">#</a></h2>
+<p>MIT</p>
+  </main>
+</div>
+<footer class="foot">
+  <p>このページは <code>README.md</code> から自動生成しています。編集は md 側で。</p>
+</footer>
+</body>
+</html>
