@@ -1,5 +1,5 @@
 [project]
-name = "4bitcom-HandM"
+name = "recon3d"
 version = "0.1.0"
 description = "2次元画像を3DCGで再構築する"
 requires-python = ">=3.11,<3.12"
