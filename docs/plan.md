@@ -99,7 +99,7 @@
 | スコープの合意 | **リアルタイム描画を扱わないことは全員が了承済み（2026-08-16）。** 詳細は §3-8 |
 | 松田の合意状況 | テーマには**合意済み**。**2026-08-16 に確認事項へ回答済み。着工をブロックする未回答はない** |
 | 関口の環境 | **Ubuntu 主 / Mac mini 補助** |
-| リポジトリ | 松田のアカウントに **private で作成済み・共有済み**。完成後に public 化 |
+| リポジトリ | 松田のアカウントの `recon3d`。**2026-09-23 に public 化を決定**（[D-41](decisions.md#d-41)・[D-42](decisions.md#d-42)） |
 | 2人の同期 | **対面で頻繁に会える** |
 | 着工 | 2026年8月中（W01 = 2026-08-17 の週） |
 
@@ -138,7 +138,7 @@
 | Blenderスクリプト（G2）のレビューが「読むだけ」になる | Approve規約（§3-2）は維持するが、**Blender固有部分は「設計と入出力の妥当性」をレビュー対象とし、挙動の検証は Blender を持つ人に委ねる** |
 | 「`cameras.json` の書き出し」を Blender内で書けない | **G6 と G2 に分ける。** `io/cameras.py` 本体（純Python・Blender不要でテスト可能）は G6、それをBlenderスクリプトから呼ぶ接続部は G2。**§7-4 の「bpy + numpy のみに依存させる」制約が、この分割を成立させている** |
 
-### 松田側（2026-08-15 受領＝`blender_system/system-info.txt` ／ 2026-08-16 補完＝松田の回答（Q-b・N2））
+### 松田側（2026-08-15 受領＝Blender システム情報 ／ 2026-08-16 補完＝松田の回答（Q-b・N2））
 
 | 項目 | 実測値 | 含意 |
 |---|---|---|
@@ -191,7 +191,7 @@
 | 開発者B | 松田（3DCG）。**Windows**。**Python歴は数か月・主言語はC。Git は clone / commit / push まで**（§7-7） |
 | 位置づけ | 大学の授業・PBLとは**無関係**。完全な自主プロジェクト |
 | 目的 | ① **GitHubでの共同開発実績**（PR・レビュー・CIの履歴が残ること） ② **数理とCGの中身を自作して理解すること**（ライブラリに丸投げしない） ③ **動く成果物と、精度を数値で示した実験結果** |
-| リポジトリ | 松田のアカウントに **private** で作成済み・共有済み。完成後に public 化 |
+| リポジトリ | 松田のアカウントの `recon3d`。**2026-09-23 に public 化を決定**（[D-41](decisions.md#d-41)・[D-42](decisions.md#d-42)） |
 | 同期 | 対面で頻繁に会える |
 | 着工 | 2026年8月中 |
 | 総工数 | 実装の積み上げは **315人時**。**2人なら週8.75h、3人なら週5.8h**（§3-1）。資料1 §1 の想定（週6〜10時間）の範囲内 |
@@ -597,7 +597,8 @@ def test_no_stray_coordinate_conversion():
 ├── .gitattributes            # * text=auto eol=lf   ← Windows対策
 ├── .gitignore
 ├── .github/workflows/ci.yml
-├── Notice.md                 # 非同期の連絡場所（対面でないときの連絡）
+├── README.md                 # 公開用の入口（概要・セットアップ・ライセンス）
+├── LICENSE                   # MIT
 ├── HowToPush.md              # Git 操作の手引き（旧 ルート `README.md`）
 │
 ├── docs/
@@ -608,11 +609,7 @@ def test_no_stray_coordinate_conversion():
 │   ├── schema/cameras.md     # cameras.json 仕様（§5）    ← 2人
 │   ├── requirements.md       # 数値目標（Phase 1で作成）  ← 2人
 │   ├── notes/                # 相手向け解説メモ（§3-7）  ← 2人
-│   ├── experiments/          # 実験ログ・グラフ           ← 関口
-│   └── internal/             # 手続き・履歴用（読まなくてよい）
-│
-├── blender_system/
-│   └── system-info.txt       # 松田の Blender 環境の原本（§7-6）
+│   └── experiments/          # 実験ログ・グラフ           ← 関口
 │
 ├── src/recon3d/
 │   ├── io/                   # ★共有境界。ここだけ2人でレビュー
@@ -725,11 +722,11 @@ packages = ["src/recon3d"]
 testpaths = ["tests"]
 ```
 
-- ⚠️ **`packages = ["src/recon3d"]` の明示は必須。** `[project] name` が `4bitcom-HandM` でパッケージ名 `recon3d` と一致しないため、書かないと hatchling がビルド対象を見つけられず **`uv sync` が失敗する**。
+- **`packages = ["src/recon3d"]` は明示しておく。** 当初は `[project] name` が `4bitcom-HandM` でパッケージ名 `recon3d` と一致せず、書かないと hatchling がビルド対象を見つけられず **`uv sync` が失敗した**。**2026-09-23 に `name = "recon3d"` へ揃えたので必須ではなくなった**が、ビルド対象がはっきりするので残す。
 - **採らなかった案**：pytest の `pythonpath = ["src"]` を張る方式。設定は1行で済むが、**通るのは pytest 実行中だけ**で、`uv run python tools/run_pipeline.py`（§6 の CLI エントリポイント）では `import recon3d` が通らない。**CLI を持つ計画なので採らない。**
 - **`uv.lock` は1行変化する**（`source = { virtual = "." }` → `source = { editable = "." }`）。依存関係は増えないので、**この差分はコミットしてよい**。
 - **他の端末は `git pull` のあと `uv sync` を1回流すこと**（editable install が入る）。
-- ⚠️ **`src/recon3d/` が無い状態で先に `uv sync` してしまった端末は、`uv sync` だけでは直らない。** editable install が「中身なし」で固定され、以降の `uv sync` は `Audited` と言って再ビルドしない。**`uv sync --reinstall-package 4bitcom-handm` を1回流すこと**（`git pull` で `src/` ごと受け取る端末では起きない）。
+- ⚠️ **`src/recon3d/` が無い状態で先に `uv sync` してしまった端末は、`uv sync` だけでは直らない。** editable install が「中身なし」で固定され、以降の `uv sync` は `Audited` と言って再ビルドしない。**`uv sync --reinstall-package recon3d` を1回流すこと**（2026-09-22 以前の `pyproject.toml` では `4bitcom-handm`）（`git pull` で `src/` ごと受け取る端末では起きない）。
 
 > **→ この方式を選んだ理由・`pythonpath` 案を却下した理由: 決定記録 [D-38](decisions.md#d-38)**
 
@@ -756,7 +753,7 @@ uv run pytest    # テスト実行
 ```
 Blender: 5.0.1  (branch: blender-v5.0-release, hash: a3db93c5b259, 2025-12-15 Release)
 Python : 3.11.13 (MSC v.1929 64 bit AMD64)
-出典   : blender_system/system-info.txt（松田提出・2026-08-15）
+出典   : 松田提出の Blender システム情報（2026-08-15）
 ```
 
 **設定**: `pyproject.toml` に `requires-python = ">=3.11,<3.12"`、`.python-version` に `3.11.13`（`[build-system]` は §6-3）。Mac mini のシステムPythonは 3.13.15 だが、`uv` が 3.11 を別途取得するため問題ない。
@@ -822,7 +819,7 @@ Python : 3.11.13 (MSC v.1929 64 bit AMD64)
 <a id="s7-6"></a>
 ### 7-6. 松田の実行環境と、そこから来る設計制約【2026-08-15 追加 / 2026-08-16 更新】
 
-出典は `blender_system/system-info.txt`（松田提出）と、**松田の回答（2026-08-16）**。**環境まわりで疑義が出たら `blender_system/system-info.txt` を参照し、そこに無い項目は本人に聞き直すこと**（回答シートは反映後に削除済み。§14）。
+出典は松田提出の Blender システム情報（2026-08-15。**public 化にあたり原本はリポジトリから削除し、要点を本節に残した**）と、**松田の回答（2026-08-16）**。**環境まわりで疑義が出たら本人に聞き直すこと**（回答シートは反映後に削除済み。§14）。
 
 #### 確定した環境
 
@@ -1231,22 +1228,22 @@ Phase 1 の数値目標をここから決める。
 - [x] ~~**`pyproject.toml` に `[build-system]` を足す**~~ → **✅ 2026-08-20 完了**（hatchling。`packages = ["src/recon3d"]` の明示あり。`uv.lock` も `source = { editable = "." }` に変化済み）
 - [x] ~~**ディレクトリ骨格を作成（範囲は §6-2）**~~ → **✅ 2026-08-20 完了・push 済み**（`G6フェーズ修了`）。§6-2 の「作らないもの」（個別モジュールの空ファイル・`.github/workflows/`・`data/`）が作られていないことも確認済み
 - [x] ~~**`tests/test_import.py`（smoke test）を置き、`uv run pytest` が `1 passed` になることを確認**~~ → **✅ 2026-08-20 完了**（mac で `1 passed` / exit 0。**2026-08-24 に再実行して再現を確認**）。**3台での確認も 2026-08-24 に完了し、§6-2 の完了判定を満たした（→ ④）**
-- [x] ~~**remote URL を `recon3d` に更新**~~ → **✅ 完了**（`git remote -v` で確認済み。→ [D-27](decisions.md#d-27)）
+- [x] ~~**remote URL を `4bitcom_HandM` に更新**~~ → **✅ 完了**（`git remote -v` で確認済み。→ [D-27](decisions.md#d-27)）。**2026-09-23 にリポジトリが `recon3d` へ改名されたため、各端末で `git remote set-url origin https://github.com/matsudaryusei/recon3d.git` を打ち直すこと**
 
 ### ② G7・G9：CI と運用の器
 
-- [ ] `.github/workflows/ci.yml` の雛形 → **手順: [T03](tasks/T03-ci-workflow.md)**
-- [ ] `main` ブランチの保護設定（直push禁止、PR必須）**← リポジトリ設定の変更権限は取得済み（2026-08-16）** → **手順: [T04](tasks/T04-branch-protection.md)**（**T03 と T05 の後**。保護すると直 push が止まるため、先に全員が PR の手順を通しておく）
-- [ ] GitHub Projects ボードを1枚作成、**ラベルを登録（ジャンル `G1`〜`G9` と `phase:*`。§8-3）** → **手順: [T06](tasks/T06-labels-and-board.md)**
-- [ ] **`docs/notes/` に「Blender の Scripting タブと CLI レンダリングの入口」を1本置く**（§7-7） → **手順: [T08](tasks/T08-blender-entry-note.md)**
-- [ ] **マスク生成方式の候補を1枚にまとめる**（→ W02 に決める。[D-35](decisions.md#d-35)） → **手順: [T07](tasks/T07-mask-options.md)**
+- [x] ~~`.github/workflows/ci.yml` の雛形~~ → **✅ 2026-09-06 完了（PR #6）** → [T03](tasks/T03-ci-workflow.md)
+- [x] ~~`main` ブランチの保護設定（直push禁止、PR必須）~~ → **✅ 2026-09-07 完了**（Ruleset `protect-main`） → [T04](tasks/T04-branch-protection.md)
+- [x] ~~GitHub Projects ボードを1枚作成、ラベルを登録（ジャンル `G1`〜`G9` と `phase:*`。§8-3）~~ → **✅ 2026-09-07 完了** → [T06](tasks/T06-labels-and-board.md)
+- [x] ~~`docs/notes/` に「Blender の Scripting タブと CLI レンダリングの入口」を1本置く（§7-7）~~ → **✅ 2026-09-22 完了（PR #21・`docs/notes/blender-entry.md`）** → [T08](tasks/T08-blender-entry-note.md)
+- [x] ~~マスク生成方式の候補を1枚にまとめる~~ → **✅ 2026-09-16 完了（PR #20・`docs/notes/mask-options.md`）。方式の決定は §16 で継続**（[D-35](decisions.md#d-35)） → [T07](tasks/T07-mask-options.md)
 
 ### ③ G2：Blender 環境の確認
 
-- [x] ~~Blenderのバージョンと内蔵Pythonのバージョンを確認~~ → **✅ 2026-08-15 完了**（`blender_system/system-info.txt`。Blender 5.0.1 / Python 3.11.13）
+- [x] ~~Blenderのバージョンと内蔵Pythonのバージョンを確認~~ → **✅ 2026-08-15 完了**（松田提出の Blender システム情報。Blender 5.0.1 / Python 3.11.13）
 - [x] ~~Blender内蔵Pythonに `numpy` が入っていることを確認~~ → **✅ 2026-08-16 完了（numpy 1.26.4）。** §7-4 の「bpy + numpy のみ」制約が成立する
 - [x] ~~メモリ容量・CPU型番・ストレージ空きを報告~~ → **✅ 2026-08-16 完了**（16GB / i7-1360P / 82.6GB。§7-6）
-- [ ] **合成データに使う3Dモデルの候補を探す**（**凹み形状が必須**。配布モデルでよい。ライセンス表記を確認すること。§2・§16） → **手順: [T09](tasks/T09-find-3d-model.md)**
+- [x] ~~合成データに使う3Dモデルの候補を探す（凹み形状が必須。配布モデルでよい。ライセンス表記を確認すること。§2・§16）~~ → **✅ 2026-09-23 完了（`docs/notes/model-candidates.md`）** → [T09](tasks/T09-find-3d-model.md)
 
 > 📌 **これは作業ではなく、期間中ずっと有効な取り決め**（チェックしない）:
 > **開発期間中は Blender 5.0.x を維持する。** 了承済み。更新が必要なら事前に相談する（§7-2）。
@@ -1276,7 +1273,7 @@ Phase 1 の数値目標をここから決める。
 - [x] ~~撤退ライン L1〜L4 と判定時期（11/1・11/29）の認識合わせ~~ → **目標 L3・判定①②の切り替え条件で合意**
 - [x] ~~週の進め方（曜日・連絡手段・返信速度）~~ → **縛らない。各自の空き時間で進める（非同席可）**
 - [x] ~~メッシュ処理をどこまで自作するか~~ → **現行どおり**（UV展開のみ Blender）
-- [x] ~~**public 化のタイミング**~~ → **[T10](tasks/T10-read-scope.md) 完了後に決める**（「完成後」までは合意済み）
+- [x] ~~**public 化のタイミング**~~ → **[T10](tasks/T10-read-scope.md) 完了後に決める**（「完成後」までは合意済み）→ **✅ 2026-09-23 に「今すぐ」と決定**（[D-41](decisions.md#d-41)）
 
 ---
 
@@ -1285,19 +1282,19 @@ Phase 1 の数値目標をここから決める。
 
 
 
-**W01 中に確認 — 5〜7・9 は完了。残るは 8 のみ**（→ [T09](tasks/T09-find-3d-model.md)）
+**W01 中に確認 — 5〜9 すべて完了**（8 は 2026-09-23 に [T09](tasks/T09-find-3d-model.md) で消し込み）
 
 5. ~~Blenderのバージョンと内蔵Pythonのバージョン~~ → **✅ 2026-08-15 完了**（§7-2）
 6. ~~メモリ容量・CPU型番・ストレージ空き~~ → **✅ 2026-08-16 完了**（16GB / i7-1360P / 82.6GB。**ボクセル 256³ を維持** → [D-32](decisions.md#d-32)）
 7. ~~リポジトリの扱い~~ → **✅ 2026-08-16 完了。「ここは3D復元プロジェクト用にしていい（完成後に public 化する）」。** [D-27](decisions.md#d-27) の「崩れる条件」は解消した
-8. **合成データの元となる3Dモデル**（凹み形状を含むマグカップ相当が必須。§2、資料3 Q18）。**松田は既存モデルを読み込む派なので、配布モデルの調達で進める。ライセンスの確認だけ必要**
+8. ~~合成データの元となる3Dモデル~~ → **✅ 2026-09-23 完了。** 主データ（`synthetic_cup`）は Ceramic Pot、副データ（`synthetic_bunny`）は Food Lychee 01（どちらも Poly Haven・CC0）。候補と比較は `docs/notes/model-candidates.md`（[T09](tasks/T09-find-3d-model.md)）
 9. ~~Blender内蔵Pythonに numpy が入っていることの確認~~ → **✅ 2026-08-16 完了（1.26.4）**
 
 **W01 の対面で口頭確認（2026-08-16 に保留となった分）** → **10〜13 は 2026-09-07（[T02](tasks/T02-oral-decisions.md)）で消し込み完了。詳細は [D-40](decisions.md#d-40)**
 
-10. **合成データの元モデルの具体**（→ [T09](tasks/T09-find-3d-model.md)）。~~最終成果物として何が欲しいか~~ → **✅ 2026-09-07 決定：`.blend` ファイル（単一）。** glTF・`.obj`・`.ply` の書き出しコードは作らない（[D-40](decisions.md#d-40)①）
+10. ~~合成データの元モデルの具体~~ → **✅ 2026-09-23 完了（8 と同じ。[T09](tasks/T09-find-3d-model.md)）**。~~最終成果物として何が欲しいか~~ → **✅ 2026-09-07 決定：`.blend` ファイル（単一）。** glTF・`.obj`・`.ply` の書き出しコードは作らない（[D-40](decisions.md#d-40)①）
 11. ~~撤退ライン L1〜L4 と判定時期（11/1・11/29）の認識合わせ~~ → **✅ 2026-09-07 完了。目標 L3・判定①②の切り替え条件で合意**（§12・[D-40](decisions.md#d-40)②）
-12. ~~週の進め方／メッシュ処理をどこまで自作するか／public 化の時期~~ → **✅ 2026-09-07 完了。** 進め方は縛らず各自の空き時間で（非同席可）／メッシュ自作範囲は現行どおり（§3-3）／public 化の時期は [T10](tasks/T10-read-scope.md) 完了後に決める（[D-40](decisions.md#d-40)③④⑤）
+12. ~~週の進め方／メッシュ処理をどこまで自作するか／public 化の時期~~ → **✅ 2026-09-07 完了。** 進め方は縛らず各自の空き時間で（非同席可）／メッシュ自作範囲は現行どおり（§3-3）／public 化の時期は [T10](tasks/T10-read-scope.md) 完了後に決める（[D-40](decisions.md#d-40)③④⑤）→ **2026-09-23 に「今すぐ」と決定**（[D-41](decisions.md#d-41)）
 13. ~~関口に言っておきたいこと（計画で納得できない点・無理そうな点・追加提案）~~ → **✅ 2026-09-07 完了。特に出なかった**（[D-40](decisions.md#d-40)）
 
 **W03 までに確認**
@@ -1338,11 +1335,13 @@ Phase 1 の数値目標をここから決める。
 > **2026-09-07（[T02](tasks/T02-oral-decisions.md)）に、最終成果物（`.blend`）・撤退ラインの合意（目標 L3）・週の進め方（縛らない）・メッシュ自作範囲（現行どおり）も決定した**（→ [D-40](decisions.md#d-40)）。
 >
 > **2026-09-23（[T10](tasks/T10-read-scope.md)）に、public 化の時期を「今すぐ」に決定した**（→ [D-41](decisions.md#d-41)）。下表から該当行は削除した。
+>
+> **2026-09-23 にリポジトリ名を `recon3d` に改名した**（→ [D-27](decisions.md#d-27)）。下表から該当行は削除した。
+>
+> **2026-09-23（[T09](tasks/T09-find-3d-model.md)）に、合成データの元モデルを決定した**（主 Ceramic Pot・副 Food Lychee 01。`docs/notes/model-candidates.md`）。下表から該当行は削除した。
 
 | 項目 | 決定時期 | 備考 | 手順 |
 |---|---|---|---|
-| リポジトリ名（改名の要否と新名称） | **public 化の直前** | 既存 `recon3d` をそのまま使うと決定したため、**着工をブロックしない**。→ [D-27](decisions.md#d-27) | — |
-| 合成データの元モデルの具体 | **W02**（W01 から持ち越し） | 凹み形状必須。**配布モデルの調達で進める**（§7-7）。**ライセンス確認が必要** | [T09](tasks/T09-find-3d-model.md) |
 | マスク画像の生成方法（アルファ / クリプトマット等） | W02 | View Transform は Standard 固定（§7-6）。**経験者がいないため、候補を1枚にまとめてから2人で決める**（[D-35](decisions.md#d-35)） | [T07](tasks/T07-mask-options.md) |
 | **E8（レンダリング条件 vs 復元精度）の採否** | **W04** | G2 と G8 にまたがる追加実験。**W02 の実装負荷を見てから決める**（§11・[D-31](decisions.md#d-31)） | — |
 | 数値目標の具体値 | W04 | Phase 0 の実測値待ち | — |

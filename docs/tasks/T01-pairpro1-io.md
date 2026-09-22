@@ -396,7 +396,7 @@ uv run pytest -x                          # 最初の1件が落ちたらそこ�
 
 | 症状 | 対処 |
 |---|---|
-| `ModuleNotFoundError: No module named 'recon3d'` | `uv sync` を1回。それでも直らなければ `uv sync --reinstall-package 4bitcom-handm`（[計画書 §6-3](../plan.md#s6-3)） |
+| `ModuleNotFoundError: No module named 'recon3d'` | `uv sync` を1回。それでも直らなければ `uv sync --reinstall-package recon3d`（[計画書 §6-3](../plan.md#s6-3)） |
 | 同じ症状が数分後に再発する | **リポジトリが iCloud / OneDrive の同期フォルダの下にある**可能性。[計画書 §7-8](../plan.md#s7-8) を読んで移動してください |
 | **`det(R) = -1` になる** | **`C` の符号の付け方が違います。** `C` で**符号を反転させる軸が奇数本**だと `det = -1`（鏡映）になります。規約の `diag(1, -1, -1)` は2本なので `+1`。`diag(1, 1, -1)` や `diag(-1, -1, -1)` にしていないか見てください |
 | **`det` は合っているが、値が規約と合わない** | **掛ける順序の可能性。** `C @ R` と `R @ C` は**別の行列**ですが、**`det` はどちらも同じ**なので `det` では気づけません。規約は `C @ R` です（[計画書 §4-2](../plan.md#s4-2)） |

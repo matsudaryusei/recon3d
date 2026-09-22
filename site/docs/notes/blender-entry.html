@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Blender スクリプトの入口</title>
+<link rel="stylesheet" href="../../assets/style.css">
+</head>
+<body>
+<header class="topbar">
+  <div class="topbar-inner">
+    <nav class="crumbs"><a href="../../index.html">ドキュメント</a><span class="sep">/</span><span>notes/</span></nav>
+    <span class="src">docs/notes/blender-entry.md</span>
+  </div>
+</header>
+<div class="layout">
+  <details class="toc"><summary class="toc-title">目次</summary><ul><li class="lv2"><a href="#0-まず動くことを確かめる">0. まず動くことを確かめる</a></li><li class="lv2"><a href="#1-scripting-タブの使い方">1. Scripting タブの使い方</a></li><li class="lv2"><a href="#2-cli-から実行する">2. CLI から実行する</a></li><li class="lv2"><a href="#3-よく使う-bpy-の入口分かった範囲でよい">3. よく使う bpy の入口（分かった範囲でよい）</a></li><li class="lv2"><a href="#4-詰まった点">4. 詰まった点</a></li></ul></details>
+  <main class="page">
+<h1 id="blender-スクリプトの入口">Blender スクリプトの入口<a class="hash" href="#blender-スクリプトの入口" aria-label="このセクションへのリンク">#</a></h1>
+<p><strong>対象</strong>: Blender 5.0.1 / 内蔵 Python 3.11.13 / numpy 1.26.4
+<strong>前提</strong>: <code>pip install</code> はしない。<code>tools/blender_*.py</code> は <code>bpy</code> と <code>numpy</code> のみに依存させる（<a href="../plan.html#s7-4">計画書 §7-4</a>）。同梱の <code>mathutils</code> 等を使ってよいかは未決定（使いたくなったら Issue に出して相談する）。</p>
+<h2 id="0-まず動くことを確かめる">0. まず動くことを確かめる<a class="hash" href="#0-まず動くことを確かめる" aria-label="このセクションへのリンク">#</a></h2>
+<p>実行コマンド（Windows / PowerShell、リポジトリのルートで実行）：</p>
+<pre><code class="lang-powershell">&amp; "C:\Program Files\Blender Foundation\Blender 5.0\blender.exe" --background --python tools\hello_bpy.py</code></pre>
+<p>実際に出た出力：</p>
+<pre><code>==================================================
+Blender version : 5.0.1
+Python version  : 3.11.13 (main, Sep 23 2025, 09:08:45) [MSC v.1929 64 bit (AMD64)]
+numpy version   : 1.26.4
+シーン内のオブジェクト: ['Camera', 'Cube', 'Light']
+==================================================</code></pre>
+<p>計画書が前提にしている「Blender 5.0.1 / Python 3.11.13 / numpy 1.26.4」と完全に一致。</p>
+<h2 id="1-scripting-タブの使い方">1. Scripting タブの使い方<a class="hash" href="#1-scripting-タブの使い方" aria-label="このセクションへのリンク">#</a></h2>
+<ul><li>タブの場所：Blenderのウィンドウ上部のワークスペースタブ一覧の中に <code>Scripting</code> がある</li><li><strong>Python Console</strong>（左下）：1行ずつ打って即座に結果を見る場所。<code>import bpy</code> → <code>bpy.app.version_string</code> のように対話的に試すのに向く</li><li><strong>Text Editor</strong>（中央）：複数行のスクリプトを書いて <code>Run Script ▶</code> で一括実行する場所</li><li><strong><code>Run Script</code> の出力がどこに出るか</strong> ← 詰まりやすい<ul><li>Text Editor 上には出ない。<code>print()</code> の出力は <strong>OSのコンソール（ターミナル）</strong>に出る</li><li>Windows で GUI から Blender を起動した場合は <code>Window → Toggle System Console</code> でコンソールウィンドウを出す必要がある<ul><li><strong>UIを日本語にしている場合</strong>：<code>ウィンドウ → システムコンソールの切り替え</code>（メニューの英語/日本語表記が違うだけで同じ項目）</li><li>このメニュー項目は <strong>Windows専用</strong>。macOSには無いので、ターミナルから <code>blender</code> を起動して確認する</li></ul></li><li>ターミナルから <code>blender</code>（GUI付きで起動）した場合は、その起動元のターミナルに出力される</li></ul></li></ul>
+<h2 id="2-cli-から実行する">2. CLI から実行する<a class="hash" href="#2-cli-から実行する" aria-label="このセクションへのリンク">#</a></h2>
+<ul><li><code>--background</code>（略して <code>-b</code>）：GUIを開かずに実行する。20枚のレンダリングのような自動化はここが本命</li><li><code>--python &lt;file&gt;</code>：起動時に指定したPythonスクリプトを実行する</li><li>自分の環境（Windows）での blender 実行ファイルのフルパス： ``<code> C:\Program Files\Blender Foundation\Blender 5.0\blender.exe </code>``</li><li><strong>フラグの短縮形に注意</strong>：<code>--python &lt;file&gt;</code> の短縮形は <strong>大文字の <code>-P</code></strong>。小文字の <code>-p</code> は別の意味（<code>--window-geometry</code>、ウィンドウ位置・サイズ指定）なので間違えると意図しない動作になる。<code>-python</code>（ハイフン1つ）という書き方は存在しない ``<code>powershell blender -b -P tools\hello_bpy.py </code>``</li><li>PowerShell / Git Bash から毎回フルパスを打つのは面倒なので、エイリアスや関数を用意すると楽： ``<code>powershell # PowerShell プロファイルに追加 function blender { &amp; "C:\Program Files\Blender Foundation\Blender 5.0\blender.exe" @args } </code>``<ul><li><strong>プロファイルに書いただけでは今開いているウィンドウには反映されない。</strong> <code>. $PROFILE</code> で読み込み直すか、PowerShellを開き直す（プロファイルはPowerShell起動時に1回だけ読まれるため）</li><li><strong>初回は実行ポリシーでブロックされることがある</strong>：<code>. $PROFILE</code> が <code>このシステムではスクリプトの実行が無効になっているため...</code> というエラーになったら、<code>Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned</code> を実行してから再試行する（Windows既定の <code>Restricted</code> はスクリプト実行を全面禁止しており、プロファイル <code>.ps1</code> もスクリプト扱いのため止められる）</li></ul></li></ul>
+<h2 id="3-よく使う-bpy-の入口分かった範囲でよい">3. よく使う bpy の入口（分かった範囲でよい）<a class="hash" href="#3-よく使う-bpy-の入口分かった範囲でよい" aria-label="このセクションへのリンク">#</a></h2>
+<div class="table-wrap"><table class="md"><thead><tr><th>やりたいこと</th><th>書き方</th></tr></thead><tbody><tr><td>シーンのオブジェクト一覧</td><td><code>bpy.data.objects</code></td></tr><tr><td>カメラを取る</td><td><code>bpy.data.objects["Camera"]</code></td></tr><tr><td>出力先を決める</td><td><code>bpy.context.scene.render.filepath = "..."</code></td></tr><tr><td>レンダリングする</td><td><code>bpy.ops.render.render(write_still=True)</code></td></tr><tr><td>背景を透明にする</td><td><code>bpy.context.scene.render.film_transparent = True</code></td></tr></tbody></table></div>
+<p>（<code>tools/hello_bpy.py</code> で動作確認済みなのは <code>bpy.app.version_string</code> と <code>bpy.data.objects</code> のみ。他はまだ未検証）</p>
+<h2 id="4-詰まった点">4. 詰まった点<a class="hash" href="#4-詰まった点" aria-label="このセクションへのリンク">#</a></h2>
+<ul><li><strong>アドオンのログがまじる</strong>：<code>--background</code> 実行時、<code>Rokoko Studio Live for Blender</code> というアドオンが自動でロード／アンロードされ、<code>### Loading Rokoko Studio Live...</code> のようなログが自分の <code>print()</code> 出力の前後に混ざって出る。想定していなかった出力なので、初見だと自分のスクリプトが何かおかしいのかと勘違いしかける。実害はない（アドオンの標準出力なだけ）</li><li><strong>パスにスペースが入る</strong>：<code>C:\Program Files\Blender Foundation\Blender 5.0\blender.exe</code> はスペースを含むため、PowerShell では <code>&amp;</code> 呼び出し演算子と <code>""</code> の両方が必要（<code>&amp;</code>無しだとパス文字列がただのコマンドとして解釈されずエラーになる）</li><li><strong><code>--python</code>/<code>-P</code> は相対パスで通った</strong>：リポジトリのルートで実行していれば <code>tools\hello_bpy.py</code> のような相対パスで問題なく見つかった</li><li><strong>実際にルート以外で実行してハマった</strong>：<code>blender</code> 関数（エイリアス）を作った直後、ホームディレクトリ（<code>C:\Users\&lt;ユーザー名&gt;</code>）にいたまま <code>blender -b -P tools\hello_bpy.py</code> を叩いたところ <code>OSError: Python file "C:\Users\&lt;ユーザー名&gt;\tools\hello_bpy.py" could not be opened</code> になった。<strong>相対パスは「blenderのインストール場所」ではなく「PowerShellの現在地（カレントディレクトリ）」基準で解決される。</strong> <code>cd</code> でリポジトリルート（<code>C:\4bitcom\recon3d</code>）に移動してから実行したら解消した</li></ul>
+<blockquote><p>GUIでの Method A（Python Console）・Method B（Text Editor で Run Script）は、実際に手元で1回ずつ触ってから、気づいた点をこの節に追記してください。特に「Run Script を押したのに何も起きない」体験は、実際に踏んでみないと実感が湧きません。</p></blockquote>
+  </main>
+</div>
+<footer class="foot">
+  <p>このページは <code>docs/notes/blender-entry.md</code> から自動生成しています。編集は md 側で。</p>
+</footer>
+</body>
+</html>

@@ -1,7 +1,7 @@
 # Blender スクリプトの入口
 
 **対象**: Blender 5.0.1 / 内蔵 Python 3.11.13 / numpy 1.26.4
-**前提**: `pip install` はしない。`tools/blender_*.py` は `bpy` と `numpy` のみに依存させる（[計画書 §7-4](../plan.md#s7-4)）。同梱の `mathutils` 等を使ってよいかは未決定（使いたくなったら [Notice.md](../../Notice.md) に出して相談する）。
+**前提**: `pip install` はしない。`tools/blender_*.py` は `bpy` と `numpy` のみに依存させる（[計画書 §7-4](../plan.md#s7-4)）。同梱の `mathutils` 等を使ってよいかは未決定（使いたくなったら Issue に出して相談する）。
 
 ## 0. まず動くことを確かめる
 

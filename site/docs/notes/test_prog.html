@@ -55,7 +55,7 @@ assert 条件, メッセージ</code></pre>
 <p>この関数について一行ずつ解説していく</p>
 <pre><code class="lang-python">    src_dir = Path(__file__).resolve().parents[1] / "src"</code></pre>
 <ul><li><code>__file__</code>は今実行されているファイルのパスが入っている特殊変数である。つまり<code>Path(__file__)</code>は今実行されているファイルのパスをオブジェクトに変換する操作を行っている。</li><li><code>.resolve()</code>で相対パスから絶対パスへの変更を行い、<code>../</code>など表現のあいまいさを無くす。</li><li><code>.parents[]</code>で親ディレクトリを遡ることができ<code>.parents[0]</code>で1つ上の階層である<code>tests</code>へ、<code>.parents[1]</code>で2つ上のリポジトリ直下までさかのぼることができる。</li></ul>
-<p>以上を踏まえると<code>.../4bitcom_HandM/src</code>という絶対パスを入手していることが分かる。</p>
+<p>以上を踏まえると<code>.../recon3d/src</code>という絶対パスを入手していることが分かる。</p>
 <p>もしそのまま<code>Path("src")</code>と書いてしまう場合「pytestを実行した場所」からの相対パスとなってしまう。この場合、リポジトリ直下以外から<code>pytest</code>を実行すると、<code>src_dir</code>が見つからず走査対象が0件になる。<strong>しかもこれはエラーにならず、単に何も検出されないまま静かにpassしてしまう</strong>（＝規約違反を永久に見逃す、一番たちの悪い壊れ方）。絶対パスでの記述にすることでこれを防ぐことができる。</p>
 <pre><code class="lang-python">    coords_file = src_dir / "recon3d" / "io" / "coords.py"</code></pre>
 <p>これは「座標変換を書いていい場所」のパスを組み立てている。</p>

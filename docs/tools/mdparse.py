@@ -54,6 +54,8 @@ class Inline:
 
     def _link(self, m: re.Match) -> str:
         label, url = m.group(1), self.rewrite(m.group(2))
+        if url is None:  # site/ に出力されないファイルへのリンクは文字だけ残す
+            return label
         external = url.startswith(("http://", "https://"))
         attrs = ' target="_blank" rel="noopener"' if external else ""
         cls = ' class="ext"' if external else ""

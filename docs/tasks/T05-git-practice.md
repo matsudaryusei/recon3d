@@ -218,7 +218,7 @@ git branch                                        # main だけになってい�
 | **間違えて `main` で作業してしまった（まだ commit していない）** | `git switch -c <新しい枝名>` と打つだけで、**変更を持ったまま枝に移れます。** その後 commit すれば OK |
 | **間違えて `main` に commit してしまった** | **枝に移るだけでは `main` に commit が残ります**（あとで `git pull` したときに履歴が枝分かれします）。`git switch -c <新しい枝名>` で枝を作ってから、**`git switch main && git reset --hard origin/main` で `main` を戻す**。⚠️ **`reset --hard` は未コミットの変更を消す**ので、`git status` が clean であることを確認してから |
 | commit を1個取り消したい | `git reset --soft HEAD~1`（変更は手元に残る）。`--hard` は変更ごと消えるので注意 |
-| **何が起きているか分からなくなった** | `git status` と `git log --oneline -5` を貼って [Notice.md](../../Notice.md) で聞く。**自力で `--force` を試さないこと** |
+| **何が起きているか分からなくなった** | `git status` と `git log --oneline -5` を貼って Issue で聞く。**自力で `--force` を試さないこと** |
 
 ---
 
