@@ -28,6 +28,11 @@
 | [T08](T08-blender-entry-note.md) | Blender スクリプトの入口メモ | G2 3DCG | 1.5h |
 | [T09](T09-find-3d-model.md) | 合成データ用の3Dモデルを探す | G2 3DCG | 1h |
 | [T10](T10-read-scope.md) | スコープと撤退ラインに目を通す | 全員 | 15分 |
+| [T11](T11-decide-mask-method.md) | マスク生成方式を決める | G2・G3 | 30分 |
+| [T12](T12-prepare-blend.md) | 元モデルを `.blend` に整え、長さの単位を決める | G2 | 1.5h |
+| [T13](T13-blender-render.md) | `blender_render.py`（20方向レンダリング）を実装する | G2 | 10h前後 |
+| [T14](T14-synthetic-scene.md) | 画像なしの合成シーン生成器を実装する | G7 | 3〜4h |
+| [T15](T15-opencv-pipeline.md) | OpenCV の既存関数でパイプラインを一周する | G1・G3 | 6〜8h |
 
 ---
 

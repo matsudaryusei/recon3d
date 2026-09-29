@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>T12 — 元モデルを .blend にして、長さの単位を決める</title>
+<link rel="stylesheet" href="../../assets/style.css">
+</head>
+<body>
+<header class="topbar">
+  <div class="topbar-inner">
+    <nav class="crumbs"><a href="../../index.html">ドキュメント</a><span class="sep">/</span><a href="README.html">tasks/</a></nav>
+    <span class="src">docs/tasks/T12-prepare-blend.md</span>
+  </div>
+</header>
+<div class="layout">
+  <details class="toc"><summary class="toc-title">目次</summary><ul><li class="lv2"><a href="#なぜやるのか">なぜやるのか</a></li><li class="lv2"><a href="#ステップ1モデルを取る">ステップ1：モデルを取る</a></li><li class="lv2"><a href="#ステップ2単位を決める">ステップ2：単位を決める</a></li><li class="lv2"><a href="#ステップ3モデルを規約に合わせるblender-gui">ステップ3：モデルを規約に合わせる（Blender GUI）</a></li><li class="lv2"><a href="#ステップ4cli-で中身を読む確認">ステップ4：CLI で中身を読む（確認）</a></li><li class="lv2"><a href="#ステップ5記録して-pr">ステップ5：記録して PR</a></li><li class="lv2"><a href="#完了判定">完了判定</a></li><li class="lv2"><a href="#つまずいたら">つまずいたら</a></li><li class="lv2"><a href="#終わったら">終わったら</a></li></ul></details>
+  <main class="page">
+<h1 id="t12--元モデルを-blend-にして長さの単位を決める">T12 — 元モデルを <code>.blend</code> にして、長さの単位を決める<a class="hash" href="#t12--元モデルを-blend-にして長さの単位を決める" aria-label="このセクションへのリンク">#</a></h1>
+<p><a href="../next.html">← 次にやること一覧に戻る</a></p>
+<div class="table-wrap"><table class="md table--headless"><thead><tr><th></th><th></th></tr></thead><tbody><tr><td>ジャンル</td><td><strong>G2 3DCG・データ生成</strong></td></tr><tr><td>目安時間</td><td>1.5時間</td></tr><tr><td>前提</td><td><strong>Blender 5.0.1（松田の端末）</strong>。<a href="T09-find-3d-model.html">T09</a> 完了（主データ＝Ceramic Pot）。<a href="T11-decide-mask-method.html">T11</a> は並行してよい</td></tr><tr><td>作るもの</td><td><strong><code>data/synthetic_cup/cup.blend</code></strong>（コミットしない）／ <strong>長さの単位を決めて <a href="../conventions.html">conventions.md</a> に1行</strong>／採用結果の追記</td></tr><tr><td>出どころ</td><td><a href="../notes/model-candidates.html">model-candidates.md</a> ／ <a href="../plan.html#s2">計画書 §2</a> ／ <a href="../plan.html#s4-1">§4-1</a></td></tr></tbody></table></div>
+<hr>
+<h2 id="なぜやるのか">なぜやるのか<a class="hash" href="#なぜやるのか" aria-label="このセクションへのリンク">#</a></h2>
+<p><strong><a href="T13-blender-render.html">T13 の <code>blender_render.py</code></a> は「シーンに被写体が1つ、原点に立っている」ことを前提に書きます。</strong> ダウンロードしたモデルはそのまま使えません。大きさも位置もバラバラだからです。</p>
+<p><strong>もう1つ、まだ誰も決めていないことがあります：長さの単位です。</strong> <code>cameras.json</code> の <code>t</code> や <code>gt_mesh.ply</code> の座標が <strong>m なのか mm なのか</strong>、<a href="../schema/cameras.html">cameras.md</a> にも <a href="../conventions.html">conventions.md</a> にも書いてありません。
+<strong>後から食い違うと、再投影誤差もHausdorff距離（mm で目標を立てる）も静かにずれます。</strong> 最初の1回で決めて、規約に書きます。</p>
+<blockquote><p>座標の<strong>向き</strong>は決まっています（+Z が上・原点は回転台の中心・<a href="../plan.html#s4-1">計画書 §4-1</a>）。<strong>ここで整えるのはモデルをその規約に合わせる作業です。</strong></p></blockquote>
+<hr>
+<h2 id="ステップ1モデルを取る">ステップ1：モデルを取る<a class="hash" href="#ステップ1モデルを取る" aria-label="このセクションへのリンク">#</a></h2>
+<ol><li>&lt;https://polyhaven.com/a/ceramic_pot&gt; を開く</li><li><strong>Download</strong> で形式 <strong><code>.blend</code></strong>、解像度は <strong>1K</strong> を選ぶ（テクスチャは軽くてよい。20枚のレンダリング時間が変わる）</li><li>展開して、リポジトリの <strong><code>data/synthetic_cup/</code></strong> に置く（<code>data/</code> は <code>.gitignore</code> 済み。<strong>コミットされません</strong>）</li></ol>
+<pre><code class="lang-bash">mkdir -p data/synthetic_cup
+# 展開したファイルをここへ移す</code></pre>
+<hr>
+<h2 id="ステップ2単位を決める">ステップ2：単位を決める<a class="hash" href="#ステップ2単位を決める" aria-label="このセクションへのリンク">#</a></h2>
+<p><strong>推す案は「メートル」です</strong>（Blender の既定単位。<a href="../plan.html#s5-1">計画書 §5-1</a> の <code>t: [0, 0, 0.5]</code> の例もメートルの大きさ）。
+<strong>Hausdorff 距離を mm で述べるときは、出力時に ×1000 すれば足ります。</strong></p>
+<p><strong>2人で1分話して決める。</strong> 決まったら <a href="../conventions.html">conventions.md</a> に次の1行を足す（<code>io/</code> の規約なので<strong>両者がレビュー</strong>する）：</p>
+<pre><code class="lang-markdown">| 長さの単位 | **メートル**（`t`・`gt_mesh.ply` の座標。Hausdorff 距離を mm で述べるときは表示時に ×1000） |</code></pre>
+<hr>
+<h2 id="ステップ3モデルを規約に合わせるblender-gui">ステップ3：モデルを規約に合わせる（Blender GUI）<a class="hash" href="#ステップ3モデルを規約に合わせるblender-gui" aria-label="このセクションへのリンク">#</a></h2>
+<p><strong>1. 被写体を1つにする</strong>：床・背景・ライトなどの余計なオブジェクトを消す（ライトは T13 で置き直す）</p>
+<p><strong>2. スケールを実寸にする</strong>：<code>N</code> キーの <strong>Item</strong> タブで <strong>Dimensions</strong> を見る。<strong>マグカップなら高さ 0.1 m 前後</strong>が目安。ずれていたら <code>S</code> で拡縮し、<strong><code>Ctrl+A</code> → <code>Scale</code></strong> で確定する（<strong>確定しないと <code>scale</code> が 1 でないまま残り、<code>gt_mesh.ply</code> の座標が狂います</strong>）</p>
+<p><strong>3. 底面を Z=0、中心を XY の原点に置く</strong>：<code>Object → Set Origin → Origin to Geometry</code> のあと、<code>Location</code> を <code>X=0, Y=0</code>、<strong>底面が Z=0 に触れるよう <code>Z</code> を調整</strong>（Dimensions の Z の半分）。<strong><code>Ctrl+A</code> → <code>Location</code></strong> で確定</p>
+<p><strong>4. Pass Index を1にする</strong>：Properties → Object → <strong>Relations → Pass Index = 1</strong>（<a href="T11-decide-mask-method.html">T11</a> で ID Mask 以外に決まったら飛ばす）</p>
+<p><strong>5. 閉じたメッシュか確認</strong>：Edit モード → <code>Select → Select All by Trait → Non Manifold</code>。<strong>0件ならOK</strong>（<a href="../notes/model-candidates.html">model-candidates.md</a> で確認済みだが、加工後にもう一度）</p>
+<p><strong>6. 保存</strong>：<code>File → Save As</code> → <code>data/synthetic_cup/cup.blend</code></p>
+<hr>
+<h2 id="ステップ4cli-で中身を読む確認">ステップ4：CLI で中身を読む（確認）<a class="hash" href="#ステップ4cli-で中身を読む確認" aria-label="このセクションへのリンク">#</a></h2>
+<p><strong>GUI で直したものを、<code>-b</code> でも同じに読めるかを確かめます。</strong> 次の内容を <strong><code>tools/inspect_blend.py</code></strong>（新規・使い捨てでよいがコミットしてよい）に貼る：</p>
+<pre><code class="lang-python">"""シーンのオブジェクトと寸法・位置を出力する。T12 の完了判定用。
+
+使い方:
+    blender -b data/synthetic_cup/cup.blend -P tools/inspect_blend.py
+"""
+
+import bpy
+
+for o in bpy.data.objects:
+    print(o.name, o.type,
+          "loc=", tuple(round(v, 4) for v in o.location),
+          "scale=", tuple(round(v, 4) for v in o.scale),
+          "dim=", tuple(round(v, 4) for v in o.dimensions),
+          "pass_index=", o.pass_index)</code></pre>
+<pre><code class="lang-powershell">&amp; "C:\Program Files\Blender Foundation\Blender 5.0\blender.exe" -b data\synthetic_cup\cup.blend -P tools\inspect_blend.py</code></pre>
+<p><strong>期待する出力：被写体が1つ。<code>scale=(1.0, 1.0, 1.0)</code>、<code>loc</code> の X・Y が 0、<code>dim</code> の Z がおよそ 0.1、<code>pass_index=1</code>。</strong></p>
+<hr>
+<h2 id="ステップ5記録して-pr">ステップ5：記録して PR<a class="hash" href="#ステップ5記録して-pr" aria-label="このセクションへのリンク">#</a></h2>
+<ol><li><a href="../notes/model-candidates.html">model-candidates.md</a> の末尾に「<strong>採用結果</strong>」を足す：採用したモデル・ダウンロードした形式と解像度・Dimensions・<strong>単位（m）</strong>・加工した点（例：蓋は一体のまま）</li><li>PR：</li></ol>
+<pre><code class="lang-bash">git switch main &amp;&amp; git pull origin main
+git switch -c docs/prepare-blend
+git add docs/conventions.md docs/notes/model-candidates.md tools/inspect_blend.py
+git commit -m "docs(G2): 元モデルの準備結果と長さの単位を記録"
+git push -u origin docs/prepare-blend</code></pre>
+<hr>
+<h2 id="完了判定">完了判定<a class="hash" href="#完了判定" aria-label="このセクションへのリンク">#</a></h2>
+<ul><li class="task"><input type="checkbox" disabled> <code>data/synthetic_cup/cup.blend</code> があり、<code>inspect_blend.py</code> の出力が上の期待どおり</li><li class="task"><input type="checkbox" disabled> <strong>単位が <a href="../conventions.html">conventions.md</a> に書いてあり、2人とも同意した</strong></li><li class="task"><input type="checkbox" disabled> <code>git status</code> に <code>data/</code> が出ない（コミットされない）</li><li class="task"><input type="checkbox" disabled> 関口側で <code>cup.blend</code> が要る場合の<strong>受け渡し方法を決めた</strong>（対面で USB／ローカル転送でよい。<strong>CC0 でも 20枚＋テクスチャは大きいので、リポジトリには入れない</strong>）</li></ul>
+<hr>
+<h2 id="つまずいたら">つまずいたら<a class="hash" href="#つまずいたら" aria-label="このセクションへのリンク">#</a></h2>
+<div class="table-wrap"><table class="md"><thead><tr><th>症状</th><th>対処</th></tr></thead><tbody><tr><td><code>Ctrl+A</code> の Apply が灰色</td><td>オブジェクトモード（Object Mode）か確認。複数選択していないか確認</td></tr><tr><td>Dimensions が 2m など巨大</td><td>単位設定（Scene → Units）が違う場合がある。<strong>Scene の Unit Scale が 1.0 か</strong>確認</td></tr><tr><td>Non Manifold が出る</td><td><code>Mesh → Clean Up → Fill Holes</code>。それでも残る場合は Ceramic Pot の別解像度を試す</td></tr><tr><td><code>-b</code> で開くと GUI で見た形と違う</td><td>保存し忘れ。<code>Ctrl+S</code> して再実行</td></tr></tbody></table></div>
+<hr>
+<h2 id="終わったら">終わったら<a class="hash" href="#終わったら" aria-label="このセクションへのリンク">#</a></h2>
+<ol><li><a href="../next.html">次にやること</a> の T12 の状態を <code>✅ 完了</code> にする</li><li><strong>続けて <a href="T13-blender-render.html">T13 <code>blender_render.py</code></a>。</strong></li></ol>
+  </main>
+</div>
+<footer class="foot">
+  <p>このページは <code>docs/tasks/T12-prepare-blend.md</code> から自動生成しています。編集は md 側で。</p>
+</footer>
+</body>
+</html>
