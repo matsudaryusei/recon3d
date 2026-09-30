@@ -62,7 +62,7 @@
 | **G6 の「中身」** | ✅ **完了（2026-09-05・PR #4）。** 座標変換と `cameras.json` の実装（→ [T01](tasks/T01-pairpro1-io.md)）。`uv run pytest` は 10 passed |
 | **G7・G9 運用の器** | ✅ **完了（2026-09-06〜09-07）。** CI（→ [T03](tasks/T03-ci-workflow.md)・PR #6）／`main` の保護（→ [T04](tasks/T04-branch-protection.md)・Ruleset `protect-main`）／Git 練習1周（→ [T05](tasks/T05-git-practice.md)・PR #8 ほか）／ラベル17個と Projects ボード（→ [T06](tasks/T06-labels-and-board.md)）。**以降、着手の記録は GitHub Issue 側です** |
 | **G2・G3 の下ごしらえ** | ✅ **完了（2026-09-16〜09-23）。** マスク方式の候補（→ [T07](tasks/T07-mask-options.md)・PR #20。**方式の決定は [計画書 §16](plan.md#s16) で継続**）／Blender の入口メモ（→ [T08](tasks/T08-blender-entry-note.md)・PR #21）／3Dモデルの候補（→ [T09](tasks/T09-find-3d-model.md)。主 Ceramic Pot・副 Food Lychee 01） |
-| **G1〜G5・G8 の本体** | ⬜ **W02 から。** [計画書 §10](plan.md#s10) の Phase 0（OpenCV で一直線に通す／Blender で合成データ）。**手順書はありません** → [next.md §1-b](next.md#w02) |
+| **G1〜G5・G8 の本体** | ⬜ **W02 から。** [計画書 §10](plan.md#s10) の Phase 0（OpenCV で一直線に通す／Blender で合成データ）。**手順書はありません** → [next.md §1](next.md#w02) |
 
 > ⚠️ **他の端末は `git pull` のあと `uv sync` を1回流してください。** `pyproject.toml` に `[build-system]` が入ったので、プロジェクト自身が editable install されます（→ [計画書 §6-3](plan.md#s6-3)）。
 
@@ -85,9 +85,9 @@
 > **手順書のあるタスク（[T01](tasks/T01-pairpro1-io.md)〜[T10](tasks/T10-read-scope.md)）は 2026-09-23 にすべて完了しました。**
 > 以降、**「誰が何を作業中か」は GitHub Issue（Assignee と `In Progress` 列）が正**です（→ [next.md](next.md#w02) の「この表と GitHub Issue の使い分け」）。
 
-**次は [next.md §1-b の W02 作業](next.md#w02)（G1・G2・G3・G7 の実装）です。** 手順書はありません。
+**次は [next.md §1 の W02 作業](next.md#w02)（G1・G2・G3・G7 の実装）です。** 手順書はありません。
 
-**座標系・データ形式・最終成果物（`.blend`）・撤退ラインは決まり、CI とブランチ保護も入りました。** [§1-b の W02 作業](next.md#w02)（G1・G2・G3・G7 の実装）に着手できます。
+**座標系・データ形式・最終成果物（`.blend`）・撤退ラインは決まり、CI とブランチ保護も入りました。** [§1 の W02 作業](next.md#w02)（G1・G2・G3・G7 の実装）に着手できます。
 
 **終わったタスクの一覧は [next.md の末尾](next.md)** にあります。
 
@@ -149,7 +149,7 @@
 
 | 時期 | やること | 開く文書 |
 |---|---|---|
-| **W02–W03** | ~~ペアプロ#1~~・~~保留分の口頭確認~~・~~CI・運用の器（CI／ブランチ保護／Git練習／ラベルとボード）~~・~~T07〜T10~~ は完了（2026-09-23） | **[next.md](next.md) の §1-b** ／ 計画書 [§4](plan.md#s4)・[§5](plan.md#s5)・[§13](plan.md#s13) |
+| **W02–W03** | ~~ペアプロ#1~~・~~保留分の口頭確認~~・~~CI・運用の器（CI／ブランチ保護／Git練習／ラベルとボード）~~・~~T07〜T10~~ は完了（2026-09-23） | **[next.md](next.md) の §1** ／ 計画書 [§4](plan.md#s4)・[§5](plan.md#s5)・[§13](plan.md#s13) |
 | **W02–W03**（いまここ） | G2：Blenderで合成データ作成<br>G1・G3：OpenCVで一直線に通してみる | [計画書 §10 Phase 0](plan.md#s10) |
 | **W04–W05** | 実測値を根拠に「何ができたら合格か」を決める | [計画書 §10 Phase 1](plan.md#s10) |
 | **W06–W11** | 数理コアの自作（一番重い6週間） | [計画書 §10 Phase 2](plan.md#s10) ／ **資料は [学びの入口 G1](learning.md)** |

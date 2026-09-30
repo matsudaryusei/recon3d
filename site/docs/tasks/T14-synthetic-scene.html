@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>T14 — tests/fixtures/synthetic_scene.py を実装する（画像なしの合成シーン）</title>
+<link rel="stylesheet" href="../../assets/style.css">
+</head>
+<body>
+<header class="topbar">
+  <div class="topbar-inner">
+    <nav class="crumbs"><a href="../../index.html">ドキュメント</a><span class="sep">/</span><a href="README.html">tasks/</a></nav>
+    <span class="src">docs/tasks/T14-synthetic-scene.md</span>
+  </div>
+</header>
+<div class="layout">
+  <details class="toc"><summary class="toc-title">目次</summary><ul><li class="lv2"><a href="#着手前に読むもの">着手前に読むもの</a></li><li class="lv2"><a href="#なぜやるのか">なぜやるのか</a></li><li class="lv2"><a href="#ステップ1ブランチと足場">ステップ1：ブランチと足場</a></li><li class="lv2"><a href="#ステップ2関数の形ここだけ決まっている">ステップ2：関数の形（ここだけ決まっている）</a></li><li class="lv2"><a href="#ステップ3生成器自身のテストを書く">ステップ3：生成器自身のテストを書く</a></li><li class="lv2"><a href="#ステップ4pr">ステップ4：PR</a></li><li class="lv2"><a href="#完了判定">完了判定</a></li><li class="lv2"><a href="#つまずいたら">つまずいたら</a></li><li class="lv2"><a href="#終わったら">終わったら</a></li></ul></details>
+  <main class="page">
+<h1 id="t14--tests-fixtures-synthetic_scenepy-を実装する画像なしの合成シーン">T14 — <code>tests/fixtures/synthetic_scene.py</code> を実装する（画像なしの合成シーン）<a class="hash" href="#t14--tests-fixtures-synthetic_scenepy-を実装する画像なしの合成シーン" aria-label="このセクションへのリンク">#</a></h1>
+<p><a href="../next.html">← 次にやること一覧に戻る</a></p>
+<div class="table-wrap"><table class="md table--headless"><thead><tr><th></th><th></th></tr></thead><tbody><tr><td>ジャンル</td><td><strong>G7 テスト・CI</strong></td></tr><tr><td>目安時間</td><td>3〜4時間（実装が中心）</td></tr><tr><td>前提</td><td><a href="T01-pairpro1-io.html">T01</a> 完了（<code>io/coords.py</code>・<code>io/cameras.py</code>）。<strong>Blender も画像も不要</strong>。T11〜T13 とは独立に進められる</td></tr><tr><td>作るもの</td><td><strong><code>tests/fixtures/synthetic_scene.py</code></strong> と、それ自身のテスト <strong><code>tests/test_synthetic_scene.py</code></strong></td></tr><tr><td>出どころ</td><td><a href="../plan.html#s9-1">計画書 §9-1（第1層）</a> ／ <a href="../decisions.html#d-23">D-23</a> ／ <a href="../conventions.html">conventions.md</a> ／ <a href="../schema/cameras.html">cameras.md</a></td></tr></tbody></table></div>
+<hr>
+<h2 id="着手前に読むもの">着手前に読むもの<a class="hash" href="#着手前に読むもの" aria-label="このセクションへのリンク">#</a></h2>
+<div class="table-wrap"><table class="md"><thead><tr><th>初めて出てくること</th><th>資料</th></tr></thead><tbody><tr><td>pytest の書き方・<code>pytest.raises</code>・<code>np.testing</code></td><td><a href="../learning.html">学びの入口 G6+G7</a> の pytest 入門</td></tr><tr><td><strong>ピンホールカメラで3D点を投影する式</strong> `x ~ K [R \</td><td>t] X`</td><td><a href="https://www.robots.ox.ac.uk/~vgg/hzbook/" class="ext" target="_blank" rel="noopener">Hartley &amp; Zisserman</a> の第6章／<a href="https://szeliski.org/Book/" class="ext" target="_blank" rel="noopener">Szeliski 本</a> のカメラモデル</td></tr><tr><td>乱数を再現可能にする（<code>np.random.default_rng(seed)</code>）</td><td><a href="https://numpy.org/doc/stable/reference/random/index.html" class="ext" target="_blank" rel="noopener">NumPy の乱数</a></td></tr></tbody></table></div>
+<hr>
+<h2 id="なぜやるのか">なぜやるのか<a class="hash" href="#なぜやるのか" aria-label="このセクションへのリンク">#</a></h2>
+<p><strong>Phase 2（W06〜）の主力テストは、この生成器です</strong>（<a href="../decisions.html#d-23">D-23</a>）。DLT・三角測量・バンドル調整を自作したとき、<strong>「正解が分かっている入力」がなければ、合っているか間違っているかが分かりません。</strong></p>
+<p>画像を使わないので、<strong>Blender も OpenCV も要らず、CI（Ubuntu・Windows）で数ミリ秒で回ります。</strong>
+そして <strong>ノイズを 0 にすれば解析的に厳密な正解</strong>が出るので、<strong>バグが自作のソルバなのか、生成器なのか</strong>を切り分けられます。</p>
+<blockquote><p><strong>この生成器が間違っていると、後で書くソルバのテストが全部無意味になります。</strong> だから生成器自身に先にテストを書きます（下のステップ3）。</p></blockquote>
+<hr>
+<h2 id="ステップ1ブランチと足場">ステップ1：ブランチと足場<a class="hash" href="#ステップ1ブランチと足場" aria-label="このセクションへのリンク">#</a></h2>
+<pre><code class="lang-bash">git switch main &amp;&amp; git pull origin main
+uv sync
+git switch -c feat/synthetic-scene</code></pre>
+<p><code>tests/fixtures/</code> には <code>.gitkeep</code> があります。<strong>ファイルが入ったら <code>.gitkeep</code> は消してかまいません</strong>（<a href="../plan.html#s6-2">計画書 §6-2</a>）。</p>
+<hr>
+<h2 id="ステップ2関数の形ここだけ決まっている">ステップ2：関数の形（ここだけ決まっている）<a class="hash" href="#ステップ2関数の形ここだけ決まっている" aria-label="このセクションへのリンク">#</a></h2>
+<p><a href="../plan.html#s9-1">計画書 §9-1</a> が決めているのはこの形です。<strong>中身と、戻り値の型の細部は自分で設計してください。</strong></p>
+<pre><code class="lang-python">def make_scene(n_points=100, n_cameras=20, noise_px=0.0, seed=0):
+    """3D点をランダム生成し、既知のカメラ行列で投影する。
+    戻り値: (points_3d, cameras, observations_2d)  — すべて正解が既知
+    """</code></pre>
+<p><strong>決めておく設計の項目</strong>（自分たちで決める。<strong>決めたら docstring に書く</strong>）：</p>
+<div class="table-wrap"><table class="md"><thead><tr><th>項目</th><th>考えること</th></tr></thead><tbody><tr><td>点をどこに置くか</td><td>被写体の大きさ（<a href="T12-prepare-blend.html">T12</a> で決めた単位）に合わせるか。カメラの前方（<code>z &gt; 0</code>）に必ず入るか</td></tr><tr><td>カメラをどう並べるか</td><td>ターンテーブル風に円周上か／ランダムか。<strong>両方あってもよい</strong>（引数で切り替え）</td></tr><tr><td>内部パラメータ <code>K</code></td><td>固定か引数か。<code>cameras.json</code> の <code>intrinsics</code> と同じ形にしておくと後で楽</td></tr><tr><td>戻り値の型</td><td><code>recon3d.io.cameras</code> の <code>CameraSet</code> を再利用するか／素の <code>np.ndarray</code> か。<strong>G1 の関数が受け取りやすい形</strong>を考える</td></tr><tr><td>画像外に出た点</td><td>除くか、<code>NaN</code> か（観測できない点の扱い）</td></tr></tbody></table></div>
+<p><strong>制約</strong>（守ること）：</p>
+<ul><li><strong><code>numpy</code> と標準ライブラリだけで書く。</strong> <code>cv2</code> を入れない（<a href="../decisions.html#d-23">D-23</a> の狙いが崩れる）</li><li><strong><code>seed</code> が同じなら、まったく同じ結果になる</strong>（<code>np.random.default_rng(seed)</code>）</li><li><strong>座標変換を自分で書かない。</strong> 必要なら <code>recon3d.io.coords</code> を呼ぶ（<code>diag(1,-1,-1)</code> を書くと <code>tests/test_conventions.py</code> が落ちる）</li></ul>
+<hr>
+<h2 id="ステップ3生成器自身のテストを書く">ステップ3：生成器自身のテストを書く<a class="hash" href="#ステップ3生成器自身のテストを書く" aria-label="このセクションへのリンク">#</a></h2>
+<p><strong><code>tests/test_synthetic_scene.py</code> に、最低限この4つのテストを書きます。</strong>（期待値の中身は自分で導いてください）</p>
+<div class="table-wrap"><table class="md"><thead><tr><th>#</th><th>テストの名前の案</th><th>確かめること</th></tr></thead><tbody><tr><td>1</td><td><code>test_zero_noise_reprojection_is_exact</code></td><td><code>noise_px=0</code> のとき、<code>points_3d</code> を <code>cameras</code> で投影し直すと <code>observations_2d</code> と<strong>ほぼ完全に一致</strong>（許容誤差は自分で決める）</td></tr><tr><td>2</td><td><code>test_same_seed_same_scene</code></td><td>同じ <code>seed</code> で2回呼ぶと、3つとも完全に一致</td></tr><tr><td>3</td><td><code>test_all_points_in_front_of_cameras</code></td><td>すべてのカメラで、点のカメラ座標の <code>z &gt; 0</code></td></tr><tr><td>4</td><td><code>test_noise_has_expected_scale</code></td><td><code>noise_px=1.0</code> で、観測とのずれの標準偏差が 1 px 前後（統計的な許容幅を自分で決める）</td></tr></tbody></table></div>
+<p><strong>加えて1つ、カメラの <code>R</code> が正しい回転行列であることを確かめる</strong>（<code>RᵀR ≈ I</code>・<code>det(R) ≈ +1</code>。<code>validate</code> と同じ検査）。</p>
+<pre><code class="lang-bash">uv run pytest tests/test_synthetic_scene.py -v
+uv run pytest            # 全部（既存の10件 + 新規）</code></pre>
+<hr>
+<h2 id="ステップ4pr">ステップ4：PR<a class="hash" href="#ステップ4pr" aria-label="このセクションへのリンク">#</a></h2>
+<pre><code class="lang-bash">git add tests/fixtures/synthetic_scene.py tests/test_synthetic_scene.py
+git commit -m "feat(G7): 画像なしの合成シーン生成器を追加"
+git push -u origin feat/synthetic-scene</code></pre>
+<p><strong>PR の説明に書くこと</strong>：上の設計の項目（ステップ2の表）にどう答えたか。<strong>Approve する人は「この生成器のどこを信じてよいか」を自分の言葉で1〜3行</strong>書く（<a href="../plan.html#s3-2">計画書 §3-2</a>）。</p>
+<p>CI（Ubuntu・Windows）が緑になることを確認してからマージ。</p>
+<hr>
+<h2 id="完了判定">完了判定<a class="hash" href="#完了判定" aria-label="このセクションへのリンク">#</a></h2>
+<ul><li class="task"><input type="checkbox" disabled> <code>uv run pytest</code> が緑（新規テスト5件以上を含む）</li><li class="task"><input type="checkbox" disabled> <strong><code>noise_px=0</code> で投影し直した誤差がほぼゼロ</strong>（テスト1）</li><li class="task"><input type="checkbox" disabled> 同じ <code>seed</code> で結果が完全に同じ（テスト2）</li><li class="task"><input type="checkbox" disabled> <code>cv2</code> を import していない（<code>grep -n "import cv2" tests/fixtures/synthetic_scene.py</code> が空）</li><li class="task"><input type="checkbox" disabled> 設計の項目の答えが docstring か PR に書いてある</li><li class="task"><input type="checkbox" disabled> CI が Ubuntu・Windows とも緑</li></ul>
+<hr>
+<h2 id="つまずいたら">つまずいたら<a class="hash" href="#つまずいたら" aria-label="このセクションへのリンク">#</a></h2>
+<div class="table-wrap"><table class="md"><thead><tr><th>症状</th><th>対処</th></tr></thead><tbody><tr><td><code>tests/fixtures</code> から import できない</td><td><code>tests/fixtures/__init__.py</code> を置く（空でよい）か、<code>tests/conftest.py</code> でパスを通す。<strong>どちらにしたかを PR に書く</strong></td></tr><tr><td>テスト1が 1e-6 程度で落ちる</td><td>浮動小数点の誤差。<strong>許容誤差の根拠</strong>（float64 の精度・座標の大きさ）を考えて <code>atol</code> を決める</td></tr><tr><td>点が画像の外に出る</td><td><code>K</code> の <code>cx, cy</code>・点の範囲・カメラ距離のバランス。<strong>投影した <code>u, v</code> の最小最大を print して確かめる</strong></td></tr><tr><td>テストが緑にならず、生成器かテストか分からない</td><td><strong>紙に1点・1カメラの手計算を書く。</strong> 手計算と一致すれば生成器が合っている</td></tr><tr><td><code>test_conventions.py</code> が落ちた</td><td>座標変換のリテラルを書いた。<code>io/coords.py</code> の関数を呼ぶ形に直す</td></tr></tbody></table></div>
+<hr>
+<h2 id="終わったら">終わったら<a class="hash" href="#終わったら" aria-label="このセクションへのリンク">#</a></h2>
+<ol><li><a href="../next.html">次にやること</a> の T14 の状態を <code>✅ 完了（日付・PR番号）</code> にする</li><li><strong><a href="T15-opencv-pipeline.html">T15</a> の自作版（W06〜）が、この生成器を最初の入力にします。</strong> 使い方を <code>docs/notes/</code> に1行残すと、G1 に入る人が楽です</li></ol>
+  </main>
+</div>
+<footer class="foot">
+  <p>このページは <code>docs/tasks/T14-synthetic-scene.md</code> から自動生成しています。編集は md 側で。</p>
+</footer>
+</body>
+</html>

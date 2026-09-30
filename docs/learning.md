@@ -130,6 +130,11 @@
 | [T05 Git の練習](tasks/T05-git-practice.md) | G9 の Pro Git 3章 |
 | [T07 マスク方式の候補](tasks/T07-mask-options.md) | G2 の Blender マニュアル |
 | [T08 Blender 入口メモ](tasks/T08-blender-entry-note.md) | G2 の3本 |
+| [T11 マスク方式を決める](tasks/T11-decide-mask-method.md) | 不要（[mask-options.md](notes/mask-options.md) の3つの質問だけ） |
+| [T12 元モデルの `.blend`](tasks/T12-prepare-blend.md) | G2 の Blender マニュアル |
+| [T13 `blender_render.py`](tasks/T13-blender-render.md) | **G2 の3本 ＋ G1 の Szeliski 本（カメラモデルの節）** |
+| [T14 合成シーン生成器](tasks/T14-synthetic-scene.md) | G6+G7 の pytest・NumPy ＋ G1 の Hartley & Zisserman（射影の節） |
+| [T15 OpenCV 版パイプライン](tasks/T15-opencv-pipeline.md) | **G3 の OpenCV 公式 ＋ G1 の Szeliski 本・Hartley & Zisserman（該当節）** |
 | W06 以降（数理コア） | **G1 の3本。W05 のうちに読み始めておくこと** |
 
 ---

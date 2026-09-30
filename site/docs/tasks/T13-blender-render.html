@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>T13 — tools/blender_render.py を実装する（20方向レンダリング）</title>
+<link rel="stylesheet" href="../../assets/style.css">
+</head>
+<body>
+<header class="topbar">
+  <div class="topbar-inner">
+    <nav class="crumbs"><a href="../../index.html">ドキュメント</a><span class="sep">/</span><a href="README.html">tasks/</a></nav>
+    <span class="src">docs/tasks/T13-blender-render.md</span>
+  </div>
+</header>
+<div class="layout">
+  <details class="toc"><summary class="toc-title">目次</summary><ul><li class="lv2"><a href="#着手前に読むもの">着手前に読むもの</a></li><li class="lv2"><a href="#なぜやるのか">なぜやるのか</a></li><li class="lv2"><a href="#ステップ1ブランチと足場">ステップ1：ブランチと足場</a></li><li class="lv2"><a href="#ステップ2スクリプトの骨組み手順どおりに置く">ステップ2：スクリプトの骨組み（手順どおりに置く）</a></li><li class="lv2"><a href="#ステップ31枚だけ通す--20枚にするこの順で">ステップ3：1枚だけ通す → 20枚にする（この順で）</a></li><li class="lv2"><a href="#ステップ4出力を検証するこれが完了判定の中身">ステップ4：出力を検証する（これが完了判定の中身）</a></li><li class="lv2"><a href="#ステップ5pr">ステップ5：PR</a></li><li class="lv2"><a href="#完了判定">完了判定</a></li><li class="lv2"><a href="#つまずいたら">つまずいたら</a></li><li class="lv2"><a href="#終わったら">終わったら</a></li></ul></details>
+  <main class="page">
+<h1 id="t13--tools-blender_renderpy-を実装する20方向レンダリング">T13 — <code>tools/blender_render.py</code> を実装する（20方向レンダリング）<a class="hash" href="#t13--tools-blender_renderpy-を実装する20方向レンダリング" aria-label="このセクションへのリンク">#</a></h1>
+<p><a href="../next.html">← 次にやること一覧に戻る</a></p>
+<div class="table-wrap"><table class="md table--headless"><thead><tr><th></th><th></th></tr></thead><tbody><tr><td>ジャンル</td><td><strong>G2 3DCG・データ生成</strong></td></tr><tr><td>目安時間</td><td>10時間前後（実装が中心。<strong>環境と出力の確認は下にすべて書いてある</strong>）</td></tr><tr><td>前提</td><td><a href="T11-decide-mask-method.html">T11</a>（マスク方式）・<a href="T12-prepare-blend.html">T12</a>（<code>cup.blend</code>・長さの単位）が完了。<strong>Blender 5.0.1（松田の端末）</strong></td></tr><tr><td>作るもの</td><td><strong><code>tools/blender_render.py</code></strong>。出力は <code>data/synthetic_cup/</code> の <code>images/</code>・<code>masks/</code>・<code>cameras.json</code>・<code>gt_mesh.ply</code></td></tr><tr><td>出どころ</td><td><a href="../plan.html#s2">計画書 §2</a>・<a href="../plan.html#s4-2">§4-2</a>・<a href="../plan.html#s5">§5</a>・<a href="../plan.html#s7-4">§7-4</a>・<a href="../plan.html#s7-6">§7-6</a>・<a href="../schema/cameras.html">cameras.md</a>・<a href="../decisions.html">D-43（T11）</a></td></tr></tbody></table></div>
+<hr>
+<h2 id="着手前に読むもの">着手前に読むもの<a class="hash" href="#着手前に読むもの" aria-label="このセクションへのリンク">#</a></h2>
+<div class="table-wrap"><table class="md"><thead><tr><th>初めて出てくること</th><th>資料</th></tr></thead><tbody><tr><td><code>bpy</code> でカメラ・レンダリングを動かす</td><td><a href="../learning.html">学びの入口 G2</a> の Blender API クイックスタート</td></tr><tr><td><strong>ピンホールカメラの内部パラメータ（<code>fx</code>・<code>cx</code>）</strong></td><td><a href="https://szeliski.org/Book/" class="ext" target="_blank" rel="noopener">Szeliski 本</a> のカメラモデルの節／<a href="../schema/cameras.html">cameras.md</a> の <code>intrinsics</code></td></tr><tr><td>Blender のカメラ向き（−Z を見る・+Y が上）と OpenCV の違い</td><td><a href="../plan.html#s4-2">計画書 §4-2</a> と <a href="../conventions.html">conventions.md</a></td></tr><tr><td>Blender 5.0 のコンポジタ API の変更（<code>node_tree</code> が使えない）</td><td><a href="../notes/mask-options.html">mask-options.md の落とし穴の表</a>・<a href="../notes/T07-blender5-cli-troubleshooting.html">T07 トラブルシュート</a></td></tr></tbody></table></div>
+<hr>
+<h2 id="なぜやるのか">なぜやるのか<a class="hash" href="#なぜやるのか" aria-label="このセクションへのリンク">#</a></h2>
+<p><strong>このスクリプトが、プロジェクト全体の「正解」を作ります。</strong> 画像・マスク・カメラ行列・真値メッシュのすべてがここから出るので、
+<strong>ここで座標を間違えると、下流（G1・G3・G5）の出力が全部静かに壊れます</strong>（<a href="../plan.html#s4">計画書 §4</a>）。</p>
+<p><strong>そして接続点は <code>cameras.json</code> だけです</strong>（<a href="../plan.html#s3-5">計画書 §3-5</a>）。G1 は Blender を持っていないので、<strong>関口は出力ファイルだけを頼りに動きます。</strong> 出力の形が仕様どおりであることが、いちばん大事な成果物です。</p>
+<blockquote><p><strong>本体は「カメラの置き方」と「Blender の姿勢から <code>R</code>・<code>t</code> を導くこと」です。</strong> ここには答えを書いていません。書いてあるのは<strong>環境・出力の場所・確認の仕方</strong>だけです。</p></blockquote>
+<hr>
+<h2 id="ステップ1ブランチと足場">ステップ1：ブランチと足場<a class="hash" href="#ステップ1ブランチと足場" aria-label="このセクションへのリンク">#</a></h2>
+<pre><code class="lang-bash">git switch main &amp;&amp; git pull origin main
+git switch -c feat/blender-render</code></pre>
+<hr>
+<h2 id="ステップ2スクリプトの骨組み手順どおりに置く">ステップ2：スクリプトの骨組み（手順どおりに置く）<a class="hash" href="#ステップ2スクリプトの骨組み手順どおりに置く" aria-label="このセクションへのリンク">#</a></h2>
+<p><strong>次の骨組みを <code>tools/blender_render.py</code> に貼ります。<code>TODO</code> の中が実装です。</strong></p>
+<pre><code class="lang-python">"""synthetic データセットを Blender で生成する（G2）。
+
+使い方（リポジトリのルートで）:
+    blender -b data/synthetic_cup/cup.blend -P tools/blender_render.py -- \
+        --out data/synthetic_cup --views 20 --width 640 --height 480
+
+Blender 内蔵 Python で動く。依存は bpy と numpy のみ（計画書 §7-4）。
+"""
+
+import argparse
+import sys
+from pathlib import Path
+
+import bpy
+import numpy as np
+
+# recon3d は Blender の Python には入っていないので、src/ を検索パスに足す。
+# io/cameras.py・io/coords.py は標準ライブラリと numpy だけで書いてあるので読める。
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
+from recon3d.io.cameras import CameraSet, View, save_cameras, validate  # noqa: E402
+from recon3d.io.coords import blender_to_opencv_rt  # noqa: E402
+
+
+def parse_args() -&gt; argparse.Namespace:
+    # Blender 自身の引数と混ざらないよう、"--" より後ろだけを読む。
+    argv = sys.argv[sys.argv.index("--") + 1:] if "--" in sys.argv else []
+    p = argparse.ArgumentParser()
+    p.add_argument("--out", type=Path, required=True)
+    p.add_argument("--views", type=int, default=20)
+    p.add_argument("--width", type=int, default=640)
+    p.add_argument("--height", type=int, default=480)
+    return p.parse_args(argv)
+
+
+def setup_render(scene, width: int, height: int) -&gt; None:
+    """レンダリング設定。T11 の決定（D-43）と計画書 §7-6 に従う。"""
+    scene.render.resolution_x = width
+    scene.render.resolution_y = height
+    scene.render.resolution_percentage = 100
+    scene.view_settings.view_transform = "Standard"   # 色管理の影響を消す（D-20）
+    scene.render.dither_intensity = 0.0               # ディザを切る
+    # TODO: レンダラ（D-43 で決めたもの）／サンプル数／背景色
+
+
+def camera_pose(angle_deg: float) -&gt; ...:
+    """回転角から、Blender のカメラの位置・向きを決める。
+
+    TODO: ここが本体。世界座標は「+Z が上・原点は回転台の中心」（計画書 §4-1）。
+    カメラは何を見て、どの高さから、原点を中心にどう回るか。
+    """
+    raise NotImplementedError
+
+
+def intrinsics_from_blender(cam_data, width: int, height: int) -&gt; dict:
+    """Blender のカメラ設定（焦点距離 mm・センサー幅）から fx, fy, cx, cy を出す。
+
+    TODO: ここも導出。ピクセル単位の焦点距離は何と何の比で決まるか。
+    センサーフィット（sensor_fit）が AUTO のときの扱いに注意。
+    """
+    raise NotImplementedError
+
+
+def render_view(scene, image_path: Path, mask_path: Path) -&gt; None:
+    """1視点ぶんの画像とマスクを出す。マスクの出し方は D-43 に従う。"""
+    raise NotImplementedError
+
+
+def export_gt_mesh(obj, path: Path) -&gt; None:
+    """被写体の真値メッシュを .ply で出す（世界座標・単位は T12 で決めたもの）。"""
+    raise NotImplementedError
+
+
+def main() -&gt; None:
+    args = parse_args()
+    (args.out / "images").mkdir(parents=True, exist_ok=True)
+    (args.out / "masks").mkdir(parents=True, exist_ok=True)
+    scene = bpy.context.scene
+    setup_render(scene, args.width, args.height)
+
+    # TODO: 視点ごとに camera_pose → レンダリング → R, t を記録
+    #   R, t は blender_to_opencv_rt(...) を通す（座標変換を他の場所に書かない: 規約 D-11）
+    # TODO: CameraSet を組み、source="turntable_gt" で save_cameras()、その前に validate()
+
+
+if __name__ == "__main__":
+    main()</code></pre>
+<blockquote><p><strong><code>io/coords.py</code> の外で <code>diag(1, -1, -1)</code> や <code>H - 1 - v</code> を書かないでください。</strong> <code>tests/test_conventions.py</code> が落ちます（<a href="../plan.html#s4-3">計画書 §4-3</a>）。座標変換は <strong><code>blender_to_opencv_rt</code> を呼ぶ</strong>だけです。</p></blockquote>
+<hr>
+<h2 id="ステップ31枚だけ通す--20枚にするこの順で">ステップ3：1枚だけ通す → 20枚にする（この順で）<a class="hash" href="#ステップ31枚だけ通す--20枚にするこの順で" aria-label="このセクションへのリンク">#</a></h2>
+<p><strong>いきなり20枚にしない。</strong> 1枚で出力の形を確認してから増やします。</p>
+<pre><code class="lang-powershell"># まず1視点（--views 1）
+&amp; "C:\Program Files\Blender Foundation\Blender 5.0\blender.exe" -b data\synthetic_cup\cup.blend -P tools\blender_render.py -- --out data\synthetic_cup --views 1
+
+# 出力を見る
+dir data\synthetic_cup\images
+dir data\synthetic_cup\masks</code></pre>
+<p>1枚が正しく出たら <code>--views 20</code>。<strong>時間を測って <code>docs/notes/</code> に残す</strong>（W03 の実測値に使う。EEVEE・640×480 で何秒か）。</p>
+<hr>
+<h2 id="ステップ4出力を検証するこれが完了判定の中身">ステップ4：出力を検証する（<strong>これが完了判定の中身</strong>）<a class="hash" href="#ステップ4出力を検証するこれが完了判定の中身" aria-label="このセクションへのリンク">#</a></h2>
+<p><strong>「動いた」ではなく、次の4つを観察して確かめます。</strong></p>
+<div class="table-wrap"><table class="md"><thead><tr><th>#</th><th>見るもの</th><th>どうやって</th><th>合格</th></tr></thead><tbody><tr><td>1</td><td><code>cameras.json</code> が仕様どおり</td><td>関口の端末でも <code>uv run python -c "from pathlib import Path; from recon3d.io.cameras import load_cameras, validate; c = load_cameras(Path('data/synthetic_cup/cameras.json')); validate(c); print(len(c.views), c.views[0].source)"</code></td><td>エラーなし。<code>20 turntable_gt</code></td></tr><tr><td>2</td><td>マスクが二値</td><td><code>python -c "import numpy as np, cv2; m = cv2.imread('data/synthetic_cup/masks/img_000.png', 0); print(np.unique(m))"</code>（opencv が要る場合は <a href="T15-opencv-pipeline.html">T15</a> のあと）</td><td><code>[  0 255]</code> の2つだけ</td></tr><tr><td>3</td><td><strong><code>R</code>・<code>t</code> が画像と一致している</strong></td><td><code>gt_mesh.ply</code> の頂点を <code>cameras.json</code> の <code>K</code>・<code>R</code>・<code>t</code> で自分で投影し、マスク上に点を打つ</td><td><strong>ほぼ全部の点が白（255）の領域に入る。</strong> ずれるなら座標変換の符号か <code>cx, cy</code> を疑う</td></tr><tr><td>4</td><td>画像の並びが回転順</td><td><code>img_000</code>〜<code>img_019</code> を並べて見る</td><td>被写体が一方向に回っていく</td></tr></tbody></table></div>
+<blockquote><p><strong>3 が本題です。</strong> 1・2 は形式の確認で、<strong>3 が通って初めて「正解データ」と呼べます。</strong> 3 の確認スクリプトは、自分で書いて <code>tools/</code> か <code>docs/notes/</code> に置いてください（<strong>そのまま T15 の答え合わせに使えます</strong>）。</p></blockquote>
+<hr>
+<h2 id="ステップ5pr">ステップ5：PR<a class="hash" href="#ステップ5pr" aria-label="このセクションへのリンク">#</a></h2>
+<pre><code class="lang-bash">git add tools/blender_render.py
+git commit -m "feat(G2): blender_render.py で synthetic_cup を20方向レンダリング"
+git push -u origin feat/blender-render</code></pre>
+<p><strong>PR の説明に書くこと</strong>：使ったレンダラ・解像度・1枚あたりの時間・ステップ4の結果（3 の確認画像を貼る）・<strong>Blender を持たない関口が「読む」ときの見どころ</strong>（<a href="../plan.html#s-env">計画書 §7 実測済み環境情報</a>：Blender 固有部分は設計と入出力の妥当性をレビューし、挙動の検証は松田が担う）。</p>
+<hr>
+<h2 id="完了判定">完了判定<a class="hash" href="#完了判定" aria-label="このセクションへのリンク">#</a></h2>
+<ul><li class="task"><input type="checkbox" disabled> <code>data/synthetic_cup/</code> に <code>images/</code> 20枚・<code>masks/</code> 20枚・<code>cameras.json</code>・<code>gt_mesh.ply</code> がある</li><li class="task"><input type="checkbox" disabled> <code>cameras.json</code> が <code>validate()</code> を通り、<code>source</code> が <code>turntable_gt</code></li><li class="task"><input type="checkbox" disabled> マスクの画素値が <code>[0, 255]</code> の2種類だけ</li><li class="task"><input type="checkbox" disabled> <strong>真値メッシュの頂点を投影するとマスクに重なる</strong>（ステップ4の 3）</li><li class="task"><input type="checkbox" disabled> 関口の端末に <code>data/synthetic_cup/</code> を渡し、<strong>関口側で 1 の確認コマンドが通った</strong></li><li class="task"><input type="checkbox" disabled> 1枚あたりの時間を <code>docs/notes/</code> に記録した</li></ul>
+<hr>
+<h2 id="つまずいたら">つまずいたら<a class="hash" href="#つまずいたら" aria-label="このセクションへのリンク">#</a></h2>
+<div class="table-wrap"><table class="md"><thead><tr><th>症状</th><th>対処</th></tr></thead><tbody><tr><td><code>ModuleNotFoundError: recon3d</code></td><td><code>sys.path.insert</code> の行があるか。<code>Path(__file__)</code> が <code>-P</code> で相対指定されていないか（迷ったら絶対パスで渡す）</td></tr><tr><td><code>ValueError: sys.argv.index("--")</code></td><td><code>--</code> を付け忘れ（Blender の引数と自作の引数の区切り）</td></tr><tr><td><code>scene.node_tree</code> の <code>AttributeError</code></td><td>Blender 5.0 の仕様変更。<a href="../notes/mask-options.html">mask-options.md</a> の表 #1 を参照。<code>compositing_node_group</code> を使う</td></tr><tr><td>マスクに中間値（灰色）が出る</td><td><code>view_transform="Standard"</code>・<code>dither_intensity=0</code>・（ID Mask なら）Anti-Alias オフを確認</td></tr><tr><td>投影した点が全部ずれる</td><td><strong>符号か原点の疑い。</strong> Blender と OpenCV は Y と Z の向きが逆・画像の縦も逆（<a href="../plan.html#s4-2">計画書 §4-2</a>）。<strong>その変換は <code>io/coords.py</code> の中だけで直す</strong>（別の場所に足さない）</td></tr><tr><td>20枚で時間がかかりすぎる</td><td>解像度を下げる／サンプル数を減らす。<strong>何秒かかったかを記録して</strong>から決める</td></tr><tr><td><code>det(R)</code> の検証で落ちる</td><td>鏡映になっている。変換を二重に掛けていないか確認</td></tr></tbody></table></div>
+<hr>
+<h2 id="終わったら">終わったら<a class="hash" href="#終わったら" aria-label="このセクションへのリンク">#</a></h2>
+<ol><li><a href="../next.html">次にやること</a> の T13 の状態を <code>✅ 完了（日付・PR番号）</code> にする</li><li><strong>詰まった点・学んだことを <code>docs/notes/</code> に残す</strong>（<a href="T08-blender-entry-note.html">T08</a> と同様。ここが一番価値がある）</li><li><strong>関口に <code>data/synthetic_cup/</code> を渡し、<a href="T15-opencv-pipeline.html">T15</a> が動かせる状態にする</strong></li><li><strong><code>--views 8</code> で低解像度の小セットを作り、<code>tests/data/</code> に置く</strong>のは W02 の後（G7 の第3層。数MB以内）。別 Issue にしてください</li></ol>
+  </main>
+</div>
+<footer class="foot">
+  <p>このページは <code>docs/tasks/T13-blender-render.md</code> から自動生成しています。編集は md 側で。</p>
+</footer>
+</body>
+</html>

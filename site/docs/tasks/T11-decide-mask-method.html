@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>T11 — マスク生成方式を決める</title>
+<link rel="stylesheet" href="../../assets/style.css">
+</head>
+<body>
+<header class="topbar">
+  <div class="topbar-inner">
+    <nav class="crumbs"><a href="../../index.html">ドキュメント</a><span class="sep">/</span><a href="README.html">tasks/</a></nav>
+    <span class="src">docs/tasks/T11-decide-mask-method.md</span>
+  </div>
+</header>
+<div class="layout">
+  <details class="toc"><summary class="toc-title">目次</summary><ul><li class="lv2"><a href="#なぜやるのか">なぜやるのか</a></li><li class="lv2"><a href="#ステップ1読む関口松田とも10分">ステップ1：読む（関口・松田とも／10分）</a></li><li class="lv2"><a href="#ステップ2eevee-で-id-mask-を試す松田blender-端末">ステップ2：EEVEE で ID Mask を試す（松田・Blender 端末）</a></li><li class="lv2"><a href="#ステップ33つの質問に答えて決める2人対面">ステップ3：3つの質問に答えて決める（2人・対面）</a></li><li class="lv2"><a href="#ステップ4記録する">ステップ4：記録する</a></li><li class="lv2"><a href="#完了判定">完了判定</a></li><li class="lv2"><a href="#つまずいたら">つまずいたら</a></li><li class="lv2"><a href="#終わったら">終わったら</a></li></ul></details>
+  <main class="page">
+<h1 id="t11--マスク生成方式を決める">T11 — マスク生成方式を決める<a class="hash" href="#t11--マスク生成方式を決める" aria-label="このセクションへのリンク">#</a></h1>
+<p><a href="../next.html">← 次にやること一覧に戻る</a></p>
+<div class="table-wrap"><table class="md table--headless"><thead><tr><th></th><th></th></tr></thead><tbody><tr><td>ジャンル</td><td><strong>G2・G3</strong>（全員で決める）</td></tr><tr><td>目安時間</td><td>30分（松田の EEVEE 確認 15分 ＋ 対面で決める 15分）</td></tr><tr><td>前提</td><td><a href="T07-mask-options.html">T07</a> 完了（<code>docs/notes/mask-options.md</code> がある）。<strong>Blender が入っている端末（松田）</strong></td></tr><tr><td>作るもの</td><td><strong>決定記録 D-43（1件）</strong>。計画書 §16 の該当行の削除</td></tr><tr><td>出どころ</td><td><a href="../decisions.html#d-35">D-35</a>（「W02 中に2人で決める」）／ <a href="../decisions.html#d-20">D-20</a> ／ <a href="../notes/mask-options.html">mask-options.md</a> ／ <a href="../plan.html#s7-6">計画書 §7-6</a></td></tr></tbody></table></div>
+<hr>
+<h2 id="なぜやるのか">なぜやるのか<a class="hash" href="#なぜやるのか" aria-label="このセクションへのリンク">#</a></h2>
+<p><strong><a href="T13-blender-render.html">T13（<code>blender_render.py</code>）</a> が最初に書く行は、マスクの出し方です。</strong> ここが決まっていないと G2 が着手できません。
+<a href="../decisions.html#d-35">D-35</a> の期日は <strong>W02 中</strong>で、<strong>これを越えると W03 以降の G3 が止まります。</strong></p>
+<p><strong>判断材料は <a href="T07-mask-options.html">T07</a> で揃っています。</strong> 残っているのは次の2つだけです。</p>
+<ol><li><strong>EEVEE で ID Mask が動くか</strong>（mask-options.md は「Cyclesでは確認済み・<strong>EEVEE は未検証</strong>」。合成データの既定レンダラは EEVEE です → <a href="../decisions.html#d-19">D-19</a>）</li><li><strong>2人で「これにする」と言うこと</strong></li></ol>
+<blockquote><p><strong>決めること自体が作業です。</strong> 「推す案があるからそれでいい」ではなく、<a href="../notes/mask-options.html">mask-options.md</a> の<strong>3つの質問</strong>に自分の言葉で答えてから決めてください。</p></blockquote>
+<hr>
+<h2 id="ステップ1読む関口松田とも10分">ステップ1：読む（関口・松田とも／10分）<a class="hash" href="#ステップ1読む関口松田とも10分" aria-label="このセクションへのリンク">#</a></h2>
+<p><a href="../notes/mask-options.html">mask-options.md</a> の次の3か所だけ。</p>
+<ul><li>「<strong>推す案と、その理由</strong>」</li><li>「<strong>決めるときの質問</strong>」（3つ）</li><li>「<strong>実機確認結果</strong>」の落とし穴の表（Blender 5.0 で <code>scene.node_tree</code> が使えない等）</li></ul>
+<hr>
+<h2 id="ステップ2eevee-で-id-mask-を試す松田blender-端末">ステップ2：EEVEE で ID Mask を試す（松田・Blender 端末）<a class="hash" href="#ステップ2eevee-で-id-mask-を試す松田blender-端末" aria-label="このセクションへのリンク">#</a></h2>
+<p><strong>既存の検証スクリプトのレンダラを1行変えるだけです。</strong> 新しくスクリプトは書きません。</p>
+<pre><code class="lang-bash">git switch main &amp;&amp; git pull origin main
+git switch -c docs/decide-mask</code></pre>
+<ol><li><code>tools/blender_id_mask_check.py</code> の <code>scene.render.engine = "CYCLES"</code> を <strong><code>"BLENDER_EEVEE"</code></strong> に書き換える（<strong>コミットしない。試すだけ</strong>）</li><li>実行（リポジトリのルートで。パスは <a href="../notes/blender-entry.html">blender-entry.md</a> の自分の環境の書き方で）</li></ol>
+<pre><code class="lang-powershell">&amp; "C:\Program Files\Blender Foundation\Blender 5.0\blender.exe" --background data\synthetic_cup\cup.blend --python tools\blender_id_mask_check.py</code></pre>
+<ol><li>出力の最後にある <strong><code>ユニークな画素値</code></strong> を見る。<strong><code>[0. 1.]</code>（2種類）なら EEVEE でも二値</strong></li><li>試し終わったら <code>git restore tools/blender_id_mask_check.py</code> で元に戻す</li></ol>
+<p><strong>結果を1行メモしておく</strong>（次のステップで使う）：<code>EEVEE: 二値 OK / 中間値あり（値: ...）/ 動かない（エラー: ...）</code></p>
+<hr>
+<h2 id="ステップ33つの質問に答えて決める2人対面">ステップ3：3つの質問に答えて決める（2人・対面）<a class="hash" href="#ステップ33つの質問に答えて決める2人対面" aria-label="このセクションへのリンク">#</a></h2>
+<p><a href="../notes/mask-options.html">mask-options.md</a> の質問に、<strong>それぞれ自分の言葉で1行ずつ</strong>答えます。</p>
+<div class="table-wrap"><table class="md"><thead><tr><th>質問</th><th>答え</th></tr></thead><tbody><tr><td>1. 20枚を CLI で自動生成できるか</td><td></td></tr><tr><td>2. しきい値を触らずに 0/255 の二値が出るか</td><td></td></tr><tr><td>3. 被写体が増えたとき（回転台＋被写体）に破綻しないか</td><td></td></tr></tbody></table></div>
+<p><strong>決める分岐は次のとおり</strong>（結論は2人で出してください）：</p>
+<div class="table-wrap"><table class="md"><thead><tr><th>EEVEE の結果</th><th>選択肢</th></tr></thead><tbody><tr><td>二値 OK</td><td>ID Mask を EEVEE で使う案</td></tr><tr><td>中間値あり・動かない</td><td>①マスクだけ Cycles で出す ②アルファ方式（次点）に切り替える ③全部 Cycles にする（速度は要実測）</td></tr></tbody></table></div>
+<hr>
+<h2 id="ステップ4記録する">ステップ4：記録する<a class="hash" href="#ステップ4記録する" aria-label="このセクションへのリンク">#</a></h2>
+<p><strong>決めた内容は3か所に残します</strong>（<a href="../decisions.html#d-28">D-28</a>）。</p>
+<p><strong>(a) <a href="../decisions.html">決定記録</a> に D-43 を追記</strong>（D-42 の下。書式は D-35 と同じ）</p>
+<pre><code class="lang-markdown">&lt;a id="d-43"&gt;&lt;/a&gt;
+## D-43. マスク生成方式は ○○ に決定する
+
+**決定**: （方式・使うレンダラ・View Transform=Standard・ディザ=0 を書く）
+**日付**: 2026-xx-xx ／ **計画書**: §7-6・§16 ／ **根拠**: [D-35](#d-35)・mask-options.md
+
+### 根拠
+（3つの質問への答えと、EEVEE の確認結果）</code></pre>
+<p><strong>(b) <a href="../plan.html#s16">計画書 §16</a> の「マスク画像の生成方法」の行を削除</strong>（冒頭の決着済みメモにも1行足す）</p>
+<p><strong>(c) <a href="../decisions.html#changes">決定記録の「計画を変えた記録」</a> に1行足す</strong></p>
+<pre><code class="lang-bash">git add docs/decisions.md docs/plan.md
+git commit -m "docs(G2): マスク生成方式を決定 (D-43)"
+git push -u origin docs/decide-mask</code></pre>
+<p><strong>PR を出して、もう1人が Approve</strong>（要約を1〜3行書く。<a href="../plan.html#s3-2">計画書 §3-2</a>）。</p>
+<hr>
+<h2 id="完了判定">完了判定<a class="hash" href="#完了判定" aria-label="このセクションへのリンク">#</a></h2>
+<ul><li class="task"><input type="checkbox" disabled> EEVEE での ID Mask の結果を、<strong>画素値の種類数</strong>で確認した</li><li class="task"><input type="checkbox" disabled> 3つの質問に、それぞれ自分の言葉で答えた</li><li class="task"><input type="checkbox" disabled> <strong>D-43 が <code>main</code> に入っている</strong>（採用しなかった方式の理由も1行ある）</li><li class="task"><input type="checkbox" disabled> 計画書 §16 の該当行が消えている</li></ul>
+<hr>
+<h2 id="つまずいたら">つまずいたら<a class="hash" href="#つまずいたら" aria-label="このセクションへのリンク">#</a></h2>
+<div class="table-wrap"><table class="md"><thead><tr><th>症状</th><th>対処</th></tr></thead><tbody><tr><td><code>TypeError: ... enum "BLENDER_EEVEE" not found</code></td><td><strong>エラー文に有効な値の一覧が出ます。</strong> その中の EEVEE を選ぶ（Blender のバージョンで名前が変わっています）。何が有効だったかを D-43 に書く</td></tr><tr><td><code>data\synthetic_cup\cup.blend</code> が無い</td><td><a href="T12-prepare-blend.html">T12</a> の前に試す場合は、mask-options.md の実機確認で使った <code>.blend</code> のパスに読み替える</td></tr><tr><td>EEVEE で出力が真っ黒</td><td>対象に <code>pass_index</code> が入っているか、レンダー対象のカメラがあるか。<code>blender_id_mask_check.py</code> のログを見る</td></tr><tr><td>2人の意見が割れた</td><td><strong>どちらも許容範囲なら、実装量が小さいほうを選ぶ。</strong> 理由を D-43 に残せば後から変えられる</td></tr></tbody></table></div>
+<hr>
+<h2 id="終わったら">終わったら<a class="hash" href="#終わったら" aria-label="このセクションへのリンク">#</a></h2>
+<ol><li><a href="../next.html">次にやること</a> の T11 の状態を <code>✅ 完了</code> にする</li><li><strong>続けて <a href="T12-prepare-blend.html">T12 元モデルの <code>.blend</code> 準備</a>。</strong></li></ol>
+  </main>
+</div>
+<footer class="foot">
+  <p>このページは <code>docs/tasks/T11-decide-mask-method.md</code> から自動生成しています。編集は md 側で。</p>
+</footer>
+</body>
+</html>

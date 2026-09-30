@@ -1252,18 +1252,18 @@ Phase 1 の数値目標をここから決める。
 
 - [x] ~~リポジトリをclone、**自分の環境で `uv sync` と `uv run pytest` が通ることを確認**（Windows / Ubuntu / mac のどれでも通ること）~~ → **✅ 2026-08-24 完了**
   - **mac：✅**（2026-08-20 実測、2026-08-24 に再確認）／**Windows：✅**／**Ubuntu：✅**（2台は 2026-08-24 に関口から「うまくいった」と報告。**→ §6-2 の骨格はこれで確定**）
-- [ ] **Git の練習（1h）**：branch → PR → レビュー → squash merge を1周する（§7-7） → **手順: [T05](tasks/T05-git-practice.md)**
-- [ ] §3-8（スコープの明示）と §12（撤退ライン）に目を通す → **手順: [T10](tasks/T10-read-scope.md)**
+- [x] ~~**Git の練習（1h）**：branch → PR → レビュー → squash merge を1周する（§7-7）~~ → **✅ 2026-09-07 完了（練習PR #8 ほか）** → [T05](tasks/T05-git-practice.md)
+- [x] ~~§3-8（スコープの明示）と §12（撤退ライン）に目を通す~~ → **✅ 2026-09-23 完了。public 化の時期を「今すぐ」に決定** → [T10](tasks/T10-read-scope.md)（[D-41](decisions.md#d-41)）
 
 ### ⑤ ペアプロ#1（2時間・G6）
 
 > **⏱ 2時間の割り振り・書く項目・関数のシグネチャ・完了判定は [T01 の手順書](tasks/T01-pairpro1-io.md) にある。**
 
-- [ ] `docs/conventions.md` を書く（§4）
-- [ ] `docs/schema/cameras.md` を書く（§5）
-- [ ] `src/recon3d/io/coords.py` を実装
-- [ ] `src/recon3d/io/cameras.py` を実装（`det(R)` 検証を含む）
-- [ ] `tests/test_conventions.py` を実装
+- [x] ~~`docs/conventions.md` を書く（§4）~~ → **✅ 2026-09-05 完了（#4）** → [T01](tasks/T01-pairpro1-io.md)
+- [x] ~~`docs/schema/cameras.md` を書く（§5）~~ → **✅ 2026-09-05 完了（#4）** → [T01](tasks/T01-pairpro1-io.md)
+- [x] ~~`src/recon3d/io/coords.py` を実装~~ → **✅ 2026-09-05 完了（#4）** → [T01](tasks/T01-pairpro1-io.md)
+- [x] ~~`src/recon3d/io/cameras.py` を実装（`det(R)` 検証を含む）~~ → **✅ 2026-09-05 完了（#4）** → [T01](tasks/T01-pairpro1-io.md)
+- [x] ~~`tests/test_conventions.py` を実装~~ → **✅ 2026-09-05 完了（#4・`uv run pytest` 10 passed）** → [T01](tasks/T01-pairpro1-io.md)
 
 ### ⑥ 保留分の口頭確認（15分・§14 の 11・13 と、10・12 の一部）→ ✅ 2026-09-07 完了（[T02](tasks/T02-oral-decisions.md)・[D-40](decisions.md#d-40)）
 
