@@ -19,7 +19,7 @@
 
 **判断材料は [T07](T07-mask-options.md) で揃っています。** 残っているのは次の2つだけです。
 
-1. **EEVEE で ID Mask が動くか**（mask-options.md は「Cyclesでは確認済み・**EEVEE は未検証**」。合成データの既定レンダラは EEVEE です → [D-19](../decisions.md#d-19)）
+1. ~~**EEVEE で ID Mask が動くか**~~ → **解決済み（2026-10-08・松田）：EEVEE では Object Index パス非対応＝ID Mask は成立しない**（[T11-eevee-object-index.md](../notes/T11-eevee-object-index.md)）。残るは次の1つだけです。
 2. **2人で「これにする」と言うこと**
 
 > **決めること自体が作業です。** 「推す案があるからそれでいい」ではなく、[mask-options.md](../notes/mask-options.md) の**3つの質問**に自分の言葉で答えてから決めてください。
@@ -37,6 +37,8 @@
 ---
 
 ## ステップ2：EEVEE で ID Mask を試す（松田・Blender 端末）
+
+> **【2026-10-08 実測済み】** 松田が実機確認済み。結論：**EEVEE では Object Index パス非対応＝ID Mask は成立しない**（`use_pass_object_index = True` は EEVEE でも通り、読み戻すと `True` になるが、パスは出力されない。対応状況はソケットの `enabled` で判定する）。切り分け・代替案（①アルファ／③Cryptomatte）の実測・T11 への影響は [T11-eevee-object-index.md](../notes/T11-eevee-object-index.md)。**下の手順は再確認したいときのために残す。**
 
 **既存の検証スクリプトのレンダラを1行変えるだけです。** 新しくスクリプトは書きません。
 
@@ -74,7 +76,9 @@ git switch -c docs/decide-mask
 | EEVEE の結果 | 選択肢 |
 |---|---|
 | 二値 OK | ID Mask を EEVEE で使う案 |
-| 中間値あり・動かない | ①マスクだけ Cycles で出す ②アルファ方式（次点）に切り替える ③全部 Cycles にする（速度は要実測） |
+| **中間値あり・動かない（← 実測はこの行）** | ①マスクだけ Cycles で出す ②アルファ方式（次点）に切り替える ③全部 Cycles にする（速度は要実測） |
+
+> **実測の結果は上表の「中間値あり・動かない」の行に確定**（2026-10-08）。[T11-eevee-object-index.md](../notes/T11-eevee-object-index.md) はこの3択を **A（①＝ID Mask＋マスクだけ Cycles）/ B（②＝アルファ）/ C（③相当＝Cryptomatte）** に整理し、**A と B のどちらが有利かは [T12](T12-prepare-blend.md) のシーン設計（被写体1つか／回転台・複数物体か）と連動する**と分析している。質問1・2 は実測で答えが出ており（③速度の懸念も「マスクだけ Cycles なら40枚で+4分」で解消）、**残る本当の論点は質問3（物体を分離できるか）**。結論は2人で（D-43）。
 
 ---
 

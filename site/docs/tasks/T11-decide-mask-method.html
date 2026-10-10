@@ -24,7 +24,7 @@
 <p><strong><a href="T13-blender-render.html">T13（<code>blender_render.py</code>）</a> が最初に書く行は、マスクの出し方です。</strong> ここが決まっていないと G2 が着手できません。
 <a href="../decisions.html#d-35">D-35</a> の期日は <strong>W02 中</strong>で、<strong>これを越えると W03 以降の G3 が止まります。</strong></p>
 <p><strong>判断材料は <a href="T07-mask-options.html">T07</a> で揃っています。</strong> 残っているのは次の2つだけです。</p>
-<ol><li><strong>EEVEE で ID Mask が動くか</strong>（mask-options.md は「Cyclesでは確認済み・<strong>EEVEE は未検証</strong>」。合成データの既定レンダラは EEVEE です → <a href="../decisions.html#d-19">D-19</a>）</li><li><strong>2人で「これにする」と言うこと</strong></li></ol>
+<ol><li><del><strong>EEVEE で ID Mask が動くか</strong></del> → <strong>解決済み（2026-10-08・松田）：EEVEE では Object Index パス非対応＝ID Mask は成立しない</strong>（<a href="../notes/T11-eevee-object-index.html">T11-eevee-object-index.md</a>）。残るは次の1つだけです。</li><li><strong>2人で「これにする」と言うこと</strong></li></ol>
 <blockquote><p><strong>決めること自体が作業です。</strong> 「推す案があるからそれでいい」ではなく、<a href="../notes/mask-options.html">mask-options.md</a> の<strong>3つの質問</strong>に自分の言葉で答えてから決めてください。</p></blockquote>
 <hr>
 <h2 id="ステップ1読む関口松田とも10分">ステップ1：読む（関口・松田とも／10分）<a class="hash" href="#ステップ1読む関口松田とも10分" aria-label="このセクションへのリンク">#</a></h2>
@@ -32,6 +32,7 @@
 <ul><li>「<strong>推す案と、その理由</strong>」</li><li>「<strong>決めるときの質問</strong>」（3つ）</li><li>「<strong>実機確認結果</strong>」の落とし穴の表（Blender 5.0 で <code>scene.node_tree</code> が使えない等）</li></ul>
 <hr>
 <h2 id="ステップ2eevee-で-id-mask-を試す松田blender-端末">ステップ2：EEVEE で ID Mask を試す（松田・Blender 端末）<a class="hash" href="#ステップ2eevee-で-id-mask-を試す松田blender-端末" aria-label="このセクションへのリンク">#</a></h2>
+<blockquote><p><strong>【2026-10-08 実測済み】</strong> 松田が実機確認済み。結論：<strong>EEVEE では Object Index パス非対応＝ID Mask は成立しない</strong>（<code>use_pass_object_index = True</code> は EEVEE でも通り、読み戻すと <code>True</code> になるが、パスは出力されない。対応状況はソケットの <code>enabled</code> で判定する）。切り分け・代替案（①アルファ／③Cryptomatte）の実測・T11 への影響は <a href="../notes/T11-eevee-object-index.html">T11-eevee-object-index.md</a>。<strong>下の手順は再確認したいときのために残す。</strong></p></blockquote>
 <p><strong>既存の検証スクリプトのレンダラを1行変えるだけです。</strong> 新しくスクリプトは書きません。</p>
 <pre><code class="lang-bash">git switch main &amp;&amp; git pull origin main
 git switch -c docs/decide-mask</code></pre>
@@ -44,7 +45,8 @@ git switch -c docs/decide-mask</code></pre>
 <p><a href="../notes/mask-options.html">mask-options.md</a> の質問に、<strong>それぞれ自分の言葉で1行ずつ</strong>答えます。</p>
 <div class="table-wrap"><table class="md"><thead><tr><th>質問</th><th>答え</th></tr></thead><tbody><tr><td>1. 20枚を CLI で自動生成できるか</td><td></td></tr><tr><td>2. しきい値を触らずに 0/255 の二値が出るか</td><td></td></tr><tr><td>3. 被写体が増えたとき（回転台＋被写体）に破綻しないか</td><td></td></tr></tbody></table></div>
 <p><strong>決める分岐は次のとおり</strong>（結論は2人で出してください）：</p>
-<div class="table-wrap"><table class="md"><thead><tr><th>EEVEE の結果</th><th>選択肢</th></tr></thead><tbody><tr><td>二値 OK</td><td>ID Mask を EEVEE で使う案</td></tr><tr><td>中間値あり・動かない</td><td>①マスクだけ Cycles で出す ②アルファ方式（次点）に切り替える ③全部 Cycles にする（速度は要実測）</td></tr></tbody></table></div>
+<div class="table-wrap"><table class="md"><thead><tr><th>EEVEE の結果</th><th>選択肢</th></tr></thead><tbody><tr><td>二値 OK</td><td>ID Mask を EEVEE で使う案</td></tr><tr><td><strong>中間値あり・動かない（← 実測はこの行）</strong></td><td>①マスクだけ Cycles で出す ②アルファ方式（次点）に切り替える ③全部 Cycles にする（速度は要実測）</td></tr></tbody></table></div>
+<blockquote><p><strong>実測の結果は上表の「中間値あり・動かない」の行に確定</strong>（2026-10-08）。<a href="../notes/T11-eevee-object-index.html">T11-eevee-object-index.md</a> はこの3択を <strong>A（①＝ID Mask＋マスクだけ Cycles）/ B（②＝アルファ）/ C（③相当＝Cryptomatte）</strong> に整理し、<strong>A と B のどちらが有利かは <a href="T12-prepare-blend.html">T12</a> のシーン設計（被写体1つか／回転台・複数物体か）と連動する</strong>と分析している。質問1・2 は実測で答えが出ており（③速度の懸念も「マスクだけ Cycles なら40枚で+4分」で解消）、<strong>残る本当の論点は質問3（物体を分離できるか）</strong>。結論は2人で（D-43）。</p></blockquote>
 <hr>
 <h2 id="ステップ4記録する">ステップ4：記録する<a class="hash" href="#ステップ4記録する" aria-label="このセクションへのリンク">#</a></h2>
 <p><strong>決めた内容は3か所に残します</strong>（<a href="../decisions.html#d-28">D-28</a>）。</p>
