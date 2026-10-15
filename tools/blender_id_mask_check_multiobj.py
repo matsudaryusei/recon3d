@@ -47,9 +47,15 @@ def setup_scene():
     render_layers = tree.nodes.new(type="CompositorNodeRLayers")
     render_layers.scene = scene
     render_layers.layer = view_layer.name
-    if "Object Index" not in render_layers.outputs:
-        available = [o.name for o in render_layers.outputs]
-        raise KeyError(f"'Object Index' 出力ソケットが見つかりません。利用可能な出力: {available}")
+    sock = next((s for s in render_layers.outputs if s.name == "Object Index"), None)
+    if sock is None or not sock.enabled:
+        enabled = [s.name for s in render_layers.outputs if s.enabled]
+        raise KeyError(
+            f"'Object Index' が使えません（存在={sock is not None} / "
+            f"enabled={getattr(sock, 'enabled', None)}）。"
+            f"エンジン {scene.render.engine} はこのパスに非対応の可能性があります。"
+            f"このエンジンで使える出力: {enabled}"
+        )
 
     id_mask = tree.nodes.new(type="CompositorNodeIDMask")
     id_mask.inputs["Anti-Alias"].default_value = False
