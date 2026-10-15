@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ID Mask 検証スクリプト2本の備忘録（読み方・直し方）2026/10/15</title>
+<link rel="stylesheet" href="../../assets/style.css">
+</head>
+<body>
+<header class="topbar">
+  <div class="topbar-inner">
+    <nav class="crumbs"><a href="../../index.html">ドキュメント</a><span class="sep">/</span><span>notes/</span></nav>
+    <span class="src">docs/notes/mask-check-scripts.md</span>
+  </div>
+</header>
+<div class="layout">
+  <details class="toc"><summary class="toc-title">目次</summary><ul><li class="lv2"><a href="#2本の役割">2本の役割</a></li><li class="lv2"><a href="#共通の骨格7ステップ">共通の骨格（7ステップ）</a></li><li class="lv3"><a href="#ステップ4ノードツリーだけ補足">ステップ4（ノードツリー）だけ補足</a></li><li class="lv3"><a href="#ソケットの存在チェック2026-10-15-修正">ソケットの存在チェック（2026-10-15 修正）</a></li><li class="lv2"><a href="#動かし方">動かし方</a></li><li class="lv2"><a href="#別の-blend-で使うとき">別の .blend で使うとき</a></li><li class="lv2"><a href="#編集するときの注意powershell-で一括置換しない-">編集するときの注意：PowerShell で一括置換しない ⚠️</a></li><li class="lv2"><a href="#エンジンを-eevee-に変えて試すとき">エンジンを EEVEE に変えて試すとき</a></li><li class="lv2"><a href="#未解決気になっている点">未解決・気になっている点</a></li><li class="lv2"><a href="#関連ファイル">関連ファイル</a></li></ul></details>
+  <main class="page">
+<h1 id="id-mask-検証スクリプト2本の備忘録読み方直し方2026-10-15">ID Mask 検証スクリプト2本の備忘録（読み方・直し方）2026/10/15<a class="hash" href="#id-mask-検証スクリプト2本の備忘録読み方直し方2026-10-15" aria-label="このセクションへのリンク">#</a></h1>
+<p><code>tools/</code> にある ID Mask 検証スクリプト2本について、<strong>「どの行が何のためにあるか」「触ると何が静かに壊れるか」</strong>をまとめる。
+<a href="T07-blender5-cli-troubleshooting.html">T07</a> は「詰まった順番」の記録、<a href="T11-eevee-object-index.html">T11 の EEVEE ノート</a> は「EEVEE で何が起きたか」の記録で、<strong>どちらもスクリプト全体の地図にはなっていない</strong>。次に <a href="../tasks/T13-blender-render.html">T13 <code>blender_render.py</code></a> を書くとき、この2本から持っていく行が多いので、先に1枚にしておく。</p>
+<blockquote><p><strong>このスクリプトは検証用であって、本番のレンダラではない。</strong> <a href="../tasks/T13-blender-render.html">T13</a> は20方向レンダリングの本番実装で、別ファイルになる。ただし<strong>色管理・ディザリング・PNG 読み戻し検証の3つは、そのまま T13 に持っていく必要がある</strong>（理由は下記）。</p></blockquote>
+<h2 id="2本の役割">2本の役割<a class="hash" href="#2本の役割" aria-label="このセクションへのリンク">#</a></h2>
+<div class="table-wrap"><table class="md"><thead><tr><th>ファイル</th><th>答えようとしている問い</th><th>出力</th></tr></thead><tbody><tr><td><code>tools/blender_id_mask_check.py</code></td><td><a href="mask-options.html">mask-options.md の質問2</a>：<strong>しきい値を触らずに 0/255 の二値が出るか</strong></td><td><code>//output/mask_cli.png</code> 1枚＋ユニークな画素値</td></tr><tr><td><code>tools/blender_id_mask_check_multiobj.py</code></td><td>同じく<strong>質問3：被写体が増えたときに破綻しないか</strong></td><td><code>//output/mask_&lt;名前&gt;.png</code> をオブジェクトの数だけ＋重なり画素数</td></tr></tbody></table></div>
+<p><strong>中身の8割は同じ</strong>で、違うのは「1回焼くか、<code>pass_index</code> を切り替えて複数回焼くか」だけである。</p>
+<div class="table-wrap"><table class="md"><thead><tr><th></th><th>単体版</th><th>複数版</th></tr></thead><tbody><tr><td>対象の指定</td><td><code>TARGET_OBJECT_NAME</code> / <code>TARGET_INDEX</code>（定数2つ）</td><td><code>OBJECT_INDEXES</code>（名前 → index の辞書）</td></tr><tr><td>構成の組み立て</td><td><code>main()</code> に全部</td><td><code>setup_scene()</code> に分離（<strong>ノードツリーは1回だけ組んで使い回す</strong>）</td></tr><tr><td>焼く回数</td><td>1回</td><td>オブジェクトの数だけ（<code>render_mask_for()</code>）</td></tr><tr><td>判定</td><td>ユニークな画素値の種類数</td><td>種類数の <code>assert</code> ＋<strong>2枚の重なり画素数</strong>と同一性チェック</td></tr></tbody></table></div>
+<h2 id="共通の骨格7ステップ">共通の骨格（7ステップ）<a class="hash" href="#共通の骨格7ステップ" aria-label="このセクションへのリンク">#</a></h2>
+<p>番号はスクリプト中のコメントと対応している。<strong>「消すと静かに壊れる」列が、このメモの本題</strong>である。</p>
+<div class="table-wrap"><table class="md"><thead><tr><th>#</th><th>やっていること</th><th>消すとどうなるか</th></tr></thead><tbody><tr><td>0</td><td>対象オブジェクトの存在チェック</td><td><code>.blend</code> を差し替えたとき、意味不明な箇所で落ちる</td></tr><tr><td>1</td><td><code>scene.render.engine = "CYCLES"</code></td><td><strong>EEVEE では ID Mask が成立しない</strong>（<a href="T11-eevee-object-index.html">T11 ノート</a>）。ここは今のところ Cycles 固定</td></tr><tr><td>1.5</td><td><code>view_transform = "Standard"</code> / <code>dither_intensity = 0.0</code></td><td><strong>静かに壊れる。</strong> 0/1 のはずの画素が <code>[0. 0.004 0.804 ...]</code> になる。計算は正しいのに<strong>保存側で歪む</strong>（T07 の罠5・6）</td></tr><tr><td>2</td><td><code>obj.pass_index = N</code></td><td>ID Mask が何も拾わず真っ黒</td></tr><tr><td>3</td><td><code>view_layer.use_pass_object_index = True</code></td><td>同上。<strong>ただし EEVEE ではこれを書いても効かない</strong>（後述）</td></tr><tr><td>4</td><td>コンポジタのノードツリー構築</td><td>本体</td></tr><tr><td>5</td><td><code>file_format = "PNG"</code> / <code>color_mode = "RGBA"</code></td><td>RGB にすると Alpha ごと失われる</td></tr><tr><td>6</td><td><code>bpy.ops.render.render(write_still=True)</code></td><td>本体</td></tr><tr><td>7</td><td><strong>保存した PNG を読み戻して画素値を検証</strong></td><td><strong>検証スクリプトの意味が無くなる。</strong> 1.5 の歪みはここでしか気づけない</td></tr></tbody></table></div>
+<h3 id="ステップ4ノードツリーだけ補足">ステップ4（ノードツリー）だけ補足<a class="hash" href="#ステップ4ノードツリーだけ補足" aria-label="このセクションへのリンク">#</a></h3>
+<p>Blender 5.0 でコンポジタの API が変わっているため、<strong>ネットの解説記事はほぼそのままでは動かない</strong>（<a href="https://developer.blender.org/docs/release_notes/5.0/migration/compositor_migration/" class="ext" target="_blank" rel="noopener">Compositor Migration</a>）。この4行が 5.0 の作法である。</p>
+<pre><code class="lang-python">tree = bpy.data.node_groups.new("MaskCheck", "CompositorNodeTree")  # scene.node_tree は廃止
+scene.compositing_node_group = tree                                  # 独立データブロックを scene に挿す
+scene.render.use_compositing = True
+tree.interface.new_socket(name="Image", in_out="OUTPUT", socket_type="NodeSocketColor")</code></pre>
+<p>出口も <code>Composite</code> ノードではなく <code>NodeGroupOutput</code> で、上の <code>new_socket</code> で作った "Image" に繋ぐ。</p>
+<p>そして<strong>この1行を消してはいけない</strong>：</p>
+<pre><code class="lang-python">render_layers.scene = scene   # 自分自身への再代入</code></pre>
+<p>ステップ3でパスを有効化しても、Render Layers ノードの<strong>出力ソケット一覧は即座に更新されない</strong>（<a href="https://developer.blender.org/T48760" class="ext" target="_blank" rel="noopener">T48760</a>）。自分自身を再代入すると更新される、という回避策である。<strong>無いと次のソケット探索が必ず失敗する。</strong></p>
+<h3 id="ソケットの存在チェック2026-10-15-修正">ソケットの存在チェック（2026-10-15 修正）<a class="hash" href="#ソケットの存在チェック2026-10-15-修正" aria-label="このセクションへのリンク">#</a></h3>
+<pre><code class="lang-python">sock = next((s for s in render_layers.outputs if s.name == "Object Index"), None)
+if sock is None or not sock.enabled:
+    enabled = [s.name for s in render_layers.outputs if s.enabled]
+    raise KeyError(...)</code></pre>
+<p><strong><code>"Object Index" in render_layers.outputs</code> と書いてはいけない。</strong> 理由は2つある。</p>
+<ol><li><strong>無効なソケットは <code>enabled=False</code> のまま「存在」する。</strong> 非対応のエンジンでも消えてなくならない</li><li><strong><code>bpy_prop_collection</code> のキー照合（<code>in</code> / <code>.get()</code> / <code>[...]</code>）は、無効なソケットに一致しない。</strong> 一方で <code>for s in outputs</code> の<strong>反復は無効なソケットも拾う</strong></li></ol>
+<p>この2つが組み合わさると、<strong>「<code>in</code> が False なのに、一覧には載っている」</strong>という矛盾したエラーメッセージが出る。実際に EEVEE で手が止まった（<a href="T11-eevee-object-index.html">T11 ノート</a>）。
+<strong>見るべきは名前の一覧ではなく <code>sock.enabled</code>。</strong> エラー文にも <code>enabled</code> な出力だけを並べ、エンジン名を添える。</p>
+<h2 id="動かし方">動かし方<a class="hash" href="#動かし方" aria-label="このセクションへのリンク">#</a></h2>
+<pre><code class="lang-powershell">&amp; "C:\Program Files\Blender Foundation\Blender 5.0\blender.exe" --background data\synthetic_cup\cup.blend --python tools\blender_id_mask_check.py</code></pre>
+<pre><code class="lang-powershell">&amp; "C:\Program Files\Blender Foundation\Blender 5.0\blender.exe" --background data\synthetic_cup\cup.blend --python tools\blender_id_mask_check_multiobj.py</code></pre>
+<p><strong>期待する出力</strong>（Cycles・<code>data/synthetic_cup/cup.blend</code>・2026-10-15 時点）：</p>
+<div class="table-wrap"><table class="md"><thead><tr><th>スクリプト</th><th>出力</th></tr></thead><tbody><tr><td>単体版</td><td><code>ユニークな画素値: [0. 1.] ／ 種類数: 2</code></td></tr><tr><td>複数版</td><td>両方とも種類数 2、<code>重なり画素数: 0</code>、<code>2つのマスクは異なっています</code></td></tr></tbody></table></div>
+<p><strong>種類数が 2 より多ければ、まずステップ1.5 を疑う。</strong></p>
+<blockquote><p><strong>1枚あたり1分前後かかる</strong>（Cycles・CPU）。複数版はオブジェクトの数だけ焼くので、2物体で2分強。急ぐときは <code>scene.cycles.samples</code> を下げる（マスクは <code>samples=1</code> でも二値性は変わらない。<a href="T11-eevee-object-index.html#アルファ実測">T11 ノートのレンダー時間</a>参照）。</p></blockquote>
+<h2 id="別の-blend-で使うとき">別の <code>.blend</code> で使うとき<a class="hash" href="#別の-blend-で使うとき" aria-label="このセクションへのリンク">#</a></h2>
+<p><strong>書き換えるのは先頭の定数だけ</strong>で済むように作ってある。</p>
+<div class="table-wrap"><table class="md"><thead><tr><th>スクリプト</th><th>書き換える場所</th></tr></thead><tbody><tr><td>単体版</td><td><code>TARGET_OBJECT_NAME</code>（18〜20行目付近）。既定は <code>"円.001"</code></td></tr><tr><td>複数版</td><td><code>OBJECT_INDEXES</code> の辞書（15〜19行目付近）。既定は <code>{"円": 1, "円.001": 2}</code></td></tr></tbody></table></div>
+<p>オブジェクト名が分からなければ、<strong>わざと存在しない名前にして実行する</strong>とステップ0のエラーがシーン内の一覧を出してくれる。</p>
+<blockquote><p>⚠️ <strong>既定値は <code>data/synthetic_cup/cup.blend</code> の中身に合わせてある。</strong> この <code>.blend</code> は T07・T11 の検証に使った2物体（<code>円</code>・<code>円.001</code>）のファイルで、<a href="../tasks/T12-prepare-blend.html">T12</a> で作る Ceramic Pot の <code>cup.blend</code> とは<strong>別物</strong>。T12 は同じパスに Save As すると書いてあるので、<strong>上書きする前に退避すること</strong>（<code>data/</code> は <code>.gitignore</code> 済みで、消すと Git からは戻せない）。</p></blockquote>
+<h2 id="編集するときの注意powershell-で一括置換しない-">編集するときの注意：PowerShell で一括置換しない ⚠️<a class="hash" href="#編集するときの注意powershell-で一括置換しない-" aria-label="このセクションへのリンク">#</a></h2>
+<p><strong>Windows PowerShell 5.1 の <code>Get-Content</code> は、BOM なし UTF-8 を ANSI（cp932）として読む。</strong> この2本は日本語のコメントと文字列を含むので、次のような置換をすると<strong>ファイルが壊れる</strong>。</p>
+<pre><code class="lang-powershell"># やってはいけない
+(Get-Content tools\blender_id_mask_check.py) -replace '= "CYCLES"', '= "BLENDER_EEVEE"' | Set-Content -Encoding utf8 tools\blender_id_mask_check.py</code></pre>
+<p>実際にこれで壊した（2026-10-15）。症状は次のとおりで、<strong>置換した行とは無関係な場所で落ちる</strong>ので原因が分かりにくい。</p>
+<pre><code>File "...\blender_id_mask_check.py", line 24
+    f"繧ｪ繝悶ず繧ｧ繧ｯ繝・'{TARGET_OBJECT_NAME}' 縺瑚ｦ九▽縺九ｊ縺ｾ縺帙ｓ縲・
+SyntaxError: unterminated string literal</code></pre>
+<p><code>Set-Content -Encoding utf8</code> を付けても防げない。<strong>指定できているのは書き出し側だけで、読み込み側が ANSI のまま</strong>だからである。</p>
+<p><strong>Git Bash の <code>sed</code> を使う。</strong> バイト列をそのまま扱うので、ASCII のパターン置換は日本語部分に触らない。</p>
+<pre><code class="lang-bash">sed -i 's/= "CYCLES"/= "BLENDER_EEVEE"/' tools/blender_id_mask_check.py tools/blender_id_mask_check_multiobj.py</code></pre>
+<blockquote><p><strong>壊してしまったら <code>git restore</code>。</strong> ただし<strong>ステージしていない修正も一緒に消える</strong>ので、置換の前に <code>git add</code> しておくと「置換だけ捨てて修正は残す」ができる。</p></blockquote>
+<h2 id="エンジンを-eevee-に変えて試すとき">エンジンを EEVEE に変えて試すとき<a class="hash" href="#エンジンを-eevee-に変えて試すとき" aria-label="このセクションへのリンク">#</a></h2>
+<p><strong>非対応であることの再確認</strong>や、将来 Blender 側が対応したかの確認に使える手順。</p>
+<ol><li><code>git add tools/</code>（<strong>先にステージする。</strong> これを忘れると次の <code>git restore</code> で修正ごと消える）</li><li>上の <code>sed</code> で <code>"CYCLES"</code> → <code>"BLENDER_EEVEE"</code> に置換（2ファイルとも）</li><li>実行する。<strong>レンダリングまで行かず数秒で落ちるのが正解</strong>（ガードはレンダリングの手前にある）</li></ol>
+<pre><code>KeyError: "'Object Index' が使えません（存在=True / enabled=False）。
+エンジン BLENDER_EEVEE はこのパスに非対応の可能性があります。
+このエンジンで使える出力: ['Image', 'Alpha']"</code></pre>
+<ol><li><code>git restore tools/</code> で戻す。<code>git diff --stat</code>（空）と <code>git diff --cached --stat</code>（修正あり）で確認</li></ol>
+<p><strong><code>存在=True / enabled=False</code> が、EEVEE 非対応の証拠</strong>である。<code>use_pass_object_index = True</code> は EEVEE でもエラーにならず、読み戻すと <code>True</code> が返るので、<strong>属性の読み戻しは対応状況の判定に使えない。</strong></p>
+<h2 id="未解決気になっている点">未解決・気になっている点<a class="hash" href="#未解決気になっている点" aria-label="このセクションへのリンク">#</a></h2>
+<ul><li><strong><code>円</code> の白の割合が T07 当時と食い違う。</strong> T07 の記録は <code>6.380%</code>、2026-10-15 の実行は <code>8.144%</code>。<code>.blend</code> かカメラが当時から変わった可能性がある。<strong>方式の選定には影響しない</strong>が、<a href="../tasks/T13-blender-render.html">T13</a> でレンダリング条件を固定するときに一度合わせておきたい</li><li><strong>複数版は2オブジェクト前提。</strong> <code>main()</code> の最後が <code>masks</code> の先頭2つしか比較していない（<code>a, b = masks[names[0]], masks[names[1]]</code>）。3つ以上に増やすならここを総当たりにする必要がある</li></ul>
+<h2 id="関連ファイル">関連ファイル<a class="hash" href="#関連ファイル" aria-label="このセクションへのリンク">#</a></h2>
+<ul><li>4方式の比較表（判断材料本体）：<a href="mask-options.html">docs/notes/mask-options.md</a></li><li>Blender 5.0 の API 変更で踏んだ罠6件：<a href="T07-blender5-cli-troubleshooting.html">docs/notes/T07-blender5-cli-troubleshooting.md</a></li><li>EEVEE 非対応の切り分けと代替案の実測：<a href="T11-eevee-object-index.html">docs/notes/T11-eevee-object-index.md</a></li><li>スクリプト本体：tools/blender_id_mask_check.py ／ tools/blender_id_mask_check_multiobj.py</li></ul>
+  </main>
+</div>
+<footer class="foot">
+  <p>このページは <code>docs/notes/mask-check-scripts.md</code> から自動生成しています。編集は md 側で。</p>
+</footer>
+</body>
+</html>

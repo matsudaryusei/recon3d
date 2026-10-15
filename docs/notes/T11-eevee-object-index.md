@@ -165,7 +165,7 @@ mask = a >= 0.5                                   # しきい値は鈍感なの�
 
 - **「対応していない機能」は、エラーではなく黙った無効化として現れることがある。** `use_pass_object_index = True` は EEVEE でも通り、読み戻しても `True` が返る。**書けたこと・読み戻せたことは、効いていることの証明にならない。** 効いたかどうかは別の観測点（ここではソケットの `enabled`）で確かめる
 - **`bpy_prop_collection` のキー照合は無効な要素に一致しない。** `in` が `False` なのに `[o.name for o in ...]` には載る、という食い違いが起きる。存在チェックが矛盾した結果を返したら、まず**「無効な状態で存在している」**を疑う
-- **[T07 の学び](T07-blender5-cli-troubleshooting.md)「エラーメッセージに候補一覧を出させる」は、今回**半分だけ**効いた。** 一覧は出たが、`enabled` を出していなかったため「あるのに無い」で手が止まった。**一覧を出すときは、名前だけでなく「使えるかどうか」も併記する**と、次の人が1分で分かる。具体的には [blender_id_mask_check.py:68-72](../../tools/blender_id_mask_check.py#L68-L72) をこう直せる：
+- **[T07 の学び](T07-blender5-cli-troubleshooting.md)「エラーメッセージに候補一覧を出させる」は、今回**半分だけ**効いた。** 一覧は出たが、`enabled` を出していなかったため「あるのに無い」で手が止まった。**一覧を出すときは、名前だけでなく「使えるかどうか」も併記する**と、次の人が1分で分かる。**【2026-10-15 修正済み】** [blender_id_mask_check.py](../../tools/blender_id_mask_check.py) と [blender_id_mask_check_multiobj.py](../../tools/blender_id_mask_check_multiobj.py) の両方を下の形に差し替え、Cycles で従来どおり通ること・EEVEE で `存在=True / enabled=False` が出ることを実機で確認した。[T07 の学び](T07-blender5-cli-troubleshooting.md)の側もあわせて改訂してある：
 
   ```python
   sock = next((s for s in render_layers.outputs if s.name == "Object Index"), None)
@@ -186,5 +186,6 @@ mask = a >= 0.5                                   # しきい値は鈍感なの�
 
 - 判断材料本体（4方式の比較表・T07 の実機確認結果）：[docs/notes/mask-options.md](mask-options.md)
 - Blender 5.0 の API 変更で踏んだ罠6件：[docs/notes/T07-blender5-cli-troubleshooting.md](T07-blender5-cli-troubleshooting.md)
+- **スクリプト2本の読み方・直し方（備忘録）**：[docs/notes/mask-check-scripts.md](mask-check-scripts.md)
 - 検証対象のスクリプト：[tools/blender_id_mask_check.py](../../tools/blender_id_mask_check.py)
 - タスク手順書：[docs/tasks/T11-decide-mask-method.md](../tasks/T11-decide-mask-method.md)

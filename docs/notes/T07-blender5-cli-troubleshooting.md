@@ -18,11 +18,13 @@
 ## 学んだこと・次に活かせること
 
 - **エラーメッセージに「利用可能な選択肢一覧」を出させるとデバッグが速い。** ③・④はどちらも `KeyError` だったが、例外メッセージに `[o.name for o in render_layers.outputs]` を含めるようにしたことで、正しいソケット名 `Object Index` がすぐ分かった。以後もこのパターン（存在チェック→失敗したら候補一覧を出す）を使う
+  - **【2026-10-15 改訂】一覧は「名前」だけでなく「使えるかどうか」も併記する。** このパターンは後日 EEVEE で**半分しか効かなかった**。`"Object Index" not in outputs` が `True`（＝無い）なのに、一覧には `Object Index` が載る、という矛盾した文面になったためである。原因は、**無効なソケットが `enabled=False` のまま存在し続ける**一方で、**`bpy_prop_collection` のキー照合（`in` / `.get()` / `[...]`）は無効な要素に一致しない**こと（反復 `for s in outputs` は拾う）。**存在チェックは `in` ではなく `sock.enabled` で行い、一覧も `enabled` なものだけに絞り、エンジン名を添える。** 詳細は [T11-eevee-object-index.md](T11-eevee-object-index.md)、直したコードは [mask-check-scripts.md](mask-check-scripts.md) にある
 - **「二値になっているはず」を過信しない。** コンポジタのノード計算自体は正しく0/1を出していても、**保存パイプライン（色管理・ディザリング）側で値が変わる**ことがある。マスクのように「データ」として使う画像は、必ずレンダリング後に実際のPNGを読み込んで画素値を検証するところまでやる（今回は `numpy` でユニークな画素値を出力するようにした）
 - **GUIで動いた手順を、そのままCLIスクリプトに翻訳しても動くとは限らない。** GUI操作は裏で「再描画のたびに内部状態を同期する」処理が挟まるが、スクリプト一発実行ではその同期が起きないケースがある（③がまさにこれ）
 
 ## 関連ファイル
 
 - 判断材料本体：[docs/notes/mask-options.md](mask-options.md)
+- **スクリプト2本の読み方・直し方（備忘録）**：[docs/notes/mask-check-scripts.md](mask-check-scripts.md)
 - 単体オブジェクトの自動検証スクリプト：[tools/blender_id_mask_check.py](../../tools/blender_id_mask_check.py)
 - 2オブジェクト分離の自動検証スクリプト：[tools/blender_id_mask_check_multiobj.py](../../tools/blender_id_mask_check_multiobj.py)
