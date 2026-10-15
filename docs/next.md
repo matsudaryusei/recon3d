@@ -1,28 +1,17 @@
 # 次にやること
 
-> **迷ったらまずこのページです。** 下の [§1](#w02) の表から、空いているものを1つ取るだけです。
-> **W01 からの持ち越し（[T01](tasks/T01-pairpro1-io.md)〜[T10](tasks/T10-read-scope.md)）はすべて完了しました。** 一覧は [§5](#done) に移してあります。**いまの表は W02 から始まる実装作業です。**
+> **迷ったらまずこのページです。** いまどこ → すぐ下の「[いまここ](#now)」。やることの一覧 → [§1](#w02)。終わったもの → [§5](#done)。
 
-**いまの状況**（このブロックは、下の表の状態を書き換えるときに一緒に更新してください）
+<a id="now"></a>
+## いまここ（W02・実装フェーズ）
 
-**2026-09-23**
-**public 化の準備をしました**（[D-42](decisions.md#d-42)）。個人情報を含む `docs/internal/`・`blender_system/`・`Notice.md` を外し、ルートに公開用の `README.md` と `LICENSE`（MIT）を置きました。**対面でないときの連絡は、今後は GitHub の Issue で行います。**
-**[T09](tasks/T09-find-3d-model.md) が完了しました**（2026-09-23）。候補は [docs/notes/model-candidates.md](notes/model-candidates.md) に、主データ3件・副データ2件をまとめました（どれも CC0 か自作）。**推す案は、主データ（`synthetic_cup`）が Ceramic Pot、副データ（`synthetic_bunny`）が Food Lychee 01** です（どちらも Poly Haven・CC0）。副データはテクスチャが焼き込み済みなので、貼り足す必要はありません。[計画書 §14](plan.md#s14) の 8 番と [§16](plan.md#s16) の該当行は消し込み済みです。**これで [T01](tasks/T01-pairpro1-io.md)〜[T10](tasks/T10-read-scope.md) はすべて完了しました。**
-**[T10](tasks/T10-read-scope.md) が完了しました**（2026-09-23）。関口・松田の2人でスコープ（§3-8）と撤退ライン（§12）を読み合わせ、完了判定3問に回答（詳細は [決定記録 D-41](decisions.md#d-41)）。**public 化の時期を「今すぐ」に決定**（[D-27](decisions.md#d-27)・[D-40](decisions.md#d-40)⑤の「完成後」から前倒し）。[計画書 §16](plan.md#s16) の該当行は削除済み。**リポジトリの改名（[D-27](decisions.md#d-27)）と実際の公開設定はまだ未実施。**
+**W01 の持ち越し（[T01](tasks/T01-pairpro1-io.md)〜[T10](tasks/T10-read-scope.md)）はすべて完了。** いま動いているのは W02 の実装作業です（[計画書 §10 Phase 0](plan.md#s10)）。
 
-**2026-09-22**
-**[T08](tasks/T08-blender-entry-note.md) が完了しました**（2026-09-22）。動作確認用の `tools/hello_bpy.py` と、入口メモ `docs/notes/blender-entry.md` を追加。`blender -b -P tools/hello_bpy.py` で Blender 5.0.1 / Python 3.11.13 / numpy 1.26.4（計画書の前提と一致）を確認済み。PowerShellのエイリアス化（プロファイルへの追記・実行ポリシー `RemoteSigned` への変更が必要だった点）、相対パスがカレントディレクトリ基準で解決される点などを詰まった点として記録した。
+- **関口（Blender なし）**：いますぐ [T14 合成シーン生成器](tasks/T14-synthetic-scene.md) に着手できます（T11〜T13 と独立）。並行して、下の T11 の決定に参加してください。
+- **松田（Blender 端末）**：[T11](tasks/T11-decide-mask-method.md) の EEVEE 確認は完了（→ [EEVEE ノート](notes/T11-eevee-object-index.md)）。次は T11 の決定 → [T12](tasks/T12-prepare-blend.md)。
+- **いま詰まっている1点（2人で）**：[T11 マスク方式の決定（D-43）](tasks/T11-decide-mask-method.md)。**EEVEE では ID Mask が非対応**と分かったので、残る選択は **A（マスクだけ Cycles で焼く）か B（アルファ方式）か**。これは [T12](tasks/T12-prepare-blend.md) のシーン設計（被写体1つ／回転台・複数物体）と連動します（→ [EEVEE ノート](notes/T11-eevee-object-index.md)）。
 
-**2026-09-07 / W03**
-**[T06](tasks/T06-labels-and-board.md) が完了しました**（2026-09-07）。GitHub のラベル17個（`G1`〜`G9` ジャンル／`phase:0`〜`phase:4`／`pair`・`blocked`・`good-first-issue`）を登録し、既定ラベル（`duplicate` など）を整理。Projects ボード **`3D復元 開発ボード`**（`Todo` / `In Progress` / `In Review` / `Done` の4列）を作成しました。**T01〜T10 を Issue 10件**にしてジャンルのラベルを付与し、ボードの `Todo` に配置（完了済みの T01〜T05 は `Done` へ移動）。**これ以降、「誰が何を作業中か」の管理は GitHub Issue（Assignee＋`In Progress` 列）に移ります。この表は完了時に `✅` を付けるだけです**（下の「この表と GitHub Issue の使い分け」）。
-**[T05](tasks/T05-git-practice.md) が完了しました**（2026-09-07）。関口・松田とも branch → PR → レビュー → squash merge を1周（練習PR #8 ほか）。以降の本番作業は全員 PR 経由です。
-**[T04](tasks/T04-branch-protection.md) が完了しました**（2026-09-07）。GitHub の Ruleset `protect-main` で `main` への直 push を禁止し、PR 必須・`pytest (ubuntu-latest)` / `pytest (windows-latest)` のステータスチェック必須にしました。マージ方式も `Squash and merge` のみに統一済み。push が拒否されることの実地確認も完了（[D-22](decisions.md#d-22)）。
-**[T03](tasks/T03-ci-workflow.md) が完了しました**（2026-09-06・PR #6）。`.github/workflows/ci.yml` を追加し、**PR と `main` への push で Ubuntu と Windows の2環境の `uv run pytest`** が自動で回るようになりました。手順書どおり `astral-sh/setup-uv@v5` で通り、`@v3` への降格は不要。両環境とも緑・ログの `uv run python -V` は `Python 3.11.13`・`10 passed` を確認（[D-24](decisions.md#d-24)）。
-**[T02](tasks/T02-oral-decisions.md) が完了しました**（保留5件を確定）。最終成果物は `.blend`／撤退ラインは目標 L3 で認識合わせ済み／週の進め方は縛らず各自の空き時間で／メッシュ自作範囲は現行どおり／public 化の時期は [T10](tasks/T10-read-scope.md) 完了後に決める。詳細は [決定記録 D-40](decisions.md#d-40)。
-**[T01](tasks/T01-pairpro1-io.md) も完了済み**（2026-09-05・PR #4）。座標系規約・`cameras.json` 仕様・`io/coords.py`・`io/cameras.py`・`tests/test_conventions.py` が入り、`uv run pytest` は **10 passed**。
-**W01 の持ち越し（[T01](tasks/T01-pairpro1-io.md)〜[T10](tasks/T10-read-scope.md)）はすべて完了しました。**
-**他ジャンルの前提も外れているので、[§1 の W02 作業](#w02)（G1・G2・G3・G7）に着手できます。**
-→ 経緯は [README の現在地](README.md)、詰まった点と学びは `docs/notes/`。
+> **完了の履歴（各タスクで何をやったか）は [§5 の「完了メモ（経緯）」](#done)に集約しました。** 以前ここにあった長い更新ログもそちらです。
 
 ---
 
@@ -70,10 +59,8 @@
 
 > **✅ [T06](tasks/T06-labels-and-board.md) は 2026-09-07 に完了。いまは上の表（§1）の「T06 のあと」の運用です。**
 
-| 時期 | 「誰が何を作業中か」の正 | この表の役割 |
-|---|---|---|
-| ~~**[T06](tasks/T06-labels-and-board.md) が終わるまで**~~ | ~~**この表**。`🔄 作業中（名前）` と書く~~ | ~~唯一の管理表~~ |
-| **T06 のあと（＝いま）** | **GitHub Issue**（Assignee と `In Progress` 列） | **完了したものに `✅` を付けるだけ。着手中はここを触らない** |
+**いまの正（[T06](tasks/T06-labels-and-board.md) 完了後）**：「誰が何を作業中か」は **GitHub Issue**（Assignee と `In Progress` 列）が正です。**この表（§1）は、完了したものに `✅` を付けるだけ。着手中はここを触りません。**
+（T06 完了前は、この表に `🔄 作業中（名前）` と書く唯一の管理表でした。）
 
 **なぜ分けるか**：`main` は [T04](tasks/T04-branch-protection.md) で保護されるので、**この表を1行直すだけでも PR が要ります。**
 着手のたびに PR を出すのは重いので、**着手の記録は Issue に寄せ、この表はタスクの PR に混ぜて `✅` にする**運用にします。
@@ -158,3 +145,27 @@ git switch -c feat/<何をするか>   # 例: feat/ci-workflow
 | [T08](tasks/T08-blender-entry-note.md) | Blenderスクリプトの入口メモ（`tools/hello_bpy.py`・`docs/notes/blender-entry.md`）を作成し、CLI実行を実機確認 | ✅ 2026-09-22（#21） |
 | [T09](tasks/T09-find-3d-model.md) | 合成データ用3Dモデルの候補（`docs/notes/model-candidates.md`。主データ3件・副データ2件、すべて CC0 か自作）。推す案は主 Ceramic Pot・副 Food Lychee 01 | ✅ 2026-09-23 |
 | [T10](tasks/T10-read-scope.md) | スコープ（§3-8）・撤退ライン（§12）を2人で通読。完了判定3問に回答し、public 化の時期を「今すぐ」に決定（→ [D-41](decisions.md#d-41)） | ✅ 2026-09-23 |
+
+
+### 完了メモ（経緯）
+
+**各タスクで「何をやったか」の詳細です。** 以前はこのページのトップに「いまの状況」として置いていましたが、「次にやること」を見やすくするため下へ集約しました（記録自体は残します → [D-28](decisions.md#d-28)）。
+
+**2026-09-23**
+**public 化の準備をしました**（[D-42](decisions.md#d-42)）。個人情報を含む `docs/internal/`・`blender_system/`・`Notice.md` を外し、ルートに公開用の `README.md` と `LICENSE`（MIT）を置きました。**対面でないときの連絡は、今後は GitHub の Issue で行います。**
+**[T09](tasks/T09-find-3d-model.md) が完了しました**（2026-09-23）。候補は [docs/notes/model-candidates.md](notes/model-candidates.md) に、主データ3件・副データ2件をまとめました（どれも CC0 か自作）。**推す案は、主データ（`synthetic_cup`）が Ceramic Pot、副データ（`synthetic_bunny`）が Food Lychee 01** です（どちらも Poly Haven・CC0）。副データはテクスチャが焼き込み済みなので、貼り足す必要はありません。[計画書 §14](plan.md#s14) の 8 番と [§16](plan.md#s16) の該当行は消し込み済みです。**これで [T01](tasks/T01-pairpro1-io.md)〜[T10](tasks/T10-read-scope.md) はすべて完了しました。**
+**[T10](tasks/T10-read-scope.md) が完了しました**（2026-09-23）。関口・松田の2人でスコープ（§3-8）と撤退ライン（§12）を読み合わせ、完了判定3問に回答（詳細は [決定記録 D-41](decisions.md#d-41)）。**public 化の時期を「今すぐ」に決定**（[D-27](decisions.md#d-27)・[D-40](decisions.md#d-40)⑤の「完成後」から前倒し）。[計画書 §16](plan.md#s16) の該当行は削除済み。**リポジトリの改名（[D-27](decisions.md#d-27)）と実際の公開設定はまだ未実施。**
+
+**2026-09-22**
+**[T08](tasks/T08-blender-entry-note.md) が完了しました**（2026-09-22）。動作確認用の `tools/hello_bpy.py` と、入口メモ `docs/notes/blender-entry.md` を追加。`blender -b -P tools/hello_bpy.py` で Blender 5.0.1 / Python 3.11.13 / numpy 1.26.4（計画書の前提と一致）を確認済み。PowerShellのエイリアス化（プロファイルへの追記・実行ポリシー `RemoteSigned` への変更が必要だった点）、相対パスがカレントディレクトリ基準で解決される点などを詰まった点として記録した。
+
+**2026-09-07 / W03**
+**[T06](tasks/T06-labels-and-board.md) が完了しました**（2026-09-07）。GitHub のラベル17個（`G1`〜`G9` ジャンル／`phase:0`〜`phase:4`／`pair`・`blocked`・`good-first-issue`）を登録し、既定ラベル（`duplicate` など）を整理。Projects ボード **`3D復元 開発ボード`**（`Todo` / `In Progress` / `In Review` / `Done` の4列）を作成しました。**T01〜T10 を Issue 10件**にしてジャンルのラベルを付与し、ボードの `Todo` に配置（完了済みの T01〜T05 は `Done` へ移動）。**これ以降、「誰が何を作業中か」の管理は GitHub Issue（Assignee＋`In Progress` 列）に移ります。この表は完了時に `✅` を付けるだけです**（下の「この表と GitHub Issue の使い分け」）。
+**[T05](tasks/T05-git-practice.md) が完了しました**（2026-09-07）。関口・松田とも branch → PR → レビュー → squash merge を1周（練習PR #8 ほか）。以降の本番作業は全員 PR 経由です。
+**[T04](tasks/T04-branch-protection.md) が完了しました**（2026-09-07）。GitHub の Ruleset `protect-main` で `main` への直 push を禁止し、PR 必須・`pytest (ubuntu-latest)` / `pytest (windows-latest)` のステータスチェック必須にしました。マージ方式も `Squash and merge` のみに統一済み。push が拒否されることの実地確認も完了（[D-22](decisions.md#d-22)）。
+**[T03](tasks/T03-ci-workflow.md) が完了しました**（2026-09-06・PR #6）。`.github/workflows/ci.yml` を追加し、**PR と `main` への push で Ubuntu と Windows の2環境の `uv run pytest`** が自動で回るようになりました。手順書どおり `astral-sh/setup-uv@v5` で通り、`@v3` への降格は不要。両環境とも緑・ログの `uv run python -V` は `Python 3.11.13`・`10 passed` を確認（[D-24](decisions.md#d-24)）。
+**[T02](tasks/T02-oral-decisions.md) が完了しました**（保留5件を確定）。最終成果物は `.blend`／撤退ラインは目標 L3 で認識合わせ済み／週の進め方は縛らず各自の空き時間で／メッシュ自作範囲は現行どおり／public 化の時期は [T10](tasks/T10-read-scope.md) 完了後に決める。詳細は [決定記録 D-40](decisions.md#d-40)。
+**[T01](tasks/T01-pairpro1-io.md) も完了済み**（2026-09-05・PR #4）。座標系規約・`cameras.json` 仕様・`io/coords.py`・`io/cameras.py`・`tests/test_conventions.py` が入り、`uv run pytest` は **10 passed**。
+**W01 の持ち越し（[T01](tasks/T01-pairpro1-io.md)〜[T10](tasks/T10-read-scope.md)）はすべて完了しました。**
+**他ジャンルの前提も外れているので、[§1 の W02 作業](#w02)（G1・G2・G3・G7）に着手できます。**
+→ 経緯は [README の現在地](README.md)、詰まった点と学びは `docs/notes/`。
